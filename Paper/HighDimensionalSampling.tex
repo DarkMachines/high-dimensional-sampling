@@ -1,0 +1,79 @@
+\documentclass[12pt]{JHEP3}
+\bibliographystyle{JHEP}
+\usepackage{multicol}
+\usepackage[dvips]{epsfig,graphics}
+\usepackage{graphicx}
+\usepackage{cite}
+
+%% %%%%%%%%% Graphics macros %%%%%%%%%%%%%%
+ \newlength{\wth}
+ \setlength{\wth}{2.6in}
+
+\newcommand{\twographst}[2]{%
+ \unitlength=1.1in
+ \begin{picture}(5.8,2.6)(-0.15,0)
+ \put(0,0){\epsfig{file=#1, width=\wth}}
+ \put(2.7,0){\epsfig{file=#2, width=\wth}}
+ \end{picture}
+}
+
+\title{A comparison of sampling algorithms for particle astrophysics applications}
+\author{A. N. Author\\
+Institute Details}
+\abstract{We can }
+\keywords{Sampling, Dark Matter}
+\begin{document}
+\section{Introduction}
+
+\section{Algorithms}
+\subsection{Particle swarm optimization}
+\emph{Author: Pat Scott}
+
+\subsection{Bayesian Optimization}
+
+\emph{Author: Martin White}
+
+\subsection{CMA evolution}
+\emph{Author: Gulli Johannesson}
+
+\subsection{AVO (population)}
+\emph{Author: Joeri Hermans}
+
+\subsection{AMPGO}
+\emph{Author: Luc and Roberto} 
+
+\subsection{Active learning}
+\emph{Author: Bob Stienen}
+
+\subsection{pyBAMBI}
+
+\emph{Author: Will Handley}
+
+\subsection{Sequential Neural Likelihoods}
+\emph{Author: Barry Dillon}
+
+\subsection{Calibrated approximated likelihood ratios}
+
+\subsection{Metric Gaussian Variational Inference}
+\emph{Author: Jakob Knollmueller}
+
+\subsection{MCMC}
+
+\emph{Author: Martin White, Csaba Balazs (Great and TWalk).} 
+
+\section{Comparison on test functions}
+\subsection{Frequentist}
+\subsection{Bayesian}
+
+
+\section{Comparison on physical example}
+
+\subsection{Frequentist}
+\subsection{Bayesian}
+
+\section{Conclusions}\label{Conclusions}
+
+\section{Acknowledgements}
+
+\bibliography{HighDimensionalSampling}
+\end{document}
