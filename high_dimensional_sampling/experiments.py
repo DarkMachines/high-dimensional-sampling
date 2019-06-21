@@ -5,7 +5,7 @@ import yaml
 
 from .utils import get_time, get_datetime, create_unique_folder, benchmark_matrix_inverse, benchmark_sha_hashing
 from .methods import Sampler
-from .functions import FunctionCallCounter
+from .functions import TestFunction, FunctionCallCounter
 
 
 class SamplingExperiment:
@@ -17,7 +17,8 @@ class SamplingExperiment:
     
     def run(self, function, path, log_data=True, finish_line = None):
         # Test if function is a TestFunction instance
-        # TODO
+        if not isinstance(function, TestFunction):
+            raise Exception("Provided function should be an instance of a class derived from functions.TestFunction.")
         # Create logger, which automatically creates the logging location
         self.logger = SamplingLogger(path, (type(function).__name__).lower())
         # Log experiment
