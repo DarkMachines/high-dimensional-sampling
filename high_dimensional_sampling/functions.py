@@ -77,23 +77,18 @@ class TestFunction(metaclass=ABCMeta):
 class FunctionCallCounter:
     def __init__(self, function):
         self.function = function
-        self.evaluations = [0, 0]
-        self.time = [[], []]
+        self.counter_time = []
+        self.counter_derivatives = []
     
     def __call__(self, x, derivative):
-        # Determine logging location
-        index = 0
-        if derivative:
-            index = 1
-
         # Perform function call
         t_start = get_time()
         value = self.function(x, derivative)
         t_end = get_time()
 
         # Log count and dt
-        self.evaluations[index] += 1
-        self.time[index].append( t_end - t_start )
+        self.counter_time.append( t_end - t_start )
+        self.counter_derivatives.append(1*bool(derivative))
         return value
 
     def evaluate(self, x):
