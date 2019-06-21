@@ -1,7 +1,7 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 
 
-class Sampler(Metaclass=ABCMeta):
+class Sampler(ABC):
     @abstractmethod
     def __call__(self):
         raise NotImplementedError
