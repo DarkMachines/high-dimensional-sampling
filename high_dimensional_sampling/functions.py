@@ -126,4 +126,13 @@ class Ackley(TestFunction):
     
     def evaluate(self, x):
         return -20*np.exp(-0.2*np.sqrt(0.5*(x[:,0]**2, x[:,1]**2))) - np.exp(0.5*(np.cos(2*np.pi*x[:,0]) + np.cos(2*np.pi*x[:,1]))) + np.exp(1) + 20
-        
+
+
+class Easom(TestFunction):
+    def __init__(self):
+        self.is_differentiable = False
+        self.ranges = [[-100, 100]]*2
+        self.global_minimum = [np.pi, np.pi]
+    
+    def evaluate(self, x):
+        return -1*np.cos(x[:,0])*np.cos(x[:,1])*np.exp(-1*(np.power(x[:,0]-np.pi, 2) + np.power(x[:,1]-np.pi, 2)))
