@@ -7,8 +7,13 @@ from .utils import get_time
 
 class TestFunction(metaclass=ABCMeta):
     def __init__(self):
-        self.is_differentiable = False
-        self.ranges = []
+        if not hasattr(self, 'is_differentiable'):
+            self.is_differentiable = False
+        if not hasattr(self, 'ranges'):
+            self.ranges = []
+            raise Exception("TestFunction should define ranges.")
+        self.counter_time = []
+        self.counter_derivatives = []
 
     def __call__(self, x, derivative=False):
         # Check if testfunction is fully configured
@@ -18,14 +23,25 @@ class TestFunction(metaclass=ABCMeta):
         # Check if dimensionality and ranges of the input are correct
         self.check_dimensionality(x.shape)
         self.check_ranges(x)
+        # Check if function differentiability is compatible with request
+        self.check_differentiability(derivative)
+        # Start time for function call
+        t_start = get_time()
         # Return requested result(s)
         if not derivative:
-            return self.evaluate(x)
+            value = self.evaluate(x)
         else:
-            # Check if function differentiability is compatible with request
-            self.check_differentiability(derivative)
             # Return derivative if no error was raised by previous line
-            return self.derivative(x)
+            value = self.derivative(x)
+        # Store call and dt
+        self.counter_time.append(get_time() - t_start)
+        self.counter_derivatives.append(1*bool(derivative))
+        # Return value
+        return value
+
+    def reset(self):
+        self.evaluations = [0, 0]
+        self.time = [[], []]
 
     def check_configuration(self):
         # Check if is_differentiable is known
@@ -74,34 +90,6 @@ class TestFunction(metaclass=ABCMeta):
         pass
 
 
-class FunctionCallCounter:
-    def __init__(self, function):
-        self.function = function
-        self.counter_time = []
-        self.counter_derivatives = []
-    
-    def __call__(self, x, derivative):
-        # Perform function call
-        t_start = get_time()
-        value = self.function(x, derivative)
-        t_end = get_time()
-
-        # Log count and dt
-        self.counter_time.append( t_end - t_start )
-        self.counter_derivatives.append(1*bool(derivative))
-        return value
-
-    def evaluate(self, x):
-        return self(x, False)
-    
-    def derivative(self, x):
-        return self(x, True)
-    
-    def reset(self):
-        self.evaluations = [0, 0]
-        self.time = [[], []]
-
-
 class NoDerivativeError(Exception):
     pass
 
@@ -109,8 +97,10 @@ class NoDerivativeError(Exception):
 class Sphere(TestFunction):
     def __init__(self, dimensionality=3):
         self.is_differentiable = True
-        self.ranges = [[-np.inf, np.inf]]*dimensionality
-        self.global_minimum = [0]*dimensionality
+        self.ranges = []
+        for _ in range(dimensionality):
+            self.ranges.append([-np.inf, np.inf])
+        super(Sphere, self).__init__()
 
     def evaluate(self, x):
         return np.sum(np.power(x, 2), axis=1)
@@ -121,8 +111,8 @@ class Sphere(TestFunction):
 class Ackley(TestFunction):
     def __init__(self):
         self.is_differentiable = False
-        self.ranges = [[-5, 5]]*2
-        self.global_minimum = [0,0]
+        self.ranges = [[-5, 5], [-5, 5]]
+        super(Ackley, self).__init__()
     
     def evaluate(self, x):
         return -20*np.exp(-0.2*np.sqrt(0.5*(x[:,0]**2, x[:,1]**2))) - np.exp(0.5*(np.cos(2*np.pi*x[:,0]) + np.cos(2*np.pi*x[:,1]))) + np.exp(1) + 20
@@ -131,8 +121,8 @@ class Ackley(TestFunction):
 class Easom(TestFunction):
     def __init__(self):
         self.is_differentiable = False
-        self.ranges = [[-100, 100]]*2
-        self.global_minimum = [np.pi, np.pi]
+        self.ranges = [[-100, 100], [-100, 100]]
+        super(Easom, self).__init__()
     
     def evaluate(self, x):
         return -1*np.cos(x[:,0])*np.cos(x[:,1])*np.exp(-1*(np.power(x[:,0]-np.pi, 2) + np.power(x[:,1]-np.pi, 2)))
