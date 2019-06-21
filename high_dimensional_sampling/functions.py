@@ -106,32 +106,24 @@ class NoDerivativeError(Exception):
     pass
 
 
-class Sine(TestFunction):
+class Sphere(TestFunction):
+    def __init__(self, dimensionality=3):
+        self.is_differentiable = True
+        self.ranges = [[-np.inf, np.inf]]*dimensionality
+        self.global_minimum = [0]*dimensionality
+
+    def evaluate(self, x):
+        return np.sum(np.power(x, 2), axis=1)
+    
+    def derivative(self, x):
+        return 2*x
+
+class Ackley(TestFunction):
     def __init__(self):
-        self.is_differentiable = True
-        self.ranges = [[-np.inf, np.inf]]
-
-    def evaluate(self, x):
-        return np.sin(x)
-    
-    def derivative(self, x):
-        return np.cos(x)
-
-
-"""
-class MexicanHat(TestFunction):
-    def __init__(self, fourth_order=2, second_order=-2):
-        self.is_differentiable = True
-        self.dimensionality = 2
-        self.ranges = [[-10,10], [-10,10]]
-        self.fourth_order = fourth_order
-        self.second_order = second_order
+        self.is_differentiable = False
+        self.ranges = [[-5, 5]]*2
+        self.global_minimum = [0,0]
     
     def evaluate(self, x):
-        r = np.linalg.norm(x, axis=1)
-        return self.fourth_order * np.power(r, 4) + self.second_order * np.power(r, 2)
-    
-    def derivative(self, x):
-        r = np.linalg.norm(x, axis=1)
-        return 4 * self.fourth_order * np.power(r, 3) + 2 * self.second_order * r
-"""
+        return -20*np.exp(-0.2*np.sqrt(0.5*(x[:,0]**2, x[:,1]**2))) - np.exp(0.5*(np.cos(2*np.pi*x[:,0]) + np.cos(2*np.pi*x[:,1]))) + np.exp(1) + 20
+        
