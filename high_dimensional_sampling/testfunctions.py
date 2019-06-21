@@ -2,8 +2,14 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 import pandas as pd
 
+from .utils import get_time
+
 
 class TestFunction(metaclass=ABCMeta):
+    def __init__(self):
+        self.is_differentiable = False
+        self.ranges = []
+
     def __call__(self, x, derivative=False):
         # Check if testfunction is fully configured
         self.check_configuration()
@@ -12,12 +18,13 @@ class TestFunction(metaclass=ABCMeta):
         # Check if dimensionality and ranges of the input are correct
         self.check_dimensionality(x.shape)
         self.check_ranges(x)
-        # Check if function differentiability is compatible with request
-        self.check_differentiability(derivative)
         # Return requested result(s)
         if not derivative:
             return self.evaluate(x)
         else:
+            # Check if function differentiability is compatible with request
+            self.check_differentiability(derivative)
+            # Return derivative if no error was raised by previous line
             return self.derivative(x)
 
     def check_configuration(self):
@@ -47,9 +54,8 @@ class TestFunction(metaclass=ABCMeta):
             raise Exception("Data does not fall within expected ranges: {}".format(self.ranges))
     
     def check_differentiability(self, derivative):
-        if derivative:
-            if not self.is_differentiable:
-                raise Exception("Derivative could not be calculated: function is not differentiable.")
+        if derivative and not self.is_differentiable:
+            raise Exception("Derivative could not be calculated: function is not differentiable.")
 
     def to_numpy_array(self, x):
         if isinstance(x, np.ndarray):
@@ -68,17 +74,41 @@ class TestFunction(metaclass=ABCMeta):
         pass
 
 
-class FunctionWrapper:
+class FunctionCallCounter:
     def __init__(self, function):
         self.function = function
         self.evaluations = [0, 0]
         self.time = [[], []]
+    
+    def __call__(self, x, derivative):
+        # Determine logging location
+        index = 0
+        if derivative:
+            index = 1
+
+        # Perform function call
+        t_start = get_time()
+        value = self.function(x, derivative)
+        t_end = get_time()
+
+        # Log count and dt
+        self.evaluations[index] += 1
+        self.time[index].append( t_end - t_start )
+        return value
 
     def evaluate(self, x):
-        raise NotImplementedError
+        return self(x, False)
     
     def derivative(self, x):
-        raise NotImplementedError
+        return self(x, True)
+    
+    def reset(self):
+        self.evaluations = [0, 0]
+        self.time = [[], []]
+
+
+class NoDerivativeError(Exception):
+    pass
 
 
 class Sine(TestFunction):
