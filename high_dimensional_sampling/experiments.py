@@ -2,30 +2,31 @@ import os
 import getpass
 import pandas as pd
 import yaml
+import copy
 
 from .utils import get_time, get_datetime, create_unique_folder, benchmark_matrix_inverse, benchmark_sha_hashing
 from .methods import Sampler
-from .functions import TestFunction, FunctionCallCounter
+from .functions import TestFunction
 
 
 class SamplingExperiment:
-    def __init__(self, method=None, location=None, overwrite=False):
+    def __init__(self, method=None, path=None):
         if not isinstance(method, Sampler):
             raise Exception("SamplingExperiments should be provided an instance of a class derived from the methods.Sampler class.")
+        self.path = path
         self.method = method
         self.logger = None
     
-    def run(self, function, path, log_data=True, finish_line = None):
+    def run(self, function, log_data=True, finish_line=None):
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
             raise Exception("Provided function should be an instance of a class derived from functions.TestFunction.")
         # Create logger, which automatically creates the logging location
-        self.logger = SamplingLogger(path, (type(function).__name__).lower())
+        self.logger = SamplingLogger(self.path, (type(function).__name__).lower())
         # Log experiment
         self.logger.log_experiment(self, function)
-        # Store testfunction with a FunctionCallCounter wrapped around it for
-        # logging purposes
-        self.function = FunctionCallCounter(function)
+        # Store testfunction
+        self.function = function
         # Initialise method and get first queries
         self.method.function = self.function
         # Perform sampling as long as procedure is not finished
@@ -35,7 +36,7 @@ class SamplingExperiment:
             self.logger.method_calls += 1
             # As long as the experiment is not finished, sample data
             t_start = get_time()
-            data = self.method.sample()
+            data = self.method(self.function)
             dt = get_time() - t_start
             # Log method call
             N = len(data)
@@ -67,16 +68,13 @@ class SamplingLogger:
 
     def create_handles(self):
         self.handle_samples = open(self.path + os.sep + "samples.csv", "w")
-        self.handle_method_calls = open(self.path + os.sep + "methodcalls.csv", "w")
-        self.handle_function_calls = open(self.path + os.sep + "functioncalls.csv", "w")
-        self.handle_experiment = open(self.path + os.sep + "experiment.csv", "w")
-    
+        
     def close_handles(self):
         # Close all handles of the files, after looking if they exist
-        handles = ["samples", "method_calls", "function_calls", "experiment"]
+        handles = ["samples"]
         for handle in handles:
-            if hasattr(self, handle):
-                getattr(self, handle).close()        
+            if hasattr(self, 'handle_'+handle):
+                getattr(self, 'handle_'+handle).close()        
 
     def reset(self):
         self.close_handles()
@@ -86,41 +84,48 @@ class SamplingLogger:
         n_datapoints = len(x)
         points = x.astype(str).tolist()
         for i in range(n_datapoints):
-            line = [self.method_calls].extend(points[i])
+            line = [str(self.method_calls)]
+            line.extend(points[i])
             self.handle_samples.write(','.join(line) + "\n")
     
     def log_method_calls(self, dt, size_total, size_generated):
-        line = [dt, size_total, size_generated]
-        self.handle_method_calls.write(','.join(line) + "\n")
+        with open(self.path + os.sep + "methodcalls.csv", "w") as handle:
+            line = [str(dt), str(int(size_total)), str(int(size_generated))]
+            handle.write(','.join(line) + "\n")
 
     def log_function_calls(self, function):
-        for time, derivative in zip(function.counter_time, function.counter_derivatives):
-            line = [self.method_calls, time, derivative]
-            self.handle_function_calls(','.join(line) + "\n")
+        with open(self.path + os.sep + "functioncalls.csv", "w") as handle:
+            for time, derivative in zip(function.counter_time, function.counter_derivatives):
+                line = [self.method_calls, time, derivative]
+                handle.write(','.join(line) + "\n")
 
     def log_hardware(self):
         raise NotImplementedError
 
     def log_experiment(self, experiment, function):
-        info = {}
-        # Get meta data of experiment
-        info['meta'] = {
-            'timestamp': get_datetime(),
-            'user': getpass.getuser(),
-            'benchmark': {
-                'matrix_inversion': benchmark_matrix_inverse(),
-                'sha_hashing': benchmark_sha_hashing()
-            } 
-        }
-        # Get properties of function
-        info['function'] = {
-            'name': type(function).__name__,
-            'properties': vars(function)
-        }
-        # Get properties of experiment
-        info['experiment'] = {
-            'name': type(experiment).__name__,
-            'properties': vars(experiment)
-        }
-        # Convert information to yaml and write to file
-        yaml.dump(info, self.handle_experiment, default_flow_style=False)
+        with open(self.path + os.sep + "experiment.yaml", "w") as handle:
+            info = {}
+            # Get meta data of experiment
+            info['meta'] = {
+                'datetime': str(get_datetime()),
+                'timestamp': str(get_time()),
+                'user': getpass.getuser(),
+                'benchmark': {
+                    'matrix_inversion': benchmark_matrix_inverse(),
+                    'sha_hashing': benchmark_sha_hashing()
+                } 
+            }
+            # Get properties of function
+            info['function'] = {
+                'name': type(function).__name__,
+                'properties': copy.copy(vars(function))
+            }
+            del(info['function']['properties']['counter_time'])
+            del(info['function']['properties']['counter_derivatives'])
+            # Get properties of experiment
+            info['method'] = {
+                'name': type(experiment.method).__name__,
+                'properties': vars(experiment.method)
+            }
+            # Convert information to yaml and write to file
+            yaml.dump(info, handle, default_flow_style=False)
