@@ -41,7 +41,7 @@ def benchmark_matrix_inverse():
 def benchmark_sha_hashing():
     t_start = get_time()
     s = b'Let\'s hash some stuff'
-    for i in range(1000000):
+    for _ in range(1000000):
         o = hashlib.sha1(s)
         s = bytes(o.hexdigest(), 'utf-8')
     return get_time() - t_start
