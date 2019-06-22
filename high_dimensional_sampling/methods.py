@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Sampler(ABC):
+class Method(ABC):
     @abstractmethod
     def __init__(self):
         self.store_parameters = []

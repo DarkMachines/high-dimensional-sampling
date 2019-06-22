@@ -5,7 +5,7 @@ import numpy as np
 
 # TODO: Add documentation
 
-class RandomSampling(methods.Sampler):
+class RandomSampling(methods.Method):
     def __init__(self):
         self.store_parameters = []
 
