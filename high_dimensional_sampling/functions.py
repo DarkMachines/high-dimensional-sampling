@@ -20,8 +20,6 @@ class TestFunction(ABC):
         Exception: Testfunction should define ranges.
     """
     def __init__(self):
-        if not hasattr(self, 'is_differentiable'):
-            self.is_differentiable = False
         if not hasattr(self, 'ranges'):
             self.ranges = []
             raise Exception("TestFunction should define ranges.")
@@ -83,17 +81,13 @@ class TestFunction(ABC):
 
         As this class is an abstract base class, we want to make sure that the
         derived class is configured correctly. This method performs sanity
-        checks to make us sure of this. It checks if the function has defined
-        whether or not it has a known derivative and if the ranges to sample
-        are specified. If either of these checks fails, an Exception is raised.
+        checks to make us sure of this. It checks if the ranges to sample are
+        specified. If either of these checks fails, an Exception is raised.
 
         Raises:
             Exception: The testfunction has unknown differentiability.
             Exception: Testfunction has unknown ranges.
         """
-        # Check if is_differentiable is known
-        if not hasattr(self, "is_differentiable"):
-            raise Exception("The testfunction has unknown differentiability.")
         # Check if ranges are known
         if not hasattr(self, "ranges"):
             raise Exception("Testfunction has unknown ranges.")
@@ -217,7 +211,6 @@ class Sphere(TestFunction):
         y' = 2*x
     """
     def __init__(self, dimensionality=3):
-        self.is_differentiable = True
         self.ranges = []
         for _ in range(dimensionality):
             self.ranges.append([-np.inf, np.inf])
@@ -237,7 +230,6 @@ class Ackley(TestFunction):
     No derivative has been implemented.
     """
     def __init__(self):
-        self.is_differentiable = False
         self.ranges = [[-5, 5], [-5, 5]]
         super(Ackley, self).__init__()
     
@@ -261,7 +253,6 @@ class Easom(TestFunction):
     No derivative has been implemented.
     """
     def __init__(self):
-        self.is_differentiable = False
         self.ranges = [[-100, 100], [-100, 100]]
         super(Easom, self).__init__()
     

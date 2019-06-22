@@ -52,7 +52,6 @@ def create_unique_folder(path, prefered):
             # Folder already exists, append _# to the name and try again
             i += 1
             folder_path = path + os.sep + prefered + '_' + str(i)
-    # Return path to created folder
     return folder_path
         
 def benchmark_matrix_inverse():
