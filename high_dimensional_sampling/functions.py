@@ -115,7 +115,14 @@ class Ackley(TestFunction):
         super(Ackley, self).__init__()
     
     def evaluate(self, x):
-        return -20*np.exp(-0.2*np.sqrt(0.5*(x[:,0]**2, x[:,1]**2))) - np.exp(0.5*(np.cos(2*np.pi*x[:,0]) + np.cos(2*np.pi*x[:,1]))) + np.exp(1) + 20
+        a = -20*np.exp(-0.2*np.sqrt(0.5*(np.power(x[:,0],2) + np.power(x[:,1],2))))
+        f = np.cos(2*np.pi*x[:,0])
+        g = np.cos(2*np.pi*x[:,1])
+        b = - np.exp(0.5*(f+g))
+        return a + b + np.exp(1) + 20
+    
+    def derivative(self, x):
+        raise NoDerivativeError()
 
 
 class Easom(TestFunction):
@@ -126,3 +133,6 @@ class Easom(TestFunction):
     
     def evaluate(self, x):
         return -1*np.cos(x[:,0])*np.cos(x[:,1])*np.exp(-1*(np.power(x[:,0]-np.pi, 2) + np.power(x[:,1]-np.pi, 2)))
+    
+    def derivative(self, x):
+        raise NoDerivativeError()
