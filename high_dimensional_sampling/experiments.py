@@ -120,8 +120,8 @@ class Logger:
                 'timestamp': str(get_time()),
                 'user': getpass.getuser(),
                 'benchmark': {
-                    'matrix_inversion': 0,#benchmark_matrix_inverse(),
-                    'sha_hashing': 0#benchmark_sha_hashing()
+                    'matrix_inversion': benchmark_matrix_inverse(),
+                    'sha_hashing': benchmark_sha_hashing()
                 } 
             }
             # Get properties of function
