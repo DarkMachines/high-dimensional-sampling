@@ -69,7 +69,9 @@ class Logger:
     def create_handles(self):
         self.handle_samples = open(self.path + os.sep + "samples.csv", "w")
         self.handle_functioncalls = open(self.path + os.sep + "functioncalls.csv", "w")
+        self.handle_functioncalls.write('method_call_id,dt,asked_for_derivative\n')
         self.handle_methodcalls = open(self.path + os.sep + "methodcalls.csv", "w")
+        self.handle_methodcalls.write('method_call_id,dt,total_dataset_size,new_data_generated\n')
         
     def close_handles(self):
         # Close all handles of the files, after looking if they exist
@@ -83,17 +85,23 @@ class Logger:
         self.method_calls = 0
 
     def log_samples(self, X, y):
+        # Create header
+        if self.method_calls == 1:
+            header = ['method_call_id']
+            header += ['x'+str(i) for i in range(len(X[0]))]
+            header += ['y'+str(i) for i in range(len(y[0]))]
+            self.handle_samples.write(",".join(header)+"\n")
         n_datapoints = len(X)
         points = X.astype(str).tolist()
         labels = y.astype(str).tolist()
         for i in range(n_datapoints):
             line = [str(self.method_calls)]
             line += points[i]
-            line += [labels[i]]
+            line += labels[i]
             self.handle_samples.write(','.join(line) + "\n")
     
     def log_method_calls(self, dt, size_total, size_generated):
-        line = [dt, int(size_total), int(size_generated)]
+        line = [int(self.method_calls), dt, int(size_total), int(size_generated)]
         line = list(map(str, line))
         self.handle_methodcalls.write(','.join(line) + "\n")
 

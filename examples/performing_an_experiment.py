@@ -3,7 +3,6 @@ from high_dimensional_sampling import functions
 from high_dimensional_sampling import experiments
 import numpy as np
 
-# TODO: Add header to csv file
 # TODO: Add documentation
 
 class RandomSampling(methods.Sampler):
@@ -12,7 +11,7 @@ class RandomSampling(methods.Sampler):
 
     def __call__(self, function):
         X = np.random.rand(10, len(function.ranges))
-        y = function(X)
+        y = function(X).reshape(-1,1)
         return (X,y)
     
     def is_finished(self):
