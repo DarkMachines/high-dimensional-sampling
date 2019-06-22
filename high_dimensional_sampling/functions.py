@@ -59,10 +59,10 @@ class TestFunction(ABC):
         t_start = get_time()
         # Return requested result(s)
         if not derivative:
-            value = self.evaluate(x)
+            value = self._evaluate(x)
         else:
             # Return derivative if no error was raised by previous line
-            value = self.derivative(x)
+            value = self._derivative(x)
         # Store call and dt
         self.counter_time.append(get_time() - t_start)
         self.counter_derivatives.append(1*bool(derivative))
@@ -157,7 +157,7 @@ class TestFunction(ABC):
             return x.values()
 
     @abstractmethod
-    def evaluate(self, x):
+    def _evaluate(self, x):
         """
         Queries the testfunction for a function evaluation.
 
@@ -175,7 +175,7 @@ class TestFunction(ABC):
         pass
     
     @abstractmethod
-    def derivative(self, x):
+    def _derivative(self, x):
         """
         Queries the testfunction for its derivative at the provided point(s).
         
@@ -222,10 +222,10 @@ class Sphere(TestFunction):
             self.ranges.append([-np.inf, np.inf])
         super(Sphere, self).__init__()
 
-    def evaluate(self, x):
+    def _evaluate(self, x):
         return np.sum(np.power(x, 2), axis=1)
     
-    def derivative(self, x):
+    def _derivative(self, x):
         return 2*x
 
 class Ackley(TestFunction):
@@ -240,14 +240,14 @@ class Ackley(TestFunction):
         self.ranges = [[-5, 5], [-5, 5]]
         super(Ackley, self).__init__()
     
-    def evaluate(self, x):
+    def _evaluate(self, x):
         a = -20*np.exp(-0.2*np.sqrt(0.5*(np.power(x[:,0],2) + np.power(x[:,1],2))))
         f = np.cos(2*np.pi*x[:,0])
         g = np.cos(2*np.pi*x[:,1])
         b = - np.exp(0.5*(f+g))
         return a + b + np.exp(1) + 20
     
-    def derivative(self, x):
+    def _derivative(self, x):
         raise NoDerivativeError()
 
 
@@ -263,10 +263,10 @@ class Easom(TestFunction):
         self.ranges = [[-100, 100], [-100, 100]]
         super(Easom, self).__init__()
     
-    def evaluate(self, x):
+    def _evaluate(self, x):
         return (-1 * np.cos(x[:,0]) * np.cos(x[:,1])
                 * np.exp(-1*(np.power(x[:,0]-np.pi, 2)
                 + np.power(x[:,1]-np.pi, 2))))
     
-    def derivative(self, x):
+    def _derivative(self, x):
         raise NoDerivativeError()

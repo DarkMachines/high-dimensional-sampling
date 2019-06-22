@@ -2,6 +2,7 @@ import high_dimensional_sampling as hds
 import numpy as np
 
 # TODO: Add documentation
+# TODO: track function evaluations explicitely in order to take multiple data queries in one go into account
 
 class RandomSampling(hds.Method):
     def __init__(self):
