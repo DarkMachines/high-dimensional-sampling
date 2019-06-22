@@ -25,8 +25,7 @@ class TestFunction(ABC):
         if not hasattr(self, 'ranges'):
             self.ranges = []
             raise Exception("TestFunction should define ranges.")
-        self.counter_time = []
-        self.counter_derivatives = []
+        self.counter = []
 
     def __call__(self, x, derivative=False):
         """
@@ -64,17 +63,19 @@ class TestFunction(ABC):
             # Return derivative if no error was raised by previous line
             value = self._derivative(x)
         # Store call and dt
-        self.counter_time.append(get_time() - t_start)
-        self.counter_derivatives.append(1*bool(derivative))
+        self.counter.append([
+            len(x),
+            get_time() - t_start,
+            bool(derivative)
+        ])
         # Return value
         return value
 
     def reset(self):
         """
-        Resets the internal counters of queries
+        Resets the internal counter of queries
         """
-        self.counter_time = []
-        self.counter_derivatives = []
+        self.counter = []
 
     def check_configuration(self):
         """
@@ -241,7 +242,8 @@ class Ackley(TestFunction):
         super(Ackley, self).__init__()
     
     def _evaluate(self, x):
-        a = -20*np.exp(-0.2*np.sqrt(0.5*(np.power(x[:,0],2) + np.power(x[:,1],2))))
+        a = -20 * np.exp(-0.2 * np.sqrt(0.5 *
+            (np.power(x[:,0],2) + np.power(x[:,1],2))))
         f = np.cos(2*np.pi*x[:,0])
         g = np.cos(2*np.pi*x[:,1])
         b = - np.exp(0.5*(f+g))

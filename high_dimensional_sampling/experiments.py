@@ -69,7 +69,7 @@ class Logger:
     def create_handles(self):
         self.handle_samples = open(self.path + os.sep + "samples.csv", "w")
         self.handle_functioncalls = open(self.path + os.sep + "functioncalls.csv", "w")
-        self.handle_functioncalls.write('method_call_id,dt,asked_for_derivative\n')
+        self.handle_functioncalls.write('method_call_id,n_queried,dt,asked_for_derivative\n')
         self.handle_methodcalls = open(self.path + os.sep + "methodcalls.csv", "w")
         self.handle_methodcalls.write('method_call_id,dt,total_dataset_size,new_data_generated\n')
         
@@ -106,8 +106,8 @@ class Logger:
         self.handle_methodcalls.write(','.join(line) + "\n")
 
     def log_function_calls(self, function):
-        for time, derivative in zip(function.counter_time, function.counter_derivatives):
-            line = [int(self.method_calls), float(time), bool(derivative)]
+        for entry in function.counter:
+            line = [int(self.method_calls), int(entry[0]), float(entry[1]), bool(entry[2])]
             line = list(map(str, line))
             self.handle_functioncalls.write(','.join(line) + "\n")
 
@@ -129,8 +129,7 @@ class Logger:
                 'name': type(function).__name__,
                 'properties': copy.copy(vars(function))
             }
-            del(info['function']['properties']['counter_time'])
-            del(info['function']['properties']['counter_derivatives'])
+            del(info['function']['properties']['counter'])
             # Get properties of experiment
             info['method'] = {
                 'name': type(experiment.method).__name__,
