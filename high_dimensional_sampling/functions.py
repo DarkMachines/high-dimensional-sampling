@@ -118,20 +118,20 @@ class TestFunction(ABC):
         if dim_data != dim:
             raise Exception("Provided data has dimensionality {}, but {} was expected".format(dim_data, dim))
     
-    def check_ranges(self, X):
+    def check_ranges(self, x):
         """
         Checks if the input data lies within the ranges expected by the
         defined testfunction. If not, an Exception is raised.
 
         Args:
-            X: numpy.ndarray of shape (nDatapoints, nVariables) containing the
+            x: numpy.ndarray of shape (nDatapoints, nVariables) containing the
                 data to query the testfunction for.
         
         Raises:
             Exception: Data does not fall withing the expected ranges: ?.
         """
         # Transform data
-        d = X - self.ranges[:,0]
+        d = x - self.ranges[:,0]
         d = d / (self.ranges[:,1] - self.ranges[:,0])
         # Check if any entry smaller than 0 exists
         if np.any(d < 0.0) or np.any(d > 1.0):
