@@ -63,20 +63,18 @@ class Experiment:
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
             raise Exception("Provided function should have functions.TestFunction as base class.")
-        # Create logger, which automatically creates the logging location
+        # Setup logger
         self.logger = Logger(self.path, (type(function).__name__).lower())
-        # Log experiment
         self.logger.log_experiment(self, function)
-        # Store testfunction
+        # Make function available both to the Experiment and the Method
         self.function = function
-        # Initialise method and get first queries
         self.method.function = self.function
         # Perform sampling as long as procedure is not finished
         is_finished = False
         self.N_sampled = 0
         while not is_finished:
             self.logger.method_calls += 1
-            # As long as the experiment is not finished, sample data
+            # Perform an method iteration and keep track of time elapsed
             t_start = get_time()
             X, y = self.method(self.function)
             dt = get_time() - t_start
@@ -84,15 +82,16 @@ class Experiment:
             N = len(X)
             self.N_sampled += N
             self.logger.log_method_calls(dt, self.N_sampled, N)
-            # Log data
+            # Log sampled data
             if log_data:
                 self.logger.log_samples(X, y)
-            # Log function calls and reset counter
+            # Log function calls and reset the counter
             self.logger.log_function_calls(self.function)
             self.function.reset()
-            # Update is_finished conditional
+            # Check if the experiment has to stop and update the while
+            # condition to control this.
             is_finished = self.method.is_finished()
-            if isinstance(finish_line, int):
+            if isinstance(finish_line, int) or isinstance(finish_line, float):
                 is_finished = is_finished or (self.N_sampled >= finish_line)
         # Delete the logger to close all handles
         del(self.logger)
