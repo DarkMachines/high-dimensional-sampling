@@ -1,11 +1,9 @@
-from high_dimensional_sampling import methods
-from high_dimensional_sampling import functions
-from high_dimensional_sampling import experiments
+import high_dimensional_sampling as hds
 import numpy as np
 
 # TODO: Add documentation
 
-class RandomSampling(methods.Method):
+class RandomSampling(hds.Method):
     def __init__(self):
         self.store_parameters = []
 
@@ -18,7 +16,7 @@ class RandomSampling(methods.Method):
         return False
 
 method = RandomSampling()
-function = functions.Easom()
-experiment = experiments.Experiment(method, '/Users/bstienen/Desktop/hds')
+function = hds.Easom()
+experiment = hds.Experiment(method, '/Users/bstienen/Desktop/hds')
 
 experiment.run(function, finish_line=1000)
