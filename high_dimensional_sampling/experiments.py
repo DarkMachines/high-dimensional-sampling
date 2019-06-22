@@ -36,15 +36,15 @@ class SamplingExperiment:
             self.logger.method_calls += 1
             # As long as the experiment is not finished, sample data
             t_start = get_time()
-            data = self.method(self.function)
+            X, y = self.method(self.function)
             dt = get_time() - t_start
             # Log method call
-            N = len(data)
+            N = len(X)
             self.N_sampled += N
             self.logger.log_method_calls(dt, self.N_sampled, N)
             # Log data
             if log_data:
-                self.logger.log_samples(data)
+                self.logger.log_samples(X, y)
             # Log function calls and reset counter
             self.logger.log_function_calls(self.function)
             self.function.reset()
@@ -68,10 +68,12 @@ class SamplingLogger:
 
     def create_handles(self):
         self.handle_samples = open(self.path + os.sep + "samples.csv", "w")
+        self.handle_functioncalls = open(self.path + os.sep + "functioncalls.csv", "w")
+        self.handle_methodcalls = open(self.path + os.sep + "methodcalls.csv", "w")
         
     def close_handles(self):
         # Close all handles of the files, after looking if they exist
-        handles = ["samples"]
+        handles = ["samples", "functioncalls", "methodcalls"]
         for handle in handles:
             if hasattr(self, 'handle_'+handle):
                 getattr(self, 'handle_'+handle).close()        
@@ -80,27 +82,26 @@ class SamplingLogger:
         self.close_handles()
         self.method_calls = 0
 
-    def log_samples(self, x):
-        n_datapoints = len(x)
-        points = x.astype(str).tolist()
+    def log_samples(self, X, y):
+        n_datapoints = len(X)
+        points = X.astype(str).tolist()
+        labels = y.astype(str).tolist()
         for i in range(n_datapoints):
             line = [str(self.method_calls)]
-            line.extend(points[i])
+            line += points[i]
+            line += [labels[i]]
             self.handle_samples.write(','.join(line) + "\n")
     
     def log_method_calls(self, dt, size_total, size_generated):
-        with open(self.path + os.sep + "methodcalls.csv", "w") as handle:
-            line = [str(dt), str(int(size_total)), str(int(size_generated))]
-            handle.write(','.join(line) + "\n")
+        line = [dt, int(size_total), int(size_generated)]
+        line = list(map(str, line))
+        self.handle_methodcalls.write(','.join(line) + "\n")
 
     def log_function_calls(self, function):
-        with open(self.path + os.sep + "functioncalls.csv", "w") as handle:
-            for time, derivative in zip(function.counter_time, function.counter_derivatives):
-                line = [self.method_calls, time, derivative]
-                handle.write(','.join(line) + "\n")
-
-    def log_hardware(self):
-        raise NotImplementedError
+        for time, derivative in zip(function.counter_time, function.counter_derivatives):
+            line = [int(self.method_calls), float(time), bool(derivative)]
+            line = list(map(str, line))
+            self.handle_functioncalls.write(','.join(line) + "\n")
 
     def log_experiment(self, experiment, function):
         with open(self.path + os.sep + "experiment.yaml", "w") as handle:
@@ -111,8 +112,8 @@ class SamplingLogger:
                 'timestamp': str(get_time()),
                 'user': getpass.getuser(),
                 'benchmark': {
-                    'matrix_inversion': benchmark_matrix_inverse(),
-                    'sha_hashing': benchmark_sha_hashing()
+                    'matrix_inversion': 0,#benchmark_matrix_inverse(),
+                    'sha_hashing': 0#benchmark_sha_hashing()
                 } 
             }
             # Get properties of function
