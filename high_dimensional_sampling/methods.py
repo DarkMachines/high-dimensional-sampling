@@ -23,6 +23,10 @@ class Method(ABC):
         parameters of the method. The parameters indicated in this list are
         then automatically logged at the start of an experiment. If no such
         parameters exist, store_parameters should be an empty list.
+
+        This method can be overwritten and contain input arguments, but for
+        future compatibility all these input arguments should have defaults
+        set.
         """
         self.store_parameters = []
 
