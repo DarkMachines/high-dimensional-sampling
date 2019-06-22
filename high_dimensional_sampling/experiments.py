@@ -20,15 +20,11 @@ class Experiment:
 
     Args:
         method: An instance of a Method derived class that needs to be tested
-            in this experiment. If not provided this defaults to None. The
-            run() method of the instance can not be run as long as this is not
-            fixed by setting the .method property by hand.
-        path: Path to which the experiment should write its logs. If not
-            provided it defaults to None, but the experiment can not be run as
-            long as this is not fixed by setting the .path property by hand.
+            in this experiment.
+        path: Path to which the experiment should write its logs.
     """
 
-    def __init__(self, method=None, path=None):
+    def __init__(self, method, path):
         if not isinstance(method, Method):
             raise Exception("SamplingExperiments should be provided an instance of a class derived from the methods.Sampler class.")
         self.path = path
