@@ -2,7 +2,8 @@ import high_dimensional_sampling as hds
 import numpy as np
 
 # TODO: Add documentation
-# TODO: track function evaluations explicitely in order to take multiple data queries in one go into account
+# TODO: Implement unit tests
+# TODO: Make code conform to python style standards
 
 class RandomSampling(hds.Method):
     def __init__(self):
