@@ -9,7 +9,7 @@ from .methods import Sampler
 from .functions import TestFunction
 
 
-class SamplingExperiment:
+class Experiment:
     def __init__(self, method=None, path=None):
         if not isinstance(method, Sampler):
             raise Exception("SamplingExperiments should be provided an instance of a class derived from the methods.Sampler class.")
@@ -22,7 +22,7 @@ class SamplingExperiment:
         if not isinstance(function, TestFunction):
             raise Exception("Provided function should be an instance of a class derived from functions.TestFunction.")
         # Create logger, which automatically creates the logging location
-        self.logger = SamplingLogger(self.path, (type(function).__name__).lower())
+        self.logger = Logger(self.path, (type(function).__name__).lower())
         # Log experiment
         self.logger.log_experiment(self, function)
         # Store testfunction
@@ -56,7 +56,7 @@ class SamplingExperiment:
         self.logger.close_handles()
 
 
-class SamplingLogger:
+class Logger:
     def __init__(self, path, prefered_subfolder, initialise_handles=True):
         self.path = create_unique_folder(path, prefered_subfolder)
         self.method_calls = 0
@@ -126,7 +126,9 @@ class SamplingLogger:
             # Get properties of experiment
             info['method'] = {
                 'name': type(experiment.method).__name__,
-                'properties': vars(experiment.method)
+                'properties': {}
             }
+            for prop in experiment.method.store_parameters:
+                info['method']['properties'][prop] = getattr(experiment.method, prop)
             # Convert information to yaml and write to file
             yaml.dump(info, handle, default_flow_style=False)
