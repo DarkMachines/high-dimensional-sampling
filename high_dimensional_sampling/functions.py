@@ -169,13 +169,12 @@ class TestFunction(ABC):
         """
         pass
     
-    @abstractmethod
     def _derivative(self, x):
         """
         Queries the testfunction for its derivative at the provided point(s).
         
         This method should be implemented by any testfunction derived from
-        this abstract base class.
+        this abstract base class *if* a derivative is known.
 
         Args:
             x: Data as a numpy.ndarray of shape (nDatapoints, nVariables) for
@@ -188,7 +187,7 @@ class TestFunction(ABC):
         Raises:
             NoDerivativeError: No derivative is known for this testfunction.
         """
-        pass
+        raise NoDerivativeError()
 
 
 class NoDerivativeError(Exception):
@@ -240,9 +239,6 @@ class Ackley(TestFunction):
         g = np.cos(2*np.pi*x[:,1])
         b = - np.exp(0.5*(f+g))
         return a + b + np.exp(1) + 20
-    
-    def _derivative(self, x):
-        raise NoDerivativeError()
 
 
 class Easom(TestFunction):
@@ -260,6 +256,3 @@ class Easom(TestFunction):
         return (-1 * np.cos(x[:,0]) * np.cos(x[:,1])
                 * np.exp(-1*(np.power(x[:,0]-np.pi, 2)
                 + np.power(x[:,1]-np.pi, 2))))
-    
-    def _derivative(self, x):
-        raise NoDerivativeError()
