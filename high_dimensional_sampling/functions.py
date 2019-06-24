@@ -160,6 +160,25 @@ class TestFunction(ABC):
             lists and pandas dataframes are allowed.""".format(
                 type(x).__name__))
 
+    def construct_ranges(self, dimensionality, min, max):
+        """
+        Constructs the application range of the test function for a dynamic
+        dimensionality
+
+        Args:
+            dimensionality: Number of dimensions
+            min: Minimum value for all dimensions
+            max: Maximum value for all dimensions
+
+        Returns:
+            A list containing the minimum and maximum values for all
+            dimensions.
+        """
+        ranges = []
+        for _ in range(dimensionality):
+            ranges.append([min, max])
+        return ranges
+
     @abstractmethod
     def _evaluate(self, x):
         """
@@ -206,6 +225,177 @@ class NoDerivativeError(Exception):
     pass
 
 
+class Rastrigin(TestFunction):
+    """
+    Testfunction as defined by 
+    https://en.wikipedia.org/wiki/Rastrigin_function
+    """
+
+    def __init__(self, dimensionality=2):
+        self.ranges = self.construct_ranges(dimensionality, -5.12, 5.12)
+        self.a = 10
+        super(Rastrigin, self).__init__()
+
+    def _evaluate(self, x):
+        n = len(self.ranges)
+        y = self.a * n
+        for i in range(n):
+            y += np.power(x[:, i], 2) - self.a * np.cos(2 * np.pi * x[:, i])
+        return y
+
+    def _derivative(self, x):
+        return 2 * x + 2 * np.pi * self.a * np.sin(2 * np.pi * x)
+
+
+class Rosenbrock(TestFunction):
+    """
+    Testfunction as defined by
+    https://en.wikipedia.org/wiki/Rosenbrock_function
+
+    No derivative implemented
+    """
+
+    def __init__(self, dimensionality=2):
+        if dimensionality < 2:
+            raise Exception("""Dimensionality of Rosenbrock function has to
+                            be >=2.""")
+        self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
+        super(Rosenbrock, self).__init__()
+
+    def _evaluate(self, x):
+        n = len(self.ranges)
+        y = 0
+        for i in range(n - 1):
+            y += (100 * np.power(x[:, i + 1] - np.power(x[:, i], 2), 2) +
+                  np.power(1 - x[:, i], 2))
+        return y
+
+
+class Beale(TestFunction):
+    """
+    Testfunction as defined by
+    https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
+    No derivative implemented
+    """
+
+    def __init__(self):
+        self.ranges = [[-4.5, 4.5], [-4.5, 4.5]]
+        super(Beale, self).__init__()
+
+    def _evaluate(self, x):
+        return (np.power(1.5 - x[:, 0] + x[:, 0] * x[:, 1], 2) +
+                np.power(2.25 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 2), 2) +
+                np.power(2.625 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 3), 2))
+
+
+class Booth(TestFunction):
+    """
+    Testfunction as defined by
+    https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
+    No derivative implemented
+    """
+
+    def __init__(self):
+        self.ranges = [[-10, 10], [-10, 10]]
+        super(Booth, self).__init__()
+
+    def _evaluate(self, x):
+        return np.power(x[:, 0] + 2 * x[:, 1] - 7, 2) + np.power(
+            2 * x[:, 0] + x[:, 1] - 5, 2)
+
+
+class BukinNmbr6(TestFunction):
+    """
+    Testfunction as defined by
+    https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
+    No derivative implemented
+    """
+
+    def __init__(self):
+        self.ranges = [[-15, -5], [-3, 3]]
+        super(BukinNmbr6, self).__init__()
+
+    def _evaluate(self, x):
+        return 100 * np.sqrt(
+            np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2)) +
+            0.01 * np.abs(x[:, 0] + 10))
+
+
+class Matyas(TestFunction):
+    """
+    Testfunction as defined by
+    https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
+    No derivative implemented
+    """
+
+    def __init__(self):
+        self.ranges = [[-10, 10], [-10, 10]]
+        super(Matyas, self).__init__()
+
+    def _evaluate(self, x):
+        return 0.26 * (np.power(x[:, 0], 2) +
+                       np.power(x[:, 1], 2)) - 0.48 * x[:, 0] * x[:, 1]
+
+
+class LeviNmbr13(TestFunction):
+    """
+    Testfunction as defined by
+    https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
+    No derivative implemented
+    """
+
+    def __init__(self):
+        self.ranges = [[-10, 10], [-10, 10]]
+        super(LeviNmbr13, self).__init__()
+
+    def _evaluate(self, x):
+        return (np.power(np.sin(3 * np.pi * x[:, 0]), 2) +
+                np.power(x[:, 0] - 1, 2) *
+                (1 + np.power(np.sin(3 * np.pi * x[:, 1]), 2)) +
+                np.power(x[:, 1] - 1, 2) *
+                (1 + np.power(np.sin(2 * np.pi * x[:, 1]), 2)))
+
+
+class Himmelblau(TestFunction):
+    """
+    Testfunction as defined by 
+    https://en.wikipedia.org/wiki/Himmelblau%27s_function
+
+    No derivative implemented
+    """
+
+    def __init__(self):
+        self.ranges = [[-5, 5], [-5, 5]]
+        super(Himmelblau, self).__init__()
+
+    def _evaluate(self, x):
+        return (np.power(np.power(x[:, 0], 2) + x[:, 1] - 11, 2) +
+                np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2))
+
+
+class ThreeHumpCamel(TestFunction):
+    """
+    Testfunction as defined by
+    https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
+    No derivative implemented
+    """
+
+    def __init__(self):
+        self.ranges = [[-5, 5], [-5, 5]]
+        super(ThreeHumpCamel, self).__init__()
+
+    def _evaluate(self, x):
+        return (2.0 * np.power(x[:, 0], 2) - 1.05 * np.power(x[:, 0], 4) +
+                np.power(x[:, 0], 6) / 6.0 + x[:, 0] * x[:, 1] +
+                np.power(x[:, 1], 2))
+
+
 class Sphere(TestFunction):
     """
     Testfunction that returns the squared euclidean distance on evaluation.
@@ -220,9 +410,7 @@ class Sphere(TestFunction):
     """
 
     def __init__(self, dimensionality=3):
-        self.ranges = []
-        for _ in range(dimensionality):
-            self.ranges.append([-np.inf, np.inf])
+        self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
         super(Sphere, self).__init__()
 
     def _evaluate(self, x):
