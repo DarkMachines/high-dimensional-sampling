@@ -26,7 +26,9 @@ class Experiment:
 
     def __init__(self, method, path):
         if not isinstance(method, Method):
-            raise Exception("SamplingExperiments should be provided an instance of a class derived from the methods.Sampler class.")
+            raise Exception(
+                """SamplingExperiments should be provided an instance of a 
+                class derived from the methods.Sampler class.""")
         self.path = path
         self.method = method
         self.logger = None
@@ -62,7 +64,9 @@ class Experiment:
         """
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
-            raise Exception("Provided function should have functions.TestFunction as base class.")
+            raise Exception(
+                """Provided function should have functions.TestFunction as 
+                base class.""")
         # Setup logger
         self.logger = Logger(self.path, (type(function).__name__).lower())
         self.logger.log_experiment(self, function)
@@ -94,7 +98,7 @@ class Experiment:
             if isinstance(finish_line, (int, float)):
                 is_finished = is_finished or (self.n_sampled >= finish_line)
         # Delete the logger to close all handles
-        del(self.logger)
+        del (self.logger)
 
 
 class Logger:
@@ -124,8 +128,8 @@ class Logger:
         """
         handles = ["samples", "functioncalls", "methodcalls"]
         for handle in handles:
-            if hasattr(self, 'handle_'+handle):
-                getattr(self, 'handle_'+handle).close()
+            if hasattr(self, 'handle_' + handle):
+                getattr(self, 'handle_' + handle).close()
 
     def _create_handles(self):
         """
@@ -133,10 +137,14 @@ class Logger:
         their headers added if already possible.
         """
         self.handle_samples = open(self.path + os.sep + "samples.csv", "w")
-        self.handle_functioncalls = open(self.path + os.sep + "functioncalls.csv", "w")
-        self.handle_functioncalls.write('method_call_id,n_queried,dt,asked_for_derivative\n')
-        self.handle_methodcalls = open(self.path + os.sep + "methodcalls.csv", "w")
-        self.handle_methodcalls.write('method_call_id,dt,total_dataset_size,new_data_generated\n')
+        self.handle_functioncalls = open(
+            self.path + os.sep + "functioncalls.csv", "w")
+        self.handle_functioncalls.write(
+            'method_call_id,n_queried,dt,asked_for_derivative\n')
+        self.handle_methodcalls = open(self.path + os.sep + "methodcalls.csv",
+                                       "w")
+        self.handle_methodcalls.write(
+            'method_call_id,dt,total_dataset_size,new_data_generated\n')
 
     def log_samples(self, x, y):
         """
@@ -157,9 +165,9 @@ class Logger:
         # Create header
         if self.create_samples_header:
             header = ['method_call_id']
-            header += ['x'+str(i) for i in range(len(x[0]))]
-            header += ['y'+str(i) for i in range(len(y[0]))]
-            self.handle_samples.write(",".join(header)+"\n")
+            header += ['x' + str(i) for i in range(len(x[0]))]
+            header += ['y' + str(i) for i in range(len(y[0]))]
+            self.handle_samples.write(",".join(header) + "\n")
             self.create_samples_header = False
         # Create and write line
         n_datapoints = len(x)
@@ -183,7 +191,11 @@ class Logger:
             size_generated: Number of data points sampled in this specific
                 method call.
         """
-        line = [int(self.method_calls), dt, int(size_total), int(size_generated)]
+        line = [
+            int(self.method_calls), dt,
+            int(size_total),
+            int(size_generated)
+        ]
         line = list(map(str, line))
         self.handle_methodcalls.write(','.join(line) + "\n")
 
@@ -200,7 +212,12 @@ class Logger:
                 functions.TestFunction as its base class.
         """
         for entry in function.counter:
-            line = [int(self.method_calls), int(entry[0]), float(entry[1]), bool(entry[2])]
+            line = [
+                int(self.method_calls),
+                int(entry[0]),
+                float(entry[1]),
+                bool(entry[2])
+            ]
             line = list(map(str, line))
             self.handle_functioncalls.write(','.join(line) + "\n")
 
@@ -235,13 +252,14 @@ class Logger:
                 'name': type(function).__name__,
                 'properties': copy.copy(vars(function))
             }
-            del(info['function']['properties']['counter'])
+            del (info['function']['properties']['counter'])
             # Get properties of experiment
             info['method'] = {
                 'name': type(experiment.method).__name__,
                 'properties': {}
             }
             for prop in experiment.method.store_parameters:
-                info['method']['properties'][prop] = getattr(experiment.method, prop)
+                info['method']['properties'][prop] = getattr(
+                    experiment.method, prop)
             # Convert information to yaml and write to file
             yaml.dump(info, handle, default_flow_style=False)

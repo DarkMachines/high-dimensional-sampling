@@ -74,7 +74,7 @@ def benchmark_matrix_inverse():
     t_start = get_time()
     x = np.random.rand(6400, 6400)
     x = np.linalg.inv(x)
-    del(x)
+    del x
     return get_time() - t_start
 
 

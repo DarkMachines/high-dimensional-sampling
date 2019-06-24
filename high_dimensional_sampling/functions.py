@@ -19,6 +19,7 @@ class TestFunction(ABC):
     Raises:
         Exception: Testfunction should define ranges.
     """
+
     def __init__(self):
         if not hasattr(self, 'ranges'):
             self.ranges = []
@@ -61,11 +62,7 @@ class TestFunction(ABC):
             # Return derivative if no error was raised by previous line
             value = self._derivative(x)
         # Store call and dt
-        self.counter.append([
-            len(x),
-            get_time() - t_start,
-            bool(derivative)
-        ])
+        self.counter.append([len(x), get_time() - t_start, bool(derivative)])
         # Return value
         return value
 
@@ -110,7 +107,9 @@ class TestFunction(ABC):
         dim = self.ranges.shape[0]
         dim_data = shape[1]
         if dim_data != dim:
-            raise Exception("Provided data has dimensionality {}, but {} was expected".format(dim_data, dim))
+            raise Exception(
+                "Provided data has dimensionality {}, but {} was expected".
+                format(dim_data, dim))
 
     def check_ranges(self, x):
         """
@@ -129,7 +128,9 @@ class TestFunction(ABC):
         d = d / (self.ranges[:, 1] - self.ranges[:, 0])
         # Check if any entry smaller than 0 exists
         if np.any(d < 0.0) or np.any(d > 1.0):
-            raise Exception("Data does not fall within expected ranges: {}.".format(self.ranges))
+            raise Exception(
+                "Data does not fall within expected ranges: {}.".format(
+                    self.ranges))
 
     def to_numpy_array(self, x):
         """
@@ -154,7 +155,10 @@ class TestFunction(ABC):
             return np.array(x)
         if isinstance(x, pd.DataFrame):
             return x.values()
-        raise Exception("Testfunctions don't accept {} as input: only numpy arrays, lists and pandas dataframes are allowed.".format(type(x).__name__))
+        raise Exception(
+            """"Testfunctions don't accept {} as input: only numpy arrays, 
+            lists and pandas dataframes are allowed.""".format(
+                type(x).__name__))
 
     @abstractmethod
     def _evaluate(self, x):
@@ -214,6 +218,7 @@ class Sphere(TestFunction):
 
         y' = 2*x
     """
+
     def __init__(self, dimensionality=3):
         self.ranges = []
         for _ in range(dimensionality):
@@ -224,7 +229,7 @@ class Sphere(TestFunction):
         return np.sum(np.power(x, 2), axis=1)
 
     def _derivative(self, x):
-        return 2*x
+        return 2 * x
 
 
 class Ackley(TestFunction):
@@ -234,16 +239,18 @@ class Ackley(TestFunction):
 
     No derivative has been implemented.
     """
+
     def __init__(self):
         self.ranges = [[-5, 5], [-5, 5]]
         super(Ackley, self).__init__()
 
     def _evaluate(self, x):
-        a = -20 * np.exp(-0.2 * np.sqrt(0.5 *
-                         (np.power(x[:, 0], 2) + np.power(x[:, 1], 2))))
-        f = np.cos(2*np.pi*x[:, 0])
-        g = np.cos(2*np.pi*x[:, 1])
-        b = - np.exp(0.5*(f+g))
+        a = -20 * np.exp(
+            -0.2 * np.sqrt(0.5 *
+                           (np.power(x[:, 0], 2) + np.power(x[:, 1], 2))))
+        f = np.cos(2 * np.pi * x[:, 0])
+        g = np.cos(2 * np.pi * x[:, 1])
+        b = -np.exp(0.5 * (f + g))
         return a + b + np.exp(1) + 20
 
 
@@ -254,11 +261,12 @@ class Easom(TestFunction):
 
     No derivative has been implemented.
     """
+
     def __init__(self):
         self.ranges = [[-100, 100], [-100, 100]]
         super(Easom, self).__init__()
 
     def _evaluate(self, x):
-        return (-1 * np.cos(x[:, 0]) * np.cos(x[:, 1])
-                * np.exp(-1*(np.power(x[:, 0]-np.pi, 2)
-                + np.power(x[:, 1]-np.pi, 2))))
+        return (-1 * np.cos(x[:, 0]) * np.cos(x[:, 1]) * np.exp(
+            -1 *
+            (np.power(x[:, 0] - np.pi, 2) + np.power(x[:, 1] - np.pi, 2))))
