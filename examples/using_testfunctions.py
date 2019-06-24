@@ -10,7 +10,7 @@ N = 2000
 x = np.linspace(-1, 1, N)*5
 x = x.reshape(-1, 1)
 
-z = hds.Sine()
+z = hds.functions.Sphere()
 y = z(x)
 yprime = z(x, True)
 

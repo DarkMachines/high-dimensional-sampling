@@ -16,7 +16,7 @@ class RandomSampling(hds.Method):
 
 
 method = RandomSampling()
-function = hds.Easom()
+function = hds.functions.Easom()
 experiment = hds.Experiment(method, '/Users/bstienen/Desktop/hds')
 
 experiment.run(function, finish_line=1000)
