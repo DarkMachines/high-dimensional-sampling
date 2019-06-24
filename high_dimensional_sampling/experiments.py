@@ -30,7 +30,7 @@ class Experiment:
         self.path = path
         self.method = method
         self.logger = None
-    
+
     def run(self, function, log_data=True, finish_line=10000):
         """
         Run the experiment.
@@ -53,9 +53,9 @@ class Experiment:
                 tested indicates it is finished, the experiment will be
                 stopped, regardless of the size of the sampled data set. The
                 finish_line is set to 10,000 by default. If set to None, the
-                experiment will continue to run until the method indicates 
+                experiment will continue to run until the method indicates
                 it is finished.
-        
+
         Raises:
             Exception: Provided function should have functions.TestFunction as
                 base class.
@@ -71,28 +71,28 @@ class Experiment:
         self.method.function = self.function
         # Perform sampling as long as procedure is not finished
         is_finished = False
-        self.N_sampled = 0
+        self.n_sampled = 0
         while not is_finished:
             self.logger.method_calls += 1
             # Perform an method iteration and keep track of time elapsed
             t_start = get_time()
-            X, y = self.method(self.function)
+            x, y = self.method(self.function)
             dt = get_time() - t_start
             # Log method call
-            N = len(X)
-            self.N_sampled += N
-            self.logger.log_method_calls(dt, self.N_sampled, N)
+            n = len(x)
+            self.n_sampled += n
+            self.logger.log_method_calls(dt, self.n_sampled, n)
             # Log sampled data
             if log_data:
-                self.logger.log_samples(X, y)
+                self.logger.log_samples(x, y)
             # Log function calls and reset the counter
             self.logger.log_function_calls(self.function)
             self.function.reset()
             # Check if the experiment has to stop and update the while
             # condition to control this.
             is_finished = self.method.is_finished()
-            if isinstance(finish_line, int) or isinstance(finish_line, float):
-                is_finished = is_finished or (self.N_sampled >= finish_line)
+            if isinstance(finish_line, (int, float)):
+                is_finished = is_finished or (self.n_sampled >= finish_line)
         # Delete the logger to close all handles
         del(self.logger)
 
@@ -117,7 +117,7 @@ class Logger:
         self.method_calls = 0
         self.create_samples_header = True
         self._create_handles()
-    
+
     def __del__(self):
         """
         Closes all the opened handles at deletion of the instance.
@@ -170,7 +170,7 @@ class Logger:
             line += points[i]
             line += labels[i]
             self.handle_samples.write(','.join(line) + "\n")
-    
+
     def log_method_calls(self, dt, size_total, size_generated):
         """
         Log a method call to the methodscalls.csv file.
@@ -228,7 +228,7 @@ class Logger:
                 'benchmark': {
                     'matrix_inversion': benchmark_matrix_inverse(),
                     'sha_hashing': benchmark_sha_hashing()
-                } 
+                }
             }
             # Get properties of function
             info['function'] = {

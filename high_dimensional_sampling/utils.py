@@ -14,6 +14,7 @@ def get_time():
     """
     return int(round(time.time() * 1000))
 
+
 def get_datetime():
     """
     Returns a string containing the current date and time
@@ -22,6 +23,7 @@ def get_datetime():
         String containign the current date and time
     """
     return str(datetime.datetime.now())
+
 
 def create_unique_folder(path, prefered):
     """
@@ -53,7 +55,8 @@ def create_unique_folder(path, prefered):
             i += 1
             folder_path = path + os.sep + prefered + '_' + str(i)
     return folder_path
-        
+
+
 def benchmark_matrix_inverse():
     """
     Benchmark the user's setup by measuring the time taken by matrix inversion
@@ -73,6 +76,7 @@ def benchmark_matrix_inverse():
     x = np.linalg.inv(x)
     del(x)
     return get_time() - t_start
+
 
 def benchmark_sha_hashing():
     """

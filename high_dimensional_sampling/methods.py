@@ -6,7 +6,7 @@ class Method(ABC):
     Abstract base class for all sampling methods
 
     All sampling methods subjected to an experiment should be derived from this
-    class. It requires the implementation of the __init__, __call__ and 
+    class. It requires the implementation of the __init__, __call__ and
     is_finished methods.
 
     As it is an abstract base class, direct (i.e. not derived) instances of
@@ -44,7 +44,7 @@ class Method(ABC):
                 TestFunction class. This function can be queried for values
                 and derivatives by calling the function with function(data) and
                 function(data, True) respectively.
-        
+
         Returns:
             x: Sampled data in the form of a numpy.ndarray of shape
                 (nDatapoints, nVariables).
@@ -52,7 +52,7 @@ class Method(ABC):
                 (nDatapoints, ?)
         """
         raise NotImplementedError
-    
+
     @abstractmethod
     def is_finished(self):
         """

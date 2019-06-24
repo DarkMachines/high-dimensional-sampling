@@ -9,7 +9,7 @@ class TestFunction(ABC):
     """
     Abstract base class for test functions
 
-    This class forms the basis for all testfunctions implemented in this 
+    This class forms the basis for all testfunctions implemented in this
     module. It automatically tracks the number of evaluations of the function
     and does dimensionality checks on the input data.
 
@@ -29,7 +29,7 @@ class TestFunction(ABC):
         """
         Request an evaluation of the (derivative of the) testfunction.
 
-        After having performed dimensionality and ranges checks on the 
+        After having performed dimensionality and ranges checks on the
         provided parameters x, the testfunction in the derived class is queried
         for its value or its derivative (depending on the request by the user).
         In this proces the query time is stored for later logging.
@@ -37,7 +37,7 @@ class TestFunction(ABC):
         Args:
             x: numpy.ndarray of shape (nDatapoints, nVariables) containing the
                 datapoints to query to the testfunction
-            derivative: If this boolean is False (default), the testfunction 
+            derivative: If this boolean is False (default), the testfunction
                 will be queried for its value. If it is True, the derivative
                 of the function is queried (if existing).
 
@@ -98,12 +98,12 @@ class TestFunction(ABC):
 
     def check_dimensionality(self, shape):
         """
-        Checks if the dimensionality of the input data is conform expected by 
+        Checks if the dimensionality of the input data is conform expected by
         the defined testfunction. If not, an Exception is raised.
 
         Args:
             shape: Tuple defining the shape of the input data.
-        
+
         Raises:
             Exception: Provided data has dimensionality ?, but ? was expected.
         """
@@ -111,7 +111,7 @@ class TestFunction(ABC):
         dim_data = shape[1]
         if dim_data != dim:
             raise Exception("Provided data has dimensionality {}, but {} was expected".format(dim_data, dim))
-    
+
     def check_ranges(self, x):
         """
         Checks if the input data lies within the ranges expected by the
@@ -120,13 +120,13 @@ class TestFunction(ABC):
         Args:
             x: numpy.ndarray of shape (nDatapoints, nVariables) containing the
                 data to query the testfunction for.
-        
+
         Raises:
             Exception: Data does not fall withing the expected ranges: ?.
         """
         # Transform data
-        d = x - self.ranges[:,0]
-        d = d / (self.ranges[:,1] - self.ranges[:,0])
+        d = x - self.ranges[:, 0]
+        d = d / (self.ranges[:, 1] - self.ranges[:, 0])
         # Check if any entry smaller than 0 exists
         if np.any(d < 0.0) or np.any(d > 1.0):
             raise Exception("Data does not fall within expected ranges: {}.".format(self.ranges))
@@ -140,9 +140,13 @@ class TestFunction(ABC):
 
         Args:
             x: Data of type numpy.ndarray, list or pandas.DataFrame.
-        
+
         Returns:
             Data converted to numpy.ndarray.
+
+        Raises:
+            Exception: Testfunctions don't accept ? as input: only numpy
+                arrays, list and pandas dataframes are allowed.
         """
         if isinstance(x, np.ndarray):
             return x
@@ -150,6 +154,7 @@ class TestFunction(ABC):
             return np.array(x)
         if isinstance(x, pd.DataFrame):
             return x.values()
+        raise Exception("Testfunctions don't accept {} as input: only numpy arrays, lists and pandas dataframes are allowed.".format(type(x).__name__))
 
     @abstractmethod
     def _evaluate(self, x):
@@ -162,28 +167,28 @@ class TestFunction(ABC):
         Args:
             x: Data as a numpy.ndarray of shape (nDatapoints, nVariables) for
                 which the testfunction should be evaluated.
-        
+
         Returns:
             Values returned by the function evaluation as numpy.ndarray of
             shape (nDatapoints, ?).
         """
         pass
-    
+
     def _derivative(self, x):
         """
         Queries the testfunction for its derivative at the provided point(s).
-        
+
         This method should be implemented by any testfunction derived from
         this abstract base class *if* a derivative is known.
 
         Args:
             x: Data as a numpy.ndarray of shape (nDatapoints, nVariables) for
                 which the gradient of the testfunction should be returned.
-        
+
         Returns:
             Gradient of the testfunction at the provided location as
             numpy.ndarray of shape (nDatapoints, ?).
-        
+
         Raises:
             NoDerivativeError: No derivative is known for this testfunction.
         """
@@ -199,12 +204,12 @@ class NoDerivativeError(Exception):
 
 class Sphere(TestFunction):
     """
-    Testfunction that returns the squared euclidean distance on evaluation. 
+    Testfunction that returns the squared euclidean distance on evaluation.
 
     Testfunction following the formula:
 
         y = sum_{i=1}^{N} x_i^2
-    
+
     The derivative of this function is implemented as
 
         y' = 2*x
@@ -217,9 +222,10 @@ class Sphere(TestFunction):
 
     def _evaluate(self, x):
         return np.sum(np.power(x, 2), axis=1)
-    
+
     def _derivative(self, x):
         return 2*x
+
 
 class Ackley(TestFunction):
     """
@@ -231,12 +237,12 @@ class Ackley(TestFunction):
     def __init__(self):
         self.ranges = [[-5, 5], [-5, 5]]
         super(Ackley, self).__init__()
-    
+
     def _evaluate(self, x):
         a = -20 * np.exp(-0.2 * np.sqrt(0.5 *
-            (np.power(x[:,0],2) + np.power(x[:,1],2))))
-        f = np.cos(2*np.pi*x[:,0])
-        g = np.cos(2*np.pi*x[:,1])
+                         (np.power(x[:, 0], 2) + np.power(x[:, 1], 2))))
+        f = np.cos(2*np.pi*x[:, 0])
+        g = np.cos(2*np.pi*x[:, 1])
         b = - np.exp(0.5*(f+g))
         return a + b + np.exp(1) + 20
 
@@ -251,8 +257,8 @@ class Easom(TestFunction):
     def __init__(self):
         self.ranges = [[-100, 100], [-100, 100]]
         super(Easom, self).__init__()
-    
+
     def _evaluate(self, x):
-        return (-1 * np.cos(x[:,0]) * np.cos(x[:,1])
-                * np.exp(-1*(np.power(x[:,0]-np.pi, 2)
-                + np.power(x[:,1]-np.pi, 2))))
+        return (-1 * np.cos(x[:, 0]) * np.cos(x[:, 1])
+                * np.exp(-1*(np.power(x[:, 0]-np.pi, 2)
+                + np.power(x[:, 1]-np.pi, 2))))
