@@ -156,19 +156,19 @@ class TestFunction(ABC):
         if isinstance(x, pd.DataFrame):
             return x.values()
         raise Exception(
-            """"Testfunctions don't accept {} as input: only numpy arrays, 
+            """"Testfunctions don't accept {} as input: only numpy arrays,
             lists and pandas dataframes are allowed.""".format(
                 type(x).__name__))
 
-    def construct_ranges(self, dimensionality, min, max):
+    def construct_ranges(self, dimensionality, minimum, maximum):
         """
         Constructs the application range of the test function for a dynamic
         dimensionality
 
         Args:
             dimensionality: Number of dimensions
-            min: Minimum value for all dimensions
-            max: Maximum value for all dimensions
+            minimum: Minimum value for all dimensions
+            maximum: Maximum value for all dimensions
 
         Returns:
             A list containing the minimum and maximum values for all
@@ -176,7 +176,7 @@ class TestFunction(ABC):
         """
         ranges = []
         for _ in range(dimensionality):
-            ranges.append([min, max])
+            ranges.append([minimum, maximum])
         return ranges
 
     @abstractmethod
@@ -197,6 +197,7 @@ class TestFunction(ABC):
         """
         pass
 
+    @abstractmethod
     def _derivative(self, x):
         """
         Queries the testfunction for its derivative at the provided point(s).
@@ -215,7 +216,7 @@ class TestFunction(ABC):
         Raises:
             NoDerivativeError: No derivative is known for this testfunction.
         """
-        raise NoDerivativeError()
+        pass
 
 
 class NoDerivativeError(Exception):
@@ -231,7 +232,7 @@ class FunctionFeeder:
 
     The FunctionFeeder is a container class to which functions can be added. It
     operates as an iterator, so it can be used as the argument of a for loop,
-    which will then feed the functions in the container one by one to the 
+    which will then feed the functions in the container one by one to the
     code in the loop.
     """
 
@@ -278,7 +279,7 @@ class FunctionFeeder:
         - Sphere
         - Ackley
         - Easom
-        
+
         All functions are loaded with default configuration, unless
         configuration is set through the parameters argument.
 
@@ -287,13 +288,13 @@ class FunctionFeeder:
                 implemented is the group 'optimisation' (or equivalently
                 'optimization'), which loads all functions meant for
                 optimisation problems (see list above).
-            parameters: Dictionary containing all configuration variables 
+            parameters: Dictionary containing all configuration variables
                 for all test functions that should differ from the default
                 setting. Parameters are provided on a per-function basis via
                 their classname. Any parameter and function not defined in this
                 dictionary is configured with its default value(s). For
                 instance: `{'Rastrigin': {'dimensionality':4}}`.
-        
+
         Raises:
             Exception: Group '?' not known
         """
@@ -313,7 +314,7 @@ class FunctionFeeder:
             else:
                 self.load_function(name, parameters[name])
 
-    def load_function(self, functionname, parameters={}):
+    def load_function(self, functionname, parameters=None):
         """
         Loads a function by function name and configures the parameters of this
         function.
@@ -324,7 +325,7 @@ class FunctionFeeder:
             parameters: Dictionary containing the parameters to configure
                 and the values that these parameters should take. Any parameter
                 not set in this dictionary will be set to its default value.
-        
+
         Raises:
             Exception: Function name '?' unknown.
             Exception: Cannot load a function that is not derived from the
@@ -338,6 +339,10 @@ class FunctionFeeder:
             raise Exception("""Cannot load a function that is not derived from
                                the TestFunction base class.""")
         # Configure testfunction
+        if parameters is None:
+            parameters = {}
+        if not isinstance(parameters, dict):
+            raise Exception("Parameters should be provided as a dictionary.")
         for p in parameters:
             f.p = parameters[p]
         # Store testfunction
@@ -351,9 +356,9 @@ class FunctionFeeder:
             function: Test function (instance of a class with the TestFunction
                 class as its base class) that should be added to the
                 FunctionFeeder.
-        
+
         Raises:
-            Exception: Cannot load a function that is not derived from the 
+            Exception: Cannot load a function that is not derived from the
                 TestFunction base class.
         """
         if not isinstance(function, TestFunction):
@@ -364,7 +369,7 @@ class FunctionFeeder:
 
 class Rastrigin(TestFunction):
     """
-    Testfunction as defined by 
+    Testfunction as defined by
     https://en.wikipedia.org/wiki/Rastrigin_function
     """
 
@@ -407,6 +412,9 @@ class Rosenbrock(TestFunction):
                   np.power(1 - x[:, i], 2))
         return y
 
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
 
 class Beale(TestFunction):
     """
@@ -425,6 +433,9 @@ class Beale(TestFunction):
                 np.power(2.25 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 2), 2) +
                 np.power(2.625 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 3), 2))
 
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
 
 class Booth(TestFunction):
     """
@@ -441,6 +452,9 @@ class Booth(TestFunction):
     def _evaluate(self, x):
         return np.power(x[:, 0] + 2 * x[:, 1] - 7, 2) + np.power(
             2 * x[:, 0] + x[:, 1] - 5, 2)
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
 
 
 class BukinNmbr6(TestFunction):
@@ -460,6 +474,9 @@ class BukinNmbr6(TestFunction):
             np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2)) +
             0.01 * np.abs(x[:, 0] + 10))
 
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
 
 class Matyas(TestFunction):
     """
@@ -476,6 +493,9 @@ class Matyas(TestFunction):
     def _evaluate(self, x):
         return 0.26 * (np.power(x[:, 0], 2) +
                        np.power(x[:, 1], 2)) - 0.48 * x[:, 0] * x[:, 1]
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
 
 
 class LeviNmbr13(TestFunction):
@@ -497,10 +517,13 @@ class LeviNmbr13(TestFunction):
                 np.power(x[:, 1] - 1, 2) *
                 (1 + np.power(np.sin(2 * np.pi * x[:, 1]), 2)))
 
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
 
 class Himmelblau(TestFunction):
     """
-    Testfunction as defined by 
+    Testfunction as defined by
     https://en.wikipedia.org/wiki/Himmelblau%27s_function
 
     No derivative implemented
@@ -513,6 +536,9 @@ class Himmelblau(TestFunction):
     def _evaluate(self, x):
         return (np.power(np.power(x[:, 0], 2) + x[:, 1] - 11, 2) +
                 np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2))
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
 
 
 class ThreeHumpCamel(TestFunction):
@@ -531,6 +557,9 @@ class ThreeHumpCamel(TestFunction):
         return (2.0 * np.power(x[:, 0], 2) - 1.05 * np.power(x[:, 0], 4) +
                 np.power(x[:, 0], 6) / 6.0 + x[:, 0] * x[:, 1] +
                 np.power(x[:, 1], 2))
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
 
 
 class Sphere(TestFunction):
@@ -578,6 +607,9 @@ class Ackley(TestFunction):
         b = -np.exp(0.5 * (f + g))
         return a + b + np.exp(1) + 20
 
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
 
 class Easom(TestFunction):
     """
@@ -595,3 +627,6 @@ class Easom(TestFunction):
         return (-1 * np.cos(x[:, 0]) * np.cos(x[:, 1]) * np.exp(
             -1 *
             (np.power(x[:, 0] - np.pi, 2) + np.power(x[:, 1] - np.pi, 2))))
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
