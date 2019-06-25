@@ -225,6 +225,63 @@ class NoDerivativeError(Exception):
     pass
 
 
+class FunctionFeeder:
+    def __init__(self):
+        self.reset()
+    
+    def __len__(self):
+        return len(self.functions)
+    
+    def __iter__(self):
+        return iter(self.functions)
+
+    def reset(self):
+        self.functions = []
+    
+    def load_functions(self, mode, parameters):
+        # Define functions for modes
+        if mode in ['optimisation', 'optimization']:
+            function_names = [
+                'Rastrigin',
+                'Rosenbrock',
+                'Beale',
+                'Booth',
+                'BukinNmbr6',
+                'Matyas',
+                'LeviNmbr13',
+                'Himmelblau',
+                'ThreeHumpCamel',
+                'Sphere',
+                'Ackley',
+                'Easom'
+            ]
+        elif mode in ['posterior']:
+            function_names = []
+        # Loop over function names and load each function
+        for name in function_names:
+            if name not in parameters:
+                self.load_function(name)
+            else:
+                self.load_function(name, parameters[name])
+
+    def load_function(self, functionname, parameters={}):
+        # Initialise testfunction
+        if functionname not in globals():
+            raise Exception("Function name '{}' unknown".format(functionname))
+        f = globals()[functionname]()
+        if not isinstance(f, TestFunction):
+            raise Exception("""Cannot load a function that is not derived from
+                               the TestFunction base class.""")
+        # Configure testfunction
+        for p in parameters:
+            f.p = parameters[p]
+        # Store testfunction
+        self.add_function(f)
+    
+    def add_function(self, function):
+        self.functions.append(function)
+
+
 class Rastrigin(TestFunction):
     """
     Testfunction as defined by 
