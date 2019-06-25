@@ -226,37 +226,86 @@ class NoDerivativeError(Exception):
 
 
 class FunctionFeeder:
+    """
+    Function container to perform larger automated experiments
+
+    The FunctionFeeder is a container class to which functions can be added. It
+    operates as an iterator, so it can be used as the argument of a for loop,
+    which will then feed the functions in the container one by one to the 
+    code in the loop.
+    """
+
     def __init__(self):
         self.reset()
-    
+
     def __len__(self):
+        """
+        Get the number of functions in the FunctionFeeder instance
+        """
         return len(self.functions)
-    
+
     def __iter__(self):
+        """
+        Get the iterable of functions to be used in e.g. for loops
+        """
         return iter(self.functions)
 
     def reset(self):
+        """
+        Empty the feeder from all loaded functions
+        """
         self.functions = []
-    
-    def load_functions(self, mode, parameters):
-        # Define functions for modes
-        if mode in ['optimisation', 'optimization']:
+
+    def load_functions(self, group, parameters):
+        """
+        Load functions from a specific set
+
+        This method adds test functions to the FunctionFeeder that are
+        belonging to a specific group of test functions. Currently implemented
+        is the group 'optimisation' (or equivalently 'optimization'), which
+        loads all test functions in this module meant for optimisation
+        problems:
+
+        - Rastrigin
+        - Rosenbrock
+        - Beale
+        - Booth
+        - BukinNmbr6
+        - Matyas
+        - LeviNmbr13
+        - Himmelblau
+        - ThreeHumpCamel
+        - Sphere
+        - Ackley
+        - Easom
+        
+        All functions are loaded with default configuration, unless
+        configuration is set through the parameters argument.
+
+        Args:
+            group: Name of the test function group to load. Currently
+                implemented is the group 'optimisation' (or equivalently
+                'optimization'), which loads all functions meant for
+                optimisation problems (see list above).
+            parameters: Dictionary containing all configuration variables 
+                for all test functions that should differ from the default
+                setting. Parameters are provided on a per-function basis via
+                their classname. Any parameter and function not defined in this
+                dictionary is configured with its default value(s). For
+                instance: `{'Rastrigin': {'dimensionality':4}}`.
+        
+        Raises:
+            Exception: Group '?' not known
+        """
+        # Define functions for group
+        if group in ['optimisation', 'optimization']:
             function_names = [
-                'Rastrigin',
-                'Rosenbrock',
-                'Beale',
-                'Booth',
-                'BukinNmbr6',
-                'Matyas',
-                'LeviNmbr13',
-                'Himmelblau',
-                'ThreeHumpCamel',
-                'Sphere',
-                'Ackley',
-                'Easom'
+                'Rastrigin', 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6',
+                'Matyas', 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel',
+                'Sphere', 'Ackley', 'Easom'
             ]
-        elif mode in ['posterior']:
-            function_names = []
+        else:
+            raise Exception("Group '{}' not known".format(group))
         # Loop over function names and load each function
         for name in function_names:
             if name not in parameters:
@@ -265,6 +314,22 @@ class FunctionFeeder:
                 self.load_function(name, parameters[name])
 
     def load_function(self, functionname, parameters={}):
+        """
+        Loads a function by function name and configures the parameters of this
+        function.
+
+        Args:
+            functionname: Classname of the function that needs to be loaded
+                and added to the FunctionFeeder container.
+            parameters: Dictionary containing the parameters to configure
+                and the values that these parameters should take. Any parameter
+                not set in this dictionary will be set to its default value.
+        
+        Raises:
+            Exception: Function name '?' unknown.
+            Exception: Cannot load a function that is not derived from the
+                TestFunction base class.
+        """
         # Initialise testfunction
         if functionname not in globals():
             raise Exception("Function name '{}' unknown".format(functionname))
@@ -277,8 +342,23 @@ class FunctionFeeder:
             f.p = parameters[p]
         # Store testfunction
         self.add_function(f)
-    
+
     def add_function(self, function):
+        """
+        Add a configured function to the FunctionFeeder instance
+
+        Args:
+            function: Test function (instance of a class with the TestFunction
+                class as its base class) that should be added to the
+                FunctionFeeder.
+        
+        Raises:
+            Exception: Cannot load a function that is not derived from the 
+                TestFunction base class.
+        """
+        if not isinstance(function, TestFunction):
+            raise Exception("""Cannot load a function that is not derived from
+                               the TestFunction base class.""")
         self.functions.append(function)
 
 
