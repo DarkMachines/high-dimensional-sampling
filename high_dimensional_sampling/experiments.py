@@ -27,7 +27,7 @@ class Experiment:
     def __init__(self, method, path):
         if not isinstance(method, Method):
             raise Exception(
-                """SamplingExperiments should be provided an instance of a 
+                """SamplingExperiments should be provided an instance of a
                 class derived from the methods.Sampler class.""")
         self.path = path
         self.method = method
@@ -65,7 +65,7 @@ class Experiment:
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
             raise Exception(
-                """Provided function should have functions.TestFunction as 
+                """Provided function should have functions.TestFunction as
                 base class.""")
         # Setup logger
         self.logger = Logger(self.path, (type(function).__name__).lower())
