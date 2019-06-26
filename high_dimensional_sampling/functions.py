@@ -369,8 +369,7 @@ class FunctionFeeder:
             parameters = {}
         if not isinstance(parameters, dict):
             raise Exception("Parameters should be provided as a dictionary.")
-        for p in parameters:
-            f.p = parameters[p]
+        f = globals()[functionname](**parameters)
         # Store testfunction
         self.add_function(f)
 
