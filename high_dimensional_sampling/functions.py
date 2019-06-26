@@ -735,8 +735,10 @@ class Block(TestFunction):
     def _evaluate(self, x):
         boundary = np.array([self.block_size] * self.dimensionality)
         inidx = np.all((-1 * boundary <= x) & (x <= boundary), axis=1)
-        return self.global_value + (self.block_value -
+        y = self.global_value + (self.block_value -
                                     self.global_value) * inidx
+        y = y.reshape(-1,1)
+        return y
 
     def _derivative(self, x):
         raise NoDerivativeError()
