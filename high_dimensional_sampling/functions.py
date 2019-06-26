@@ -732,7 +732,7 @@ class Block(TestFunction):
         self.block_size = block_size
         self.block_value = block_value
         self.global_value = global_value
-        self.ranges = self.construct_ranges(dimensionality, -100, 100)
+        self.ranges = self.construct_ranges(dimensionality, -10, 10)
         super(Block, self).__init__()
 
     def _evaluate(self, x):
