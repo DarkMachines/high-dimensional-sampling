@@ -693,10 +693,10 @@ class Cosine(TestFunction):
         super(Cosine, self).__init__()
 
     def _evaluate(self, x):
-        return np.cos(x)
+        return np.cos(x)+1
 
     def _derivative(self, x):
-        return -np.sin(x)
+        return -np.sin(x)+1
 
 
 class Block(TestFunction):
