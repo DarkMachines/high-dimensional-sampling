@@ -62,6 +62,7 @@ class Experiment:
             Exception: Provided function should have functions.TestFunction as
                 base class.
         """
+        print("Run experiment for '{}' on function '{}'...".format(type(self.method).__name__, type(function).__name__))
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
             raise Exception(
@@ -70,6 +71,7 @@ class Experiment:
         # Setup logger
         self.logger = Logger(self.path, (type(function).__name__).lower())
         self.logger.log_experiment(self, function)
+        self.logger.log_benchmarks()
         # Make function available both to the Experiment and the Method
         self.function = function
         self.method.function = self.function
@@ -117,6 +119,7 @@ class Logger:
     """
 
     def __init__(self, path, prefered_subfolder):
+        self.basepath = path
         self.path = create_unique_folder(path, prefered_subfolder)
         self.method_calls = 0
         self.create_samples_header = True
@@ -221,6 +224,25 @@ class Logger:
             line = list(map(str, line))
             self.handle_functioncalls.write(','.join(line) + "\n")
 
+    def log_benchmarks(self):
+        """
+        Benchmark the machine with some simple benchmark algorithms (as
+        implemented in the utils module).
+
+        Results are stored in the base log path in the benchmarks.yaml file. If
+        this file already exists, no benchmarks are run.
+        """
+        if os.path.exists(self.basepath + os.sep + "benchmarks.yaml"):
+            return
+        with open(self.basepath + os.sep + "benchmarks.yaml", "w") as handle:
+            info = {}
+            # Get meta data of experiment
+            info['benchmarks'] = {
+                'matrix_inversion': benchmark_matrix_inverse(),
+                'sha_hashing': benchmark_sha_hashing(),
+            }
+            yaml.dump(info, handle, default_flow_style=False)
+
     def log_experiment(self, experiment, function):
         """
         Log the setup and the function set up to a .yaml-file in order to
@@ -242,10 +264,6 @@ class Logger:
                 'datetime': str(get_datetime()),
                 'timestamp': str(get_time()),
                 'user': getpass.getuser(),
-                'benchmark': {
-                    'matrix_inversion': benchmark_matrix_inverse(),
-                    'sha_hashing': benchmark_sha_hashing()
-                }
             }
             # Get properties of function
             info['function'] = {
