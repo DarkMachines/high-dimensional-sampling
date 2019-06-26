@@ -257,7 +257,7 @@ class FunctionFeeder:
         """
         self.functions = []
 
-    def load_functions(self, group, parameters):
+    def load_functions(self, group, parameters=None):
         """
         Load functions from a specific set
 
@@ -270,8 +270,8 @@ class FunctionFeeder:
                 Sphere, Ackley, Easom, Linear
             posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
                 MultivariateNormal, GaussianShells, Linear
-            with-derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel
-            no-derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas, 
+            with_derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel
+            no_derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas, 
                 LeviNmbr13, Himmelblau, ThreeHumpCamel, Ackley, Easom, Block,
                 Eggbox, MultivariateNormal, GaussianShells,
                 Linear
@@ -313,7 +313,7 @@ class FunctionFeeder:
             function_names = [
                 'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel'
             ]
-        elif group in ['no-derivative']:
+        elif group in ['no_derivative']:
             function_names = [
                 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
                 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
@@ -332,6 +332,8 @@ class FunctionFeeder:
         else:
             raise Exception("Group '{}' not known".format(group))
         # Loop over function names and load each function
+        if parameters is None:
+            parameters = {}
         for name in function_names:
             if name not in parameters:
                 self.load_function(name)
