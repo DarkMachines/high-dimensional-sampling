@@ -707,6 +707,9 @@ class Block(TestFunction):
     [-`block_size`, `block_size`] in every dimension, where it takes on
     `block_value`.
 
+    The application range of this function is set to be -10 to 10 for each of
+    the input dimensions. No derivative has been defined.
+
     Args:
         dimensionality: Number of dimensions of the function. By default set
             to 3.
