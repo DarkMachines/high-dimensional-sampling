@@ -181,6 +181,7 @@ class Logger:
             line += points[i]
             line += labels[i]
             self.handle_samples.write(','.join(line) + "\n")
+        self.handle_samples.flush()
 
     def log_method_calls(self, dt, size_total, size_generated):
         """
