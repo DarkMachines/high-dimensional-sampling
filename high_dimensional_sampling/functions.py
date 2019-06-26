@@ -681,8 +681,11 @@ class Easom(TestFunction):
 
 class Cosine(TestFunction):
     """
-    1-D cosine function meant for posterior sampling. The ranges have been set
-    to [-4*pi, 4*pi].
+    1-D cosine function meant for posterior sampling.
+    
+        f(x) = cos(x) + 1
+
+    The ranges have been set to [-4*pi, 4*pi].
     """
 
     def __init__(self):
@@ -751,6 +754,9 @@ class Bessel(TestFunction):
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.j0.html,
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.j1.html.
 
+    To make sampling from this function possible, 0.5 is added to the evaluated
+    function value.
+
     The fast version of this function is an approximation of the true Bessel
     function.
 
@@ -768,8 +774,8 @@ class Bessel(TestFunction):
 
     def _evaluate(self, x):
         if not self.fast:
-            return special.jv(0, x)
-        return special.j0(x)
+            return special.jv(0, x)+0.5
+        return special.j0(x)+0.5
 
     def _derivative(self, x):
         if not self.fast:
