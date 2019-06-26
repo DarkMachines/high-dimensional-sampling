@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
-
+from scipy import special, stats
 from .utils import get_time
 
 
@@ -263,31 +263,30 @@ class FunctionFeeder:
 
         This method adds test functions to the FunctionFeeder that are
         belonging to a specific group of test functions. Currently implemented
-        is the group 'optimisation' (or equivalently 'optimization'), which
-        loads all test functions in this module meant for optimisation
-        problems:
+        are the following groups:
 
-        - Rastrigin
-        - Rosenbrock
-        - Beale
-        - Booth
-        - BukinNmbr6
-        - Matyas
-        - LeviNmbr13
-        - Himmelblau
-        - ThreeHumpCamel
-        - Sphere
-        - Ackley
-        - Easom
+            optimisation / optimization: Rastrigin, Rosenbrock, Beale, Booth,
+                BukinNmbr6, Mayas, leviNmbr13, Himmelblau, ThreeHumpCamel,
+                Sphere, Ackley, Easom, Linear
+            posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
+                MultivariateNormal, GaussianShells, Linear
+            with-derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel
+            no-derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas, 
+                LeviNmbr13, Himmelblau, ThreeHumpCamel, Ackley, Easom, Block,
+                Eggbox, MultivariateNormal, GaussianShells,
+                Linear
+            bounded: Rastrigin, Beale, Booth, BukinNmbr6, Matyas, LeviNmbr13,
+                Himmelblau, ThreeHumpCamel, Ackley, Easom, Bessel,
+                ModifiedBessel, Eggbox, MultivariateNormal, GaussianShells,
+                Linear
+            unbounded: Rosenbrock, Sphere, Block
 
         All functions are loaded with default configuration, unless
         configuration is set through the parameters argument.
 
         Args:
-            group: Name of the test function group to load. Currently
-                implemented is the group 'optimisation' (or equivalently
-                'optimization'), which loads all functions meant for
-                optimisation problems (see list above).
+            group: Name of the test function group to load. See above for all
+                implemented groups and the functions for each of these groups.
             parameters: Dictionary containing all configuration variables
                 for all test functions that should differ from the default
                 setting. Parameters are provided on a per-function basis via
@@ -303,8 +302,33 @@ class FunctionFeeder:
             function_names = [
                 'Rastrigin', 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6',
                 'Matyas', 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel',
-                'Sphere', 'Ackley', 'Easom'
+                'Sphere', 'Ackley', 'Easom', 'Linear'
             ]
+        elif group in ['posterior']:
+            function_names = [
+                'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
+                'MultivariateNormal', 'GaussianShells', 'Linear'
+            ]
+        elif group in ['with_derivative']:
+            function_names = [
+                'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel'
+            ]
+        elif group in ['no-derivative']:
+            function_names = [
+                'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
+                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
+                'Easom', 'Block', 'Eggbox', 'MultivariateNormal',
+                'GaussianShells', 'Linear'
+            ]
+        elif group in ['bounded']:
+            function_names = [
+                'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
+                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
+                'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
+                'MultivariateNormal', 'GaussianShells', 'Linear'
+            ]
+        elif group in ['unbounded']:
+            function_names = ['Rosenbrock', 'Sphere', 'Block']
         else:
             raise Exception("Group '{}' not known".format(group))
         # Loop over function names and load each function
@@ -371,6 +395,12 @@ class Rastrigin(TestFunction):
     """
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Rastrigin_function
+
+    The application range of this function is -5.12 to 5.12 for each of the
+    input dimensions.
+
+    Args:
+        dimensionality: Number of input dimensions the function should take.
     """
 
     def __init__(self, dimensionality=2):
@@ -394,7 +424,8 @@ class Rosenbrock(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Rosenbrock_function
 
-    No derivative implemented
+    This function has a dynamic dimensionality and is its application range is
+    unbounded. There is no derivative defined.
     """
 
     def __init__(self, dimensionality=2):
@@ -421,7 +452,8 @@ class Beale(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    No derivative implemented
+    This is a 2-dimensional function with an application range of -4.5 to 4.5
+    for both dimensions. No derivative has been defined.
     """
 
     def __init__(self):
@@ -442,7 +474,8 @@ class Booth(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    No derivative implemented
+    This is a 2-dimensional function bounded by -10 and 10 for both input
+    dimensions. No derivative has been defined.
     """
 
     def __init__(self):
@@ -462,7 +495,9 @@ class BukinNmbr6(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    No derivative implemented
+    This is a 2-dimensional function with an application range bounded by -15
+    and -5 for the first input variable and -3 and 3 for the second input
+    variable. No derivative has been defined.
     """
 
     def __init__(self):
@@ -483,7 +518,8 @@ class Matyas(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    No derivative implemented
+    This is a 2-dimensional function with an application range bounded by -10
+    and 10 for both input variables. No derivative has been defined.
     """
 
     def __init__(self):
@@ -503,7 +539,8 @@ class LeviNmbr13(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    No derivative implemented
+    This is a 2-dimensional function with an application range boundedd by -10
+    and 10 for both input variables. No derivative has been defined.
     """
 
     def __init__(self):
@@ -526,7 +563,8 @@ class Himmelblau(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Himmelblau%27s_function
 
-    No derivative implemented
+    This is a 2-dimensional function with an application range bounded by -5 
+    and 5 for both input variables. No derivative has been defined.
     """
 
     def __init__(self):
@@ -546,7 +584,8 @@ class ThreeHumpCamel(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    No derivative implemented
+    This is a 2-dimensional function with an application range bounded by -5 
+    and 5 for both input variables. No derivative has been defined.
     """
 
     def __init__(self):
@@ -573,6 +612,10 @@ class Sphere(TestFunction):
     The derivative of this function is implemented as
 
         y' = 2*x
+
+    The number of input dimensions for this function is configurable at
+    initialisation of and instance of this class. For each of these dimensions
+    the application range is unbounded.
     """
 
     def __init__(self, dimensionality=3):
@@ -591,7 +634,8 @@ class Ackley(TestFunction):
     Ackley function as defined by
     https://en.wikipedia.org/wiki/Ackley_function.
 
-    No derivative has been implemented.
+    This is a 2-dimensional function with an application range bounded by -5 
+    and 5 for each of these dimensions. No derivative has been defined.
     """
 
     def __init__(self):
@@ -616,7 +660,8 @@ class Easom(TestFunction):
     Easom function as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    No derivative has been implemented.
+    This is a 2-dimensional function with an application range bounded by -100
+    and 100 for both of these input dimensions. No derivative has been defined.
     """
 
     def __init__(self):
@@ -627,6 +672,277 @@ class Easom(TestFunction):
         return (-1 * np.cos(x[:, 0]) * np.cos(x[:, 1]) * np.exp(
             -1 *
             (np.power(x[:, 0] - np.pi, 2) + np.power(x[:, 1] - np.pi, 2))))
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
+
+class Cosine(TestFunction):
+    """
+    1-D cosine function meant for posterior sampling. The ranges have been set
+    to [-4*pi, 4*pi].
+    """
+
+    def __init__(self):
+        self.ranges = [[-4 * np.pi, 4 * np.pi]]
+        super(Cosine, self).__init__()
+
+    def _evaluate(self, x):
+        return np.cos(x)
+
+    def _derivative(self, x):
+        return -np.sin(x)
+
+
+class Block(TestFunction):
+    """
+    Multi-dimensional block function.
+
+    A function that is `global_value` everywhere except in the block spanned by
+    [-`block_size`, `block_size`] in every dimension, where it takes on
+    `block_value`.
+
+    Args:
+        dimensionality: Number of dimensions of the function. By default set
+            to 3.
+        block_size: Defines the ranges in which the block function should take 
+            on another value than the global default. Ranges are set for each
+            dimension as [-block_size, block_size]. Default: 1.
+        block_value: Value that the function takes *inside* the ranges spanned
+            by block_size. Default: 1.
+        global_value: Value that the function takes outside of the ranges
+            spanned by block_size. Default: 0.
+
+    """
+
+    def __init__(self,
+                 dimensionality=3,
+                 block_size=1,
+                 block_value=1,
+                 global_value=0):
+        self.dimensionality = dimensionality
+        self.block_size = block_size
+        self.block_value = block_value
+        self.global_value = global_value
+        self.ranges = self.construct_ranges(dimensionality, -100, 100)
+        super(Block, self).__init__()
+
+    def _evaluate(self, x):
+        boundary = np.array([self.block_size] * self.dimensionality)
+        inidx = np.all((-1 * boundary <= x) & (x <= boundary), axis=1)
+        return self.global_value + (self.block_value -
+                                    self.global_value) * inidx
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
+
+class Bessel(TestFunction):
+    """
+    Bessel function of the first kind.
+
+    Depending on the chosen function configuration, the computation of the 
+    function is performed using the jv function from scipy (if `fast` is set
+    to False): 
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.jv.html
+    or the j0 and j1 function (if `fast` is set to True):
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.j0.html,
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.j1.html.
+
+    The fast version of this function is an approximation of the true Bessel
+    function.
+
+    This is a 1-dimensional function with a range set to -100 to 100.
+    
+    Args:
+        fast: Boolean indicating which set of Bessel function implementations 
+            to use. See above for more information.
+    """
+
+    def __init__(self, fast=False):
+        self.ranges = [[-100, 100]]
+        self.fast = bool(fast)
+        super(Bessel, self).__init__()
+
+    def _evaluate(self, x):
+        if not self.fast:
+            return special.jv(0, x)
+        return special.j0(x)
+
+    def _derivative(self, x):
+        if not self.fast:
+            return special.jv(1, x)
+        return special.j1(x)
+
+
+class ModifiedBessel(TestFunction):
+    """
+    Modified Bessel function of the first kind.
+
+    Depending on the chosen function configuration, the computation of the 
+    function is performed using the jv function from scipy (if `fast` is set
+    to False): 
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kv.html
+    or the j0 and j1 function (if `fast` is set to True):
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.k0.html,
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.k1.html.
+
+    The fast version of this function is an approximation of the true modified
+    bessel function.
+
+    This is a 1-dimensional function with a range set to 0 to 10.
+    
+    Args:
+        fast: Boolean indicating which set of Bessel function implementations 
+            to use. See above for more information.
+    """
+
+    def __init__(self, fast=False):
+        self.ranges = [[0, 10]]
+        self.fast = bool(fast)
+        super(ModifiedBessel, self).__init__()
+
+    def _evaluate(self, x):
+        if not self.fast:
+            return special.kv(0, x)
+        return special.k0(x)
+
+    def _derivative(self, x):
+        if not self.fast:
+            return special.kv(1, x)
+        return special.k1(x)
+
+
+class Eggbox(TestFunction):
+    """
+    The Eggbox likelihood function as defined in the multinest paper
+    https://arxiv.org/pdf/0809.3437.pdf:
+
+        L(x, y) = exp(2 + cos(x/2)*cos(y/2))^5
+    
+    This is a 2-dimensional function bounded 0 and 10*pi in each dimension. No
+    derivative is defined.
+    """
+
+    def __init__(self):
+        self.ranges = [[0, 10 * np.pi], [0, 10 * np.pi]]
+        super(Eggbox, self).__init__()
+
+    def _evaluate(self, x):
+        return np.exp(
+            np.power(2 + np.cos(x[:, 0] / 2.0) * np.cos(x[:, 1] / 2.0), 5))
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
+
+class MultivariateNormal(TestFunction):
+    """
+    Multivariate normal distribution
+
+    The dimensionality of the function is determined by the determined based on
+    the provided covariance matrix. The range of the function is [-10, 10]
+    for each of the dimensions.
+
+    Args:
+        covariance: 2-dimension list or numpy array representing the covariance
+            matrix to use. By default is is set to the 2-dimensional unit
+            matrix, making the function 2-dimensional.
+    """
+
+    def __init__(self, covariance=None):
+        if covariance is None:
+            covariance = np.identity(2)
+        self.covariance = np.array(covariance)
+        n_dim = len(covariance)
+        self.ranges = self.construct_ranges(n_dim, -10, 10)
+        super(MultivariateNormal, self).__init__()
+
+    def _evaluate(self, x):
+        mu = np.zeros(len(self.covariance))
+        return stats.multivariate_normal.pdf(x, mu, self.covariance)
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
+
+class GaussianShells(TestFunction):
+    """
+    The Gaussian Shells likelihood function as defined in the multinest paper
+    https://arxiv.org/pdf/0809.3437.pdf:
+
+        L(x, y) = circ(x, c_1, r_1, w_1) + circ(x, c_2, r_2, w_2)
+        circ(x, c, r, w) = exp(-(|x-c|-r)^2/(2*w^2)) / sqrt(2*pi*w^2)
+    
+    where x and c are vectors in a flat 2-dimensional space, making this
+    testfunction 2-dimensional. The ranges of this function are set to
+    [-10, 10] for both input dimensions.
+    
+    This is a 2-dimensional function bounded 0 and 10*pi in each dimension. No
+    derivative is defined.
+
+    Args:
+        c_1: Numpy array or list with two entries, defining the center of the
+            first gaussian shell. It is set to [2.5, 0] by default.
+        r_1: Radius of the first gaussian shell. It is 2.0 by default.
+        w_1: Standard deviation of the first gaussian shell. By default this
+            value is 0.1.
+        c_2: Numpy array or list with two entries, defining the center of the
+            second gaussian shell. It is set to [2.5, 0] by default.
+        r_2: Radius of the second gaussian shell. It is 2.0 by default.
+        w_2: Standard deviation of the second gaussian shell. By default this
+            value is 0.1.
+    """
+
+    def __init__(self,
+                 c_1=[2.5, 0],
+                 r_1=2.0,
+                 w_1=0.1,
+                 c_2=[-2.5, 0],
+                 r_2=2.0,
+                 w_2=0.1):
+        self.c_1 = np.array(c_1)
+        self.r_1 = r_1
+        self.w_1 = w_1
+        self.c_2 = np.array(c_2)
+        self.r_2 = r_2
+        self.w_2 = w_2
+        self.ranges = [[-10, 10], [-10, 10]]
+        super(GaussianShells, self).__init__()
+
+    def _shell(self, x, c, r, w):
+        return (np.exp(-1 * np.power(np.linalg.norm(x - c) - r, 2) /
+                       (2 * w * w)) / np.sqrt(2 * np.pi * w * w))
+
+    def _evaluate(self, x):
+        shell_1 = self._shell(x, self.c_1, self.r_1, self.w_1)
+        shell_2 = self._shell(x, self.c_2, self.r_2, self.w_2)
+        return shell_1 + shell_2
+
+    def _derivative(self, x):
+        raise NoDerivativeError
+
+
+class Linear(TestFunction):
+    """
+    Test function defined by:
+
+        sum_i |x_i|
+    
+    The application range of this function is -10 to 10 for each of the input
+    dimensions. No derivative is defined.
+
+    Args:
+        dimensionality: Number of dimensions for input of the function. By
+            default this argument is set to 2.
+    """
+
+    def __init__(self, dimensionality=2):
+        self.ranges = self.construct_ranges(dimensionality, -10, 10)
+        super(Linear, self).__init__()
+
+    def _evaluate(self, x):
+        return np.sum(np.abs(x), 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
