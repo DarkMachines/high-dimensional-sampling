@@ -739,8 +739,7 @@ class Block(TestFunction):
         inidx = np.all((-1 * boundary <= x) & (x <= boundary), axis=1)
         y = self.global_value + (self.block_value -
                                     self.global_value) * inidx
-        y = y.reshape(-1,1)
-        return y
+        return y.reshape(-1,1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -841,8 +840,9 @@ class Eggbox(TestFunction):
         super(Eggbox, self).__init__()
 
     def _evaluate(self, x):
-        return np.exp(
+        y = np.exp(
             np.power(2 + np.cos(x[:, 0] / 2.0) * np.cos(x[:, 1] / 2.0), 5))
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -865,14 +865,15 @@ class MultivariateNormal(TestFunction):
     def __init__(self, covariance=None):
         if covariance is None:
             covariance = np.identity(2)
-        self.covariance = np.array(covariance)
+        self.covariance = covariance
         n_dim = len(covariance)
         self.ranges = self.construct_ranges(n_dim, -10, 10)
         super(MultivariateNormal, self).__init__()
 
     def _evaluate(self, x):
         mu = np.zeros(len(self.covariance))
-        return stats.multivariate_normal.pdf(x, mu, self.covariance)
+        y = stats.multivariate_normal.pdf(x, mu, self.covariance)
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -929,7 +930,7 @@ class GaussianShells(TestFunction):
     def _evaluate(self, x):
         shell_1 = self._shell(x, self.c_1, self.r_1, self.w_1)
         shell_2 = self._shell(x, self.c_2, self.r_2, self.w_2)
-        return shell_1 + shell_2
+        return (shell_1 + shell_2).reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError
@@ -954,7 +955,7 @@ class Linear(TestFunction):
         super(Linear, self).__init__()
 
     def _evaluate(self, x):
-        return np.sum(np.abs(x), 1)
+        return np.sum(np.abs(x), 1).reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
