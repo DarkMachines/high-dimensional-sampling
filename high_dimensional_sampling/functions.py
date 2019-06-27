@@ -104,7 +104,7 @@ class TestFunction(ABC):
         Raises:
             Exception: Provided data has dimensionality ?, but ? was expected.
         """
-        dim = self.ranges.shape[0]
+        dim = self.ranges.shape[1]
         dim_data = shape[1]
         if dim_data != dim:
             raise Exception(
@@ -285,8 +285,10 @@ class FunctionFeeder:
         configuration is set through the parameters argument.
 
         Args:
-            group: Name of the test function group to load. See above for all
+            groups: Name of the test function group to load. See above for all
                 implemented groups and the functions for each of these groups.
+                It is also possible to provide a list of names, which could
+                load the intersection of the provided groups.
             parameters: Dictionary containing all configuration variables
                 for all test functions that should differ from the default
                 setting. Parameters are provided on a per-function basis via
@@ -298,43 +300,58 @@ class FunctionFeeder:
             Exception: Group '?' not known
         """
         # Define functions for group
-        if group in ['optimisation', 'optimization']:
-            function_names = [
-                'Rastrigin', 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6',
-                'Matyas', 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel',
-                'Sphere', 'Ackley', 'Easom', 'Linear'
-            ]
-        elif group in ['posterior']:
-            function_names = [
-                'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                'MultivariateNormal', 'GaussianShells', 'Linear'
-            ]
-        elif group in ['with_derivative']:
-            function_names = [
-                'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel'
-            ]
-        elif group in ['no_derivative']:
-            function_names = [
-                'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
-                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
-                'Easom', 'Block', 'Eggbox', 'MultivariateNormal',
-                'GaussianShells', 'Linear'
-            ]
-        elif group in ['bounded']:
-            function_names = [
-                'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
-                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
-                'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                'MultivariateNormal', 'GaussianShells', 'Linear'
-            ]
-        elif group in ['unbounded']:
-            function_names = ['Rosenbrock', 'Sphere', 'Block']
+        function_names = {
+            'optimisation': ['Rastrigin', 'Rosenbrock', 'Beale', 'Booth',
+                    'BukinNmbr6', 'Matyas', 'LeviNmbr13', 'Himmelblau',
+                    'ThreeHumpCamel', 'Sphere', 'Ackley', 'Easom', 'Linear'
+                ],
+            'posterior': [
+                    'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
+                    'MultivariateNormal', 'GaussianShells', 'Linear'
+                ],
+            'with_derivative': [
+                    'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel'
+                ],
+            'no_derivative': [
+                    'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
+                    'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
+                    'Easom', 'Block', 'Eggbox', 'MultivariateNormal',
+                    'GaussianShells', 'Linear'
+                ],
+            'bounded': [
+                    'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
+                    'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
+                    'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
+                    'MultivariateNormal', 'GaussianShells', 'Linear'
+                ],
+            'unbounded': ['Rosenbrock', 'Sphere', 'Block']
+        }
+        function_names['optimization'] = function_names['optimisation']
+        # Check if provided function names are known
+        if isinstance(group, str):
+            if group not in function_names:
+                raise Exception("Group '{}' not known".format(group))
+        elif isinstance(group, list):
+            for g in group:
+                if g not in function_names:
+                    raise Exception("Group '{}' not known".format(g))
         else:
-            raise Exception("Group '{}' not known".format(group))
+            raise Exception("Group should be a string or a list of strings")
+        # Create list of function names to load
+        load = None
+        if isinstance(group, str):
+            load = function_names[group]
+        else:
+            for g in group:
+                if load is not None:
+                    load = [func for func in load if func in function_names[g]]
+                else:
+                    load = function_names[g]
+        print(load)
         # Loop over function names and load each function
         if parameters is None:
             parameters = {}
-        for name in function_names:
+        for name in load:
             if name not in parameters:
                 self.load_function(name)
             else:
@@ -414,7 +431,7 @@ class Rastrigin(TestFunction):
         y = self.a * n
         for i in range(n):
             y += np.power(x[:, i], 2) - self.a * np.cos(2 * np.pi * x[:, i])
-        return y
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         return 2 * x + 2 * np.pi * self.a * np.sin(2 * np.pi * x)
@@ -442,7 +459,7 @@ class Rosenbrock(TestFunction):
         for i in range(n - 1):
             y += (100 * np.power(x[:, i + 1] - np.power(x[:, i], 2), 2) +
                   np.power(1 - x[:, i], 2))
-        return y
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -462,9 +479,10 @@ class Beale(TestFunction):
         super(Beale, self).__init__()
 
     def _evaluate(self, x):
-        return (np.power(1.5 - x[:, 0] + x[:, 0] * x[:, 1], 2) +
-                np.power(2.25 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 2), 2) +
-                np.power(2.625 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 3), 2))
+        y = (np.power(1.5 - x[:, 0] + x[:, 0] * x[:, 1], 2) +
+             np.power(2.25 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 2), 2) +
+             np.power(2.625 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 3), 2))
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -484,8 +502,9 @@ class Booth(TestFunction):
         super(Booth, self).__init__()
 
     def _evaluate(self, x):
-        return np.power(x[:, 0] + 2 * x[:, 1] - 7, 2) + np.power(
+        y = np.power(x[:, 0] + 2 * x[:, 1] - 7, 2) + np.power(
             2 * x[:, 0] + x[:, 1] - 5, 2)
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -506,9 +525,10 @@ class BukinNmbr6(TestFunction):
         super(BukinNmbr6, self).__init__()
 
     def _evaluate(self, x):
-        return 100 * np.sqrt(
+        y = 100 * np.sqrt(
             np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2)) +
             0.01 * np.abs(x[:, 0] + 10))
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -528,8 +548,9 @@ class Matyas(TestFunction):
         super(Matyas, self).__init__()
 
     def _evaluate(self, x):
-        return 0.26 * (np.power(x[:, 0], 2) +
+        y = 0.26 * (np.power(x[:, 0], 2) +
                        np.power(x[:, 1], 2)) - 0.48 * x[:, 0] * x[:, 1]
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -549,11 +570,12 @@ class LeviNmbr13(TestFunction):
         super(LeviNmbr13, self).__init__()
 
     def _evaluate(self, x):
-        return (np.power(np.sin(3 * np.pi * x[:, 0]), 2) +
+        y = (np.power(np.sin(3 * np.pi * x[:, 0]), 2) +
                 np.power(x[:, 0] - 1, 2) *
                 (1 + np.power(np.sin(3 * np.pi * x[:, 1]), 2)) +
                 np.power(x[:, 1] - 1, 2) *
                 (1 + np.power(np.sin(2 * np.pi * x[:, 1]), 2)))
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -574,7 +596,7 @@ class Himmelblau(TestFunction):
 
     def _evaluate(self, x):
         return (np.power(np.power(x[:, 0], 2) + x[:, 1] - 11, 2) +
-                np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2))
+                np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2)).reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -596,7 +618,7 @@ class ThreeHumpCamel(TestFunction):
     def _evaluate(self, x):
         return (2.0 * np.power(x[:, 0], 2) - 1.05 * np.power(x[:, 0], 4) +
                 np.power(x[:, 0], 6) / 6.0 + x[:, 0] * x[:, 1] +
-                np.power(x[:, 1], 2))
+                np.power(x[:, 1], 2)).reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
