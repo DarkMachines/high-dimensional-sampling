@@ -78,6 +78,7 @@ class Experiment(ABC):
         self.logger.log_benchmarks()
         # Make function available both to the Experiment and the Method
         self.function = function
+        self.method.reset()
         self.method.function = self.function
         # Perform sampling as long as procedure is not finished
         is_finished = False

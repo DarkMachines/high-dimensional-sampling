@@ -67,3 +67,10 @@ class Method(ABC):
             happens, the experiment in which this Method is tested will stop.
         """
         raise NotImplementedError
+
+    @abstractmethod
+    def reset(self):
+        """
+        Resets all internal settings to the defaults
+        """
+        raise NotImplementedError
