@@ -18,18 +18,18 @@ class RejectionSampling(hds.Method):
             x = self.get_point(function.ranges)
             y = function(x)
             r = np.random.rand()
-            s = (y-self.minimum)/(self.maximum - self.minimum)
+            s = (y - self.minimum) / (self.maximum - self.minimum)
             if s > r:
                 found = True
         return (x, y)
-    
+
     def get_point(self, ranges, N=1):
         ndim = len(ranges)
         r = np.array(ranges)
         x = np.random.rand(N, ndim)
-        x = x*(r[:,1] - r[:,0]) + r[:,0]
+        x = x * (r[:, 1] - r[:, 0]) + r[:, 0]
         return x
-    
+
     def sample_for_extrama(self, function):
         x = self.get_point(function.ranges, 100000)
         y = function(x)
@@ -41,19 +41,18 @@ class RejectionSampling(hds.Method):
 
 
 method = RejectionSampling()
-experiment = hds.Experiment(method, '/Users/bstienen/Desktop/hds')
+experiment = hds.PosteriorSamplingExperiment(method,
+                                             '/Users/bstienen/Desktop/hds')
 feeder = hds.functions.FunctionFeeder()
 feeder.load_functions(
-    'posterior',
-    {
+    'posterior', {
         "Block": {
             "block_size": 8
         },
         "MultivariateNormal": {
             "covariance": [[4, 0], [0, 4]]
         }
-    }
-)
+    })
 
 for function in feeder:
     experiment.run(function, finish_line=200)
