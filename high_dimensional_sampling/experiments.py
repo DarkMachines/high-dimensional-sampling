@@ -1,17 +1,19 @@
+from abc import ABC, abstractmethod
 import os
 import getpass
 import pandas as pd
 import yaml
 import copy
+import numpy as np
 
 from .utils import get_time, get_datetime, create_unique_folder, benchmark_matrix_inverse, benchmark_sha_hashing
 from .methods import Method
 from .functions import TestFunction
 
 
-class Experiment:
+class Experiment(ABC):
     """
-    Class to perform experiments on Methods with TestFunctions
+    Base class for performing experiments on Methods with TestFunctions
 
     This class allows to test sampling methods implemented as a derived class
     from the methods.Method class by letting it work on a TestFunction derived
@@ -33,7 +35,7 @@ class Experiment:
         self.method = method
         self.logger = None
 
-    def run(self, function, log_data=True, finish_line=10000):
+    def _perform_experiment(self, function, log_data=True):
         """
         Run the experiment.
 
@@ -62,7 +64,9 @@ class Experiment:
             Exception: Provided function should have functions.TestFunction as
                 base class.
         """
-        print("Run experiment for '{}' on function '{}'...".format(type(self.method).__name__, type(function).__name__))
+        print("Run experiment for '{}' on function '{}'...".format(
+            type(self.method).__name__,
+            type(function).__name__))
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
             raise Exception(
@@ -77,7 +81,7 @@ class Experiment:
         self.method.function = self.function
         # Perform sampling as long as procedure is not finished
         is_finished = False
-        self.n_sampled = 0
+        n_sampled = 0
         while not is_finished:
             self.logger.method_calls += 1
             # Perform an method iteration and keep track of time elapsed
@@ -86,8 +90,8 @@ class Experiment:
             dt = get_time() - t_start
             # Log method call
             n = len(x)
-            self.n_sampled += n
-            self.logger.log_method_calls(dt, self.n_sampled, n)
+            n_sampled += n
+            self.logger.log_method_calls(dt, n_sampled, n)
             # Log sampled data
             if log_data:
                 self.logger.log_samples(x, y)
@@ -96,11 +100,207 @@ class Experiment:
             self.function.reset()
             # Check if the experiment has to stop and update the while
             # condition to control this.
-            is_finished = self.method.is_finished()
-            if isinstance(finish_line, (int, float)):
-                is_finished = is_finished or (self.n_sampled >= finish_line)
+            is_finished = (self.method.is_finished()
+                           or self._stop_experiment(x, y))
         # Delete the logger to close all handles
         del (self.logger)
+
+    @abstractmethod
+    def run(self):
+        pass
+
+    @abstractmethod
+    def _stop_experiment(self, x, y):
+        pass
+
+
+class OptimisationExperiment(Experiment):
+    """
+    Class for performing optimisation experiments.
+
+    This class allows for performing optimisation experiments implemented as a
+    derived class from the methods.Method class by letting them work on a 
+    TestFunction derived derived class instance. It automatically takes care of
+    logging (through a Logger instance) and sanity checks.
+    
+    The OptimisationExperiment implements functionality to set stopping
+    criterea relevant for such experiments. The configuration of these stopping
+    criterea is done through the `epsilon`, `absolute_improvement`, `patience`
+    and `finish_line` arguments of the .run() method.
+
+    Args:
+        method: An instance of a Method derived class that needs to be tested
+            in this experiment.
+        path: Path to which the experiment should write its logs.
+    """
+
+    def run(self,
+            function,
+            epsilon,
+            absolute_improvement,
+            patience=100,
+            finish_line=1000,
+            log_data=True):
+        """
+        Run the optimisation experiment on the provided test function.
+
+        The experiment is stopped if the method did not show an `epsilon`
+        improvement over `patience` samplings. If `absolute_improvement` is set
+        to True, the epsilon is interpreted as an absolute improvement,
+        otherwise it is interpreted as a relative improvement. The finish_line
+        configures a hard cut-off: if the total number of sampled points
+        reaches or exceeds this number, the experiment is stopped (regardless
+        of any other stopping criterion).
+
+        OptimisationExperiment uses the Experiment class as its base class and
+        is identical to the OptimizationExperiment class.
+
+        Args:
+            function: Function to run the experiment with. This should be an
+                instance of a class with the functions.TestFunction class as
+                base class.
+            epsilon: Required improvement on the sampled value. If this is not
+                obtained, the experiment is stopped. See the
+                `absolute_improvement` and `patience` arguments for finetuning
+                of this argument and stopping criterion.
+            absolute_improvement: Boolean indicating if the epsilon argument
+                should be interpreted as a requirement on the absolute
+                improvement (True) or on the relative improvement (False).
+            patience: Number of samples that the method may violate the 
+                epsilon improvement requirement before the experiment is
+                stopped. It is set to 100 by default.
+            finish_line: If the total sampled data set reaches or exceeds this
+                size, the experiment is stopped. This is a hard stop, not a
+                stopping condition that has to be met: if the method being
+                tested indicates it is finished, the experiment will be
+                stopped, regardless of the size of the sampled data set. The
+                finish_line is set to 1,000 by default. If set to None, the
+                experiment will continue to run until the method indicates
+                it is finished.
+            log_data: Boolean indicating if the sampled data should be logged
+                as well. It is set to True by default.
+        """
+        self.epsilon = epsilon
+        self.absolute_improvement = absolute_improvement
+        self.patience = patience
+        self.finish_line = finish_line
+        self.n_sampled = None
+        self.optimals = []
+        self._perform_experiment(function, log_data)
+
+    def _stop_experiment(self, x, y):
+        """
+        Uses the stopping criterion defined in the .run() method to determine
+        if the experiment should be stopped.
+
+        Args:
+            x: Sampled data in the form of a numpy.ndarray of shape
+                (nDatapoints, nVariables).
+            y: Function values for the samples datapoints of shape
+                (nDatapoints, ?)
+        
+        Returns:
+            Boolean indicating if the experiment should be stopped (i.e. the
+            stopping criterion is reached).
+        """
+        if self.n_sampled is None:
+            self.n_sampled = [len(x)]
+        else:
+            self.n_sampled.append(self.n_sampled[-1] + len(x))
+        if self.n_sampled[-1] > self.finish_line:
+            return True
+        self.optimals.append(np.min(y))
+        if self._sampled_since_last_improvement() > self.patience:
+            return True
+        return False
+
+    def _sampled_since_last_improvement(self):
+        """
+        Calculated the number of data points sampled since the last epsilon
+        improvement. Both epsilon and the interpretation of epsilon (i.e.
+        absolute_improvement) are taken from the .run() arguments
+
+        Returns:
+            Number of samples sampled since last epsilon improvement.
+        """
+        cut = self.optimals[-1]
+        for i in range(len(self.optimals) - 2, 0, -1):
+            if self.absolute_improvement:
+                condition = cut - self.optimals[i]
+            else:
+                condition = self.optimals[i] / float(cut)
+            if condition > self.epsilon:
+                return self.n_sampled[-1] - self.n_sampled[i]
+        return self.n_sampled[-1] - self.n_sampled[0]
+
+
+class OptimizationExperiment(OptimisationExperiment):
+    """
+    Alias of the OptimisationExperiment class
+    """
+    pass
+
+
+class PosteriorSamplingExperiment(Experiment):
+    """
+    Class for performing optimisation experiments.
+
+    This class allows for performing posterior sampling methods implemented as
+    a derived class from the methods.Method class by letting it work on a
+    TestFunction derived class instance. It automatically takes care of
+    logging (through a Logger instance) and sanity checks.
+
+    Args:
+        method: An instance of a Method derived class that needs to be tested
+            in this experiment.
+        path: Path to which the experiment should write its logs.
+    """
+
+    def run(self, function, finish_line=1000, log_data=True):
+        """
+        Run the posterior sampling experiment on the provided test function.
+
+        The experiment is stopped if the total number of sampled points reaches
+        or exceeds the number defined in the `finish_line` argument.
+
+        Args:
+            function: Function to run the experiment with. This should be an
+                instance of a class with the functions.TestFunction class as
+                base class.
+            finish_line: If the total sampled data set reaches or exceeds this
+                size, the experiment is stopped. This is a hard stop, not a
+                stopping condition that has to be met: if the method being
+                tested indicates it is finished, the experiment will be
+                stopped, regardless of the size of the sampled data set. The
+                finish_line is set to 10,000 by default. If set to None, the
+                experiment will continue to run until the method indicates
+                it is finished.
+            log_data: Boolean indicating if the sampled data should be logged
+                as well. It is set to True by default.
+        """
+        self.finish_line = finish_line
+        self.n_sampled = 0
+        self._perform_experiment(function, log_data)
+
+    def _stop_experiment(self, x, y):
+        """
+        Uses the stopping criterion defined in the .run() method to determine
+        if the experiment should be stopped.
+
+        Args:
+            x: Sampled data in the form of a numpy.ndarray of shape
+                (nDatapoints, nVariables).
+            y: Function values for the samples datapoints of shape
+                (nDatapoints, ?)
+        
+        Returns:
+            Boolean indicating if the experiment should be stopped (i.e. the
+            stopping criterion is reached).
+        """
+        self.n_sampled += len(x)
+        if self.n_sampled >= self.finish_line:
+            return True
+        return False
 
 
 class Logger:

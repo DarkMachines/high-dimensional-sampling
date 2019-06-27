@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-
 from .__version__ import __version__
-from .experiments import Experiment
+from .experiments import PosteriorSamplingExperiment, OptimisationExperiment, OptimizationExperiment
 from .methods import Method
 from . import functions
 
