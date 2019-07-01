@@ -27,10 +27,10 @@ class RejectionSampling(hds.Method):
                 found = True
         return (x, y)
 
-    def get_point(self, ranges, N=1):
+    def get_point(self, ranges, n=1):
         ndim = len(ranges)
         r = np.array(ranges)
-        x = np.random.rand(N, ndim)
+        x = np.random.rand(n, ndim)
         x = x * (r[:, 1] - r[:, 0]) + r[:, 0]
         return x
 
@@ -42,7 +42,7 @@ class RejectionSampling(hds.Method):
 
     def reset(self):
         pass
-        
+
     def is_finished(self):
         return False
 

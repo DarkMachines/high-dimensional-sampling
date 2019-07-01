@@ -116,7 +116,7 @@ class Experiment(ABC):
                 (nDatapoints, nVariables).
             y: Function values for the samples datapoints of shape
                 (nDatapoints, ?)
-        
+
         Returns:
             Boolean indicating if the experiment should be stopped (i.e. the
             stopping criterion is reached).

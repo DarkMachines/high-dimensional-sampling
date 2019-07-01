@@ -271,7 +271,7 @@ class FunctionFeeder:
             posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
                 MultivariateNormal, GaussianShells, Linear
             with_derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel
-            no_derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas, 
+            no_derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas,
                 LeviNmbr13, Himmelblau, ThreeHumpCamel, Ackley, Easom, Block,
                 Eggbox, MultivariateNormal, GaussianShells,
                 Linear
@@ -301,29 +301,29 @@ class FunctionFeeder:
         """
         # Define functions for group
         function_names = {
-            'optimisation': ['Rastrigin', 'Rosenbrock', 'Beale', 'Booth',
-                    'BukinNmbr6', 'Matyas', 'LeviNmbr13', 'Himmelblau',
-                    'ThreeHumpCamel', 'Sphere', 'Ackley', 'Easom', 'Linear'
-                ],
+            'optimisation': [
+                'Rastrigin', 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6',
+                'Matyas', 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel',
+                'Sphere', 'Ackley', 'Easom', 'Linear'
+            ],
             'posterior': [
-                    'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                    'MultivariateNormal', 'GaussianShells', 'Linear'
-                ],
-            'with_derivative': [
-                    'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel'
-                ],
+                'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
+                'MultivariateNormal', 'GaussianShells', 'Linear'
+            ],
+            'with_derivative':
+            ['Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel'],
             'no_derivative': [
-                    'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
-                    'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
-                    'Easom', 'Block', 'Eggbox', 'MultivariateNormal',
-                    'GaussianShells', 'Linear'
-                ],
+                'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
+                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
+                'Easom', 'Block', 'Eggbox', 'MultivariateNormal',
+                'GaussianShells', 'Linear'
+            ],
             'bounded': [
-                    'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
-                    'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
-                    'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                    'MultivariateNormal', 'GaussianShells', 'Linear'
-                ],
+                'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
+                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
+                'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
+                'MultivariateNormal', 'GaussianShells', 'Linear'
+            ],
             'unbounded': ['Rosenbrock', 'Sphere', 'Block']
         }
         function_names['optimization'] = function_names['optimisation']
@@ -549,7 +549,7 @@ class Matyas(TestFunction):
 
     def _evaluate(self, x):
         y = 0.26 * (np.power(x[:, 0], 2) +
-                       np.power(x[:, 1], 2)) - 0.48 * x[:, 0] * x[:, 1]
+                    np.power(x[:, 1], 2)) - 0.48 * x[:, 0] * x[:, 1]
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -571,10 +571,10 @@ class LeviNmbr13(TestFunction):
 
     def _evaluate(self, x):
         y = (np.power(np.sin(3 * np.pi * x[:, 0]), 2) +
-                np.power(x[:, 0] - 1, 2) *
-                (1 + np.power(np.sin(3 * np.pi * x[:, 1]), 2)) +
-                np.power(x[:, 1] - 1, 2) *
-                (1 + np.power(np.sin(2 * np.pi * x[:, 1]), 2)))
+             np.power(x[:, 0] - 1, 2) *
+             (1 + np.power(np.sin(3 * np.pi * x[:, 1]), 2)) +
+             np.power(x[:, 1] - 1, 2) *
+             (1 + np.power(np.sin(2 * np.pi * x[:, 1]), 2)))
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -586,7 +586,7 @@ class Himmelblau(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Himmelblau%27s_function
 
-    This is a 2-dimensional function with an application range bounded by -5 
+    This is a 2-dimensional function with an application range bounded by -5
     and 5 for both input variables. No derivative has been defined.
     """
 
@@ -596,7 +596,8 @@ class Himmelblau(TestFunction):
 
     def _evaluate(self, x):
         return (np.power(np.power(x[:, 0], 2) + x[:, 1] - 11, 2) +
-                np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2)).reshape(-1, 1)
+                np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2)).reshape(
+                    -1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -607,7 +608,7 @@ class ThreeHumpCamel(TestFunction):
     Testfunction as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    This is a 2-dimensional function with an application range bounded by -5 
+    This is a 2-dimensional function with an application range bounded by -5
     and 5 for both input variables. No derivative has been defined.
     """
 
@@ -657,7 +658,7 @@ class Ackley(TestFunction):
     Ackley function as defined by
     https://en.wikipedia.org/wiki/Ackley_function.
 
-    This is a 2-dimensional function with an application range bounded by -5 
+    This is a 2-dimensional function with an application range bounded by -5
     and 5 for each of these dimensions. No derivative has been defined.
     """
 
@@ -703,7 +704,7 @@ class Easom(TestFunction):
 class Cosine(TestFunction):
     """
     1-D cosine function meant for posterior sampling.
-    
+
         f(x) = cos(x) + 1
 
     The ranges have been set to [-4*pi, 4*pi].
@@ -714,10 +715,10 @@ class Cosine(TestFunction):
         super(Cosine, self).__init__()
 
     def _evaluate(self, x):
-        return (np.cos(x)+1).reshape(-1, 1)
+        return (np.cos(x) + 1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return (-np.sin(x)+1).reshape(-1, 1)
+        return (-np.sin(x) + 1).reshape(-1, 1)
 
 
 class Block(TestFunction):
@@ -734,7 +735,7 @@ class Block(TestFunction):
     Args:
         dimensionality: Number of dimensions of the function. By default set
             to 3.
-        block_size: Defines the ranges in which the block function should take 
+        block_size: Defines the ranges in which the block function should take
             on another value than the global default. Ranges are set for each
             dimension as [-block_size, block_size]. Default: 1.
         block_value: Value that the function takes *inside* the ranges spanned
@@ -759,9 +760,8 @@ class Block(TestFunction):
     def _evaluate(self, x):
         boundary = np.array([self.block_size] * self.dimensionality)
         inidx = np.all((-1 * boundary <= x) & (x <= boundary), axis=1)
-        y = self.global_value + (self.block_value -
-                                    self.global_value) * inidx
-        return y.reshape(-1,1)
+        y = self.global_value + (self.block_value - self.global_value) * inidx
+        return y.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -771,9 +771,9 @@ class Bessel(TestFunction):
     """
     Bessel function of the first kind.
 
-    Depending on the chosen function configuration, the computation of the 
+    Depending on the chosen function configuration, the computation of the
     function is performed using the jv function from scipy (if `fast` is set
-    to False): 
+    to False):
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.jv.html
     or the j0 and j1 function (if `fast` is set to True):
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.j0.html,
@@ -786,9 +786,9 @@ class Bessel(TestFunction):
     function.
 
     This is a 1-dimensional function with a range set to -100 to 100.
-    
+
     Args:
-        fast: Boolean indicating which set of Bessel function implementations 
+        fast: Boolean indicating which set of Bessel function implementations
             to use. See above for more information.
     """
 
@@ -799,8 +799,8 @@ class Bessel(TestFunction):
 
     def _evaluate(self, x):
         if not self.fast:
-            return special.jv(0, x)+0.5
-        return special.j0(x)+0.5
+            return special.jv(0, x) + 0.5
+        return special.j0(x) + 0.5
 
     def _derivative(self, x):
         if not self.fast:
@@ -812,9 +812,9 @@ class ModifiedBessel(TestFunction):
     """
     Modified Bessel function of the first kind.
 
-    Depending on the chosen function configuration, the computation of the 
+    Depending on the chosen function configuration, the computation of the
     function is performed using the jv function from scipy (if `fast` is set
-    to False): 
+    to False):
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kv.html
     or the j0 and j1 function (if `fast` is set to True):
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.k0.html,
@@ -824,9 +824,9 @@ class ModifiedBessel(TestFunction):
     bessel function.
 
     This is a 1-dimensional function with a range set to 0 to 10.
-    
+
     Args:
-        fast: Boolean indicating which set of Bessel function implementations 
+        fast: Boolean indicating which set of Bessel function implementations
             to use. See above for more information.
     """
 
@@ -852,7 +852,7 @@ class Eggbox(TestFunction):
     https://arxiv.org/pdf/0809.3437.pdf:
 
         L(x, y) = exp(2 + cos(x/2)*cos(y/2))^5
-    
+
     This is a 2-dimensional function bounded 0 and 10*pi in each dimension. No
     derivative is defined.
     """
@@ -908,11 +908,11 @@ class GaussianShells(TestFunction):
 
         L(x, y) = circ(x, c_1, r_1, w_1) + circ(x, c_2, r_2, w_2)
         circ(x, c, r, w) = exp(-(|x-c|-r)^2/(2*w^2)) / sqrt(2*pi*w^2)
-    
+
     where x and c are vectors in a flat 2-dimensional space, making this
     testfunction 2-dimensional. The ranges of this function are set to
     [-10, 10] for both input dimensions.
-    
+
     This is a 2-dimensional function bounded 0 and 10*pi in each dimension. No
     derivative is defined.
 
@@ -963,7 +963,7 @@ class Linear(TestFunction):
     Test function defined by:
 
         sum_i |x_i|
-    
+
     The application range of this function is -10 to 10 for each of the input
     dimensions. No derivative is defined.
 
