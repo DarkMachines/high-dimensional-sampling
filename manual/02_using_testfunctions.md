@@ -1,13 +1,14 @@
 # Using `TestFunction`s
 The `high_dimensional_sampling` package implements a variety of functions on
-which sampling methods can be tested. These are all classes with the 
+which sampling procedures can be tested. These are all classes with the 
 `functions.TestFunction` class as their base. This base class automatically
 keeps track of the number of function evaluations and performs checks on the
 input data to make sure it has the correct number of dimensions. The 
 `TestFunction` class is abstract and can not be instantiated itself.
 
 ## Evaluating the function('s derivative)
-As testfunctions are implemented as classes, they can be evaluated after initialisation. For example, if we want to evaluate the `Cosine` testfunction
+As testfunctions are implemented as classes, they can be evaluated after
+initialisation. For example, if we want to evaluate the `Cosine` testfunction
 at `x=2.65`, we would use the following script:
 
     import high_dimensional_sampling as hds
@@ -74,5 +75,7 @@ the testfunction. If no derivative is implemented, this method should raise
 a `functions.NoDerivativeError`.
 
 ## Looping over functions
-Have a look at [Using and Looping over TestFunctions](03_selecting_and_looping_over_testfunctions.md) for more information on how to
-automatically select and loop over test functions.
+Have a look at
+[Using and Looping over TestFunctions](03_selecting_and_looping_over_testfunctions.md)
+for more information on how to automatically select and loop over test
+functions.

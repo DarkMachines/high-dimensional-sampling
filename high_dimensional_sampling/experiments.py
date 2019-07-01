@@ -7,32 +7,32 @@ import copy
 import numpy as np
 
 from .utils import get_time, get_datetime, create_unique_folder, benchmark_matrix_inverse, benchmark_sha_hashing
-from .methods import Method
+from .procedures import Procedure
 from .functions import TestFunction
 
 
 class Experiment(ABC):
     """
-    Base class for performing experiments on Methods with TestFunctions
+    Base class for performing experiments on Procedures with TestFunctions
 
-    This class allows to test sampling methods implemented as a derived class
-    from the methods.Method class by letting it work on a TestFunction derived
-    class instance. It automatically takes care of logging (through a Logger
-    instance) and sanity checks.
+    This class allows to test sampling procedures implemented as a derived
+    class from the procedures.Procedure class by letting it work on a
+    TestFunction derived class instance. It automatically takes care of logging
+    (through a Logger instance) and sanity checks.
 
     Args:
-        method: An instance of a Method derived class that needs to be tested
-            in this experiment.
+        procedure: An instance of a Procedure derived class that needs to be
+            tested in this experiment.
         path: Path to which the experiment should write its logs.
     """
 
-    def __init__(self, method, path):
-        if not isinstance(method, Method):
+    def __init__(self, procedure, path):
+        if not isinstance(procedure, Procedure):
             raise Exception(
-                """SamplingExperiments should be provided an instance of a
-                class derived from the methods.Sampler class.""")
+                """Experimetns should be provided an instance of a
+                class derived from the procedures.Procedure class.""")
         self.path = path
-        self.method = method
+        self.procedure = procedure
         self.logger = None
 
     def _perform_experiment(self, function, log_data=True):
@@ -40,10 +40,10 @@ class Experiment(ABC):
         Run the experiment.
 
         Calling this method will run the experiment on the provided function.
-        It will continue to run as long as the method being tested in this
+        It will continue to run as long as the procedure being tested in this
         experiment is not finished (checked through its is_finished method)
         or a specified number of sampled datapoints is reached (configured
-        via the finish_line argument of this method).
+        via the finish_line argument of this procedure).
 
         Args:
             function: Function to run the experiment with. This should be an
@@ -53,11 +53,11 @@ class Experiment(ABC):
                 as well. It is set to True by default.
             finish_line: If the total sampled data set reaches or exceeds this
                 size, the experiment is stopped. This is a hard stop, not a
-                stopping condition that has to be met: if the method being
+                stopping condition that has to be met: if the procedure being
                 tested indicates it is finished, the experiment will be
                 stopped, regardless of the size of the sampled data set. The
                 finish_line is set to 10,000 by default. If set to None, the
-                experiment will continue to run until the method indicates
+                experiment will continue to run until the procedure indicates
                 it is finished.
 
         Raises:
@@ -65,7 +65,7 @@ class Experiment(ABC):
                 base class.
         """
         print("Run experiment for '{}' on function '{}'...".format(
-            type(self.method).__name__,
+            type(self.procedure).__name__,
             type(function).__name__))
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
@@ -76,23 +76,23 @@ class Experiment(ABC):
         self.logger = Logger(self.path, (type(function).__name__).lower())
         self.logger.log_experiment(self, function)
         self.logger.log_benchmarks()
-        # Make function available both to the Experiment and the Method
+        # Make function available both to the Experiment and the Procedure
         self.function = function
-        self.method.reset()
-        self.method.function = self.function
+        self.procedure.reset()
+        self.procedure.function = self.function
         # Perform sampling as long as procedure is not finished
         is_finished = False
         n_sampled = 0
         while not is_finished:
-            self.logger.method_calls += 1
-            # Perform an method iteration and keep track of time elapsed
+            self.logger.procedure_calls += 1
+            # Perform an procedure iteration and keep track of time elapsed
             t_start = get_time()
-            x, y = self.method(self.function)
+            x, y = self.procedure(self.function)
             dt = get_time() - t_start
-            # Log method call
+            # Log procedure call
             n = len(x)
             n_sampled += n
-            self.logger.log_method_calls(dt, n_sampled, n)
+            self.logger.log_procedure_calls(dt, n_sampled, n)
             # Log sampled data
             if log_data:
                 self.logger.log_samples(x, y)
@@ -101,7 +101,7 @@ class Experiment(ABC):
             self.function.reset()
             # Check if the experiment has to stop and update the while
             # condition to control this.
-            is_finished = (self.method.is_finished()
+            is_finished = (self.procedure.is_finished()
                            or self._stop_experiment(x, y))
         # Delete the logger to close all handles
         del (self.logger)
@@ -139,11 +139,11 @@ class Experiment(ABC):
                 base class.
             finish_line: If the total sampled data set reaches or exceeds this
                 size, the experiment is stopped. This is a hard stop, not a
-                stopping condition that has to be met: if the method being
+                stopping condition that has to be met: if the procedure being
                 tested indicates it is finished, the experiment will be
                 stopped, regardless of the size of the sampled data set. The
                 finish_line is set to 10,000 by default. If set to None, the
-                experiment will continue to run until the method indicates
+                experiment will continue to run until the procedure indicates
                 it is finished.
             log_data: Boolean indicating if the sampled data should be logged
                 as well. It is set to True by default.
@@ -183,7 +183,7 @@ class Logger:
     def __init__(self, path, prefered_subfolder):
         self.basepath = path
         self.path = create_unique_folder(path, prefered_subfolder)
-        self.method_calls = 0
+        self.procedure_calls = 0
         self.create_samples_header = True
         self._create_handles()
 
@@ -191,7 +191,7 @@ class Logger:
         """
         Closes all the opened handles at deletion of the instance.
         """
-        handles = ["samples", "functioncalls", "methodcalls"]
+        handles = ["samples", "functioncalls", "procedurecalls"]
         for handle in handles:
             if hasattr(self, 'handle_' + handle):
                 getattr(self, 'handle_' + handle).close()
@@ -205,11 +205,11 @@ class Logger:
         self.handle_functioncalls = open(
             self.path + os.sep + "functioncalls.csv", "w")
         self.handle_functioncalls.write(
-            'method_call_id,n_queried,dt,asked_for_derivative\n')
-        self.handle_methodcalls = open(self.path + os.sep + "methodcalls.csv",
+            'procedure_call_id,n_queried,dt,asked_for_derivative\n')
+        self.handle_procedurecalls = open(self.path + os.sep + "procedurecalls.csv",
                                        "w")
-        self.handle_methodcalls.write(
-            'method_call_id,dt,total_dataset_size,new_data_generated\n')
+        self.handle_procedurecalls.write(
+            'procedure_call_id,dt,total_dataset_size,new_data_generated\n')
 
     def log_samples(self, x, y):
         """
@@ -229,7 +229,7 @@ class Logger:
         """
         # Create header
         if self.create_samples_header:
-            header = ['method_call_id']
+            header = ['procedure_call_id']
             header += ['x' + str(i) for i in range(len(x[0]))]
             header += ['y' + str(i) for i in range(len(y[0]))]
             self.handle_samples.write(",".join(header) + "\n")
@@ -239,31 +239,31 @@ class Logger:
         points = x.astype(str).tolist()
         labels = y.astype(str).tolist()
         for i in range(n_datapoints):
-            line = [str(self.method_calls)]
+            line = [str(self.procedure_calls)]
             line += points[i]
             line += labels[i]
             self.handle_samples.write(','.join(line) + "\n")
         self.handle_samples.flush()
 
-    def log_method_calls(self, dt, size_total, size_generated):
+    def log_procedure_calls(self, dt, size_total, size_generated):
         """
-        Log a method call to the methodscalls.csv file.
+        Log a procedure call to the procedurecalls.csv file.
 
         Args:
-            dt: Time in ms spend on the method call.
+            dt: Time in ms spend on the procedure call.
             size_total: Number of data points sampled in total for all
-                method calls so far. This should include the data points
+                procedure calls so far. This should include the data points
                 sampled in the iteration that is currently sampled.
             size_generated: Number of data points sampled in this specific
-                method call.
+                procedure call.
         """
         line = [
-            int(self.method_calls), dt,
+            int(self.procedure_calls), dt,
             int(size_total),
             int(size_generated)
         ]
         line = list(map(str, line))
-        self.handle_methodcalls.write(','.join(line) + "\n")
+        self.handle_procedurecalls.write(','.join(line) + "\n")
 
     def log_function_calls(self, function):
         """
@@ -279,7 +279,7 @@ class Logger:
         """
         for entry in function.counter:
             line = [
-                int(self.method_calls),
+                int(self.procedure_calls),
                 int(entry[0]),
                 float(entry[1]),
                 bool(entry[2])
@@ -314,7 +314,7 @@ class Logger:
         This method should be called *before* the first experiment iteration.
 
         Args:
-            experiment: Experiment to be run, containing the method to be
+            experiment: Experiment to be run, containing the procedure to be
                 tested (which needs to be provided at initialisation).
             function: Test function that was used in an experiment iteration.
                 This test function should be a class with
@@ -335,12 +335,12 @@ class Logger:
             }
             del (info['function']['properties']['counter'])
             # Get properties of experiment
-            info['method'] = {
-                'name': type(experiment.method).__name__,
+            info['procedure'] = {
+                'name': type(experiment.procedure).__name__,
                 'properties': {}
             }
-            for prop in experiment.method.store_parameters:
-                info['method']['properties'][prop] = getattr(
-                    experiment.method, prop)
+            for prop in experiment.procedure.store_parameters:
+                info['procedure']['properties'][prop] = getattr(
+                    experiment.procedure, prop)
             # Convert information to yaml and write to file
             yaml.dump(info, handle, default_flow_style=False)

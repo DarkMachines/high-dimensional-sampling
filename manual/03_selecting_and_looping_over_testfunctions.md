@@ -1,8 +1,8 @@
 # Selecting and Looping over `TestFunction`s
 
 Running an experiment boils down to running an
-[implemented method](01_creating_a_method.md) over multiple `TestFunction`s. 
-This can be rather boring to code, so a container class 
+[implemented procedure](01_creating_a_procedure.md) over multiple
+`TestFunction`s. This can be rather boring to code, so a container class 
 `functions.FunctionFeeder` has been implemented that allows you to select 
 groups of testunctions and to loop over these functions for your experiment.
 

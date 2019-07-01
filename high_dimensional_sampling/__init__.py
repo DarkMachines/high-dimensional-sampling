@@ -2,7 +2,7 @@
 
 from .__version__ import __version__
 from .experiments import PosteriorSamplingExperiment, OptimisationExperiment, OptimizationExperiment
-from .methods import Method
+from .procedures import Procedure
 from . import functions
 
 __author__ = "Joeri Hermans, Bob Stienen"

@@ -1,12 +1,12 @@
 """
-Example of a posterior sampling experiment. Implemented method is explained at
-https://en.wikipedia.org/wiki/Rejection_sampling
+Example of a posterior sampling experiment. Implemented procedure is explained
+at https://en.wikipedia.org/wiki/Rejection_sampling
 """
 import high_dimensional_sampling as hds
 import numpy as np
 
 
-class RejectionSampling(hds.Method):
+class RejectionSampling(hds.Procedure):
     def __init__(self):
         self.store_parameters = []
         self.maximum = None
@@ -47,9 +47,9 @@ class RejectionSampling(hds.Method):
         return False
 
 
-method = RejectionSampling()
-experiment = hds.PosteriorSamplingExperiment(method,
-                                             '/Users/bstienen/Desktop/hds')
+procedure = RejectionSampling()
+experiment = hds.PosteriorSamplingExperiment(procedure,
+                                             '/Users/jdoe/Desktop/hds')
 feeder = hds.functions.FunctionFeeder()
 feeder.load_function_group(
     'posterior', {

@@ -1,10 +1,10 @@
-# Creating a method
+# Creating a procedure
 
 The high-dimensional-sampling (hds) package allows users to define sampling 
-methods and test them on a wide variety of test functions in a neatly 
+procedures and test them on a wide variety of test functions in a neatly 
 automated an logged manner. Both the experimental framework and the test 
 functions are defined within the package, the only thing the user has to do is 
-define the method itself.
+define the procedure itself.
 
 ## Choosing the type of sampling
 
@@ -15,12 +15,12 @@ probability density (i.e. the function value) is only accessible through these
 samples.
 - **Optimisation**: Finding the optimum of an unknown function.
 
-Implementing a method for either of these two can be done by creating a class
-that inherits from the `methods.Method` class:
+Implementing a procedure for either of these two can be done by creating a class
+that inherits from the `procedures.Procedure` class:
 
     import high_dimensional_sampling as hds
     
-    class MyMethod(hds.Method):
+    class MyProcedure(hds.Procedure):
         ...
 
 This class should implement at least the following four methods:
@@ -28,8 +28,8 @@ This class should implement at least the following four methods:
 ### `__init__(self)`
 This is Initialisation method in which anything can be done. At the very least
 it should define the `self.store_parameters` property as a list, containing
-the names of the parameters of the method. These parameters will then 
-autometically be stored when an experiment is run. If no method parameters
+the names of the parameters of the Procedure. These parameters will then 
+autometically be stored when an experiment is run. If no procedure parameters
 exist, `self.store_parameters` should be an empty list.
 
 Your implementation of this initialisation method is allowed to include extra
@@ -52,30 +52,30 @@ should be a numpy array of shape `(nDatapoints, nOutputVariables)`. Note that
 
 Although it is not required, it is advisable to implement the `__call__` method
 in such a way that it returns a single data point at a time. Whether of not
-this is possible depends of course on the implemented method, but following
+this is possible depends of course on the implemented procedure, but following
 this guideline makes sure that the experiment is stopped as soon as possible
 and no further (possibly expensive) iterations are run. This makes comparison
-of methods easier.
+of different Procedures easier.
 
 ### `is_finished(self)`
-This method checks if the Method is finished and the experiment can be stopped.
-It should return a boolean, which is `True` is the experiment can be stopped,
-or `False` if it should continue. If `True`, this overrides the `finish_line`
-condition set in [the Experiment](04_running_an_experiment.md).
+This method checks if the Procedure is finished and the experiment can be
+stopped. It should return a boolean, which is `True` is the experiment can be
+stopped, or `False` if it should continue. If `True`, this overrides the
+`finish_line` condition set in [the Experiment](04_running_an_experiment.md).
 
 ### `reset(self)`
 This method should reset all internal variables conserning previous runs. For
 instance: if your implementation keeps track of the number of points sampled
 in a property called `n_sampled`, the `reset()` method should set `n_sampled`
-to 0. It is called every time a new testfunction is provided to the method
+to 0. It is called every time a new testfunction is provided to the Procedure.
 
 Please do note that it should *not* reset possible configuration parameters
-of the method.
+of the Procedure.
 
 ## Example scripts
 
-In the [examples](../examples) folder two example methods are provided: one
-for [rejection sampling](../examples/rejection_sampling.py), a method for
+In the [examples](../examples) folder two example procedures are provided: one
+for [rejection sampling](../examples/rejection_sampling.py), a procedure for
 posterior sampling, the other for 
-[random optimisation](../examples/random_optimisation.py), a method for 
+[random optimisation](../examples/random_optimisation.py), a procedure for 
 optimum finding.

@@ -1,12 +1,12 @@
 """
-Example of an optimisation experiment. Implemented method is explained at
+Example of an optimisation experiment. Implemented procedure is explained at
 https://en.wikipedia.org/wiki/Random_optimization
 """
 import high_dimensional_sampling as hds
 import numpy as np
 
 
-class RandomOptimisation(hds.Method):
+class RandomOptimisation(hds.Procedure):
     def __init__(self, n_initial=10, n_sample=10):
         self.store_parameters = ['n_initial', 'n_sample']
         self.n_initial = n_initial
@@ -59,8 +59,9 @@ class RandomOptimisation(hds.Method):
         return False
 
 
-method = RandomOptimisation(n_initial=5)
-experiment = hds.OptimisationExperiment(method, '/Users/bstienen/Desktop/hds')
+procedure = RandomOptimisation(n_initial=5)
+experiment = hds.OptimisationExperiment(procedure,
+                                        '/Users/jdoe/Desktop/hds')
 feeder = hds.functions.FunctionFeeder()
 feeder.load_function_group(['optimisation', 'bounded'])
 
