@@ -104,7 +104,7 @@ class TestFunction(ABC):
         Raises:
             Exception: Provided data has dimensionality ?, but ? was expected.
         """
-        dim = self.ranges.shape[1]
+        dim = self.ranges.shape[0]
         dim_data = shape[1]
         if dim_data != dim:
             raise Exception(
@@ -714,10 +714,10 @@ class Cosine(TestFunction):
         super(Cosine, self).__init__()
 
     def _evaluate(self, x):
-        return np.cos(x)+1
+        return (np.cos(x)+1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return -np.sin(x)+1
+        return (-np.sin(x)+1).reshape(-1, 1)
 
 
 class Block(TestFunction):
