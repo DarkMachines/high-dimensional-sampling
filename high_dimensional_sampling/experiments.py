@@ -28,8 +28,7 @@ class Experiment(ABC):
 
     def __init__(self, procedure, path):
         if not isinstance(procedure, Procedure):
-            raise Exception(
-                """Experimetns should be provided an instance of a
+            raise Exception("""Experimetns should be provided an instance of a
                 class derived from the procedures.Procedure class.""")
         self.path = path
         self.procedure = procedure
@@ -206,8 +205,8 @@ class Logger:
             self.path + os.sep + "functioncalls.csv", "w")
         self.handle_functioncalls.write(
             'procedure_call_id,n_queried,dt,asked_for_derivative\n')
-        self.handle_procedurecalls = open(self.path + os.sep + "procedurecalls.csv",
-                                       "w")
+        self.handle_procedurecalls = open(
+            self.path + os.sep + "procedurecalls.csv", "w")
         self.handle_procedurecalls.write(
             'procedure_call_id,dt,total_dataset_size,new_data_generated\n')
 

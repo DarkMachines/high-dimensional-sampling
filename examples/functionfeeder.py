@@ -13,9 +13,9 @@ groups = [
 
 for group in groups:
     print(group.upper())
-    print('-'*32)
+    print('-' * 32)
     feeder.load_function_group(group)
     for f in feeder:
         print(type(f).__name__)
     feeder.reset()
-    print('='*32)
+    print('=' * 32)
