@@ -1,3 +1,7 @@
+"""
+Show testfunctions available in the functions module, grouped per function
+group. Functions can be part of multiple groups.
+"""
 from high_dimensional_sampling import functions
 
 feeder = functions.FunctionFeeder()
@@ -15,4 +19,3 @@ for group in groups:
         print(type(f).__name__)
     feeder.reset()
     print('='*32)
-

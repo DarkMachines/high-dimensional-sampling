@@ -1,3 +1,7 @@
+"""
+Example of an optimisation experiment. Implemented method is explained at
+https://en.wikipedia.org/wiki/Random_optimization
+"""
 import high_dimensional_sampling as hds
 import numpy as np
 
@@ -18,35 +22,33 @@ class RandomOptimisation(hds.Method):
             self.current_position = x[i_best].reshape(1, len(x[i_best]))
             self.current_value = y[i_best].reshape(-1, 1)
             return (self.current_position, self.current_value)
-        else:
-            # Get new point sampled from gaussian
-            x = []
-            while len(x) < self.n_sample:
-                sample = self.get_point(function.ranges, 1, 1)
-                try:
-                    function.check_ranges(sample)
-                    x.append(sample)
-                except:
-                    pass
-            x = np.array(x).reshape(self.n_sample, -1)
-            y = function(x)
-            i_best = np.argmin(y)
-            if y[i_best] < self.current_value:
-                self.current_position = x[i_best].reshape(1, len(x[i_best]))
-                self.current_value = y[i_best].reshape(-1, 1)
-            return (x[i_best].reshape((1, len(x[0]))), y[i_best].reshape(-1, 1))
+        # Get new point sampled from gaussian
+        x = []
+        while len(x) < self.n_sample:
+            sample = self.get_point(function.ranges, 1, 1)
+            try:
+                function.check_ranges(sample)
+                x.append(sample)
+            except Exception:
+                pass
+        x = np.array(x).reshape(self.n_sample, -1)
+        y = function(x)
+        i_best = np.argmin(y)
+        if y[i_best] < self.current_value:
+            self.current_position = x[i_best].reshape(1, len(x[i_best]))
+            self.current_value = y[i_best].reshape(-1, 1)
+        return (x[i_best].reshape((1, len(x[0]))), y[i_best].reshape(-1, 1))
 
-    def get_initial_position(self, ranges, n_sample):
+    def get_initial_position(self, ranges, n_sample_initial):
         ndim = len(ranges)
         r = np.array(ranges)
-        x = np.random.rand(self.n_initial, ndim)
+        x = np.random.rand(n_sample_initial, ndim)
         x = x * (r[:, 1] - r[:, 0]) + r[:, 0]
         return x
 
     def get_point(self, ranges, stdev=0.01, n_sample=1):
-        cov = np.identity(len(ranges))*stdev
-        return np.random.multivariate_normal(self.current_position[0],
-                                             cov,
+        cov = np.identity(len(ranges)) * stdev
+        return np.random.multivariate_normal(self.current_position[0], cov,
                                              n_sample)
 
     def reset(self):
@@ -63,5 +65,4 @@ feeder = hds.functions.FunctionFeeder()
 feeder.load_functions(['optimisation', 'bounded'])
 
 for function in feeder:
-    experiment.run(function,
-                   finish_line=1000)
+    experiment.run(function, finish_line=1000)

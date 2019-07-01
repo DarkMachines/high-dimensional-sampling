@@ -1,3 +1,7 @@
+"""
+Example of a posterior sampling experiment. Implemented method is explained at
+https://en.wikipedia.org/wiki/Rejection_sampling
+"""
 import high_dimensional_sampling as hds
 import numpy as np
 
