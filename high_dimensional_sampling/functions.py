@@ -257,7 +257,7 @@ class FunctionFeeder:
         """
         self.functions = []
 
-    def load_functions(self, group, parameters=None):
+    def load_function_group(self, group, parameters=None):
         """
         Load functions from a specific set
 
@@ -266,7 +266,7 @@ class FunctionFeeder:
         are the following groups:
 
             optimisation / optimization: Rastrigin, Rosenbrock, Beale, Booth,
-                BukinNmbr6, Mayas, leviNmbr13, Himmelblau, ThreeHumpCamel,
+                BukinNmbr6, Mayas, LeviNmbr13, Himmelblau, ThreeHumpCamel,
                 Sphere, Ackley, Easom, Linear
             posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
                 MultivariateNormal, GaussianShells, Linear

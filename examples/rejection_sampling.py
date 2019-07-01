@@ -51,7 +51,7 @@ method = RejectionSampling()
 experiment = hds.PosteriorSamplingExperiment(method,
                                              '/Users/bstienen/Desktop/hds')
 feeder = hds.functions.FunctionFeeder()
-feeder.load_functions(
+feeder.load_function_group(
     'posterior', {
         "Block": {
             "block_size": 8

@@ -62,7 +62,7 @@ class RandomOptimisation(hds.Method):
 method = RandomOptimisation(n_initial=5)
 experiment = hds.OptimisationExperiment(method, '/Users/bstienen/Desktop/hds')
 feeder = hds.functions.FunctionFeeder()
-feeder.load_functions(['optimisation', 'bounded'])
+feeder.load_function_group(['optimisation', 'bounded'])
 
 for function in feeder:
     experiment.run(function, finish_line=1000)
