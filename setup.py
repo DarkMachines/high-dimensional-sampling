@@ -47,16 +47,16 @@ setup(
         # dependency for `python setup.py test`
         'pytest-runner',
         # dependencies for `python setup.py build_sphinx`
-        'sphinx',
-        'sphinx_rtd_theme',
+        # 'sphinx',
+        # 'sphinx_rtd_theme',
         'recommonmark'
     ],
-    tests_require=[
-        'pytest',
-        'pytest-cov',
-        'pycodestyle',
-    ],
-    extras_require={
-        'dev':  ['prospector[with_pyroma]', 'yapf', 'isort'],
-    }
+    #tests_require=[
+    #    'pytest',
+    #    'pytest-cov',
+    #    'pycodestyle',
+    #],
+    #extras_require={
+    #    'dev':  ['prospector[with_pyroma]', 'yapf', 'isort'],
+    #}
 )
