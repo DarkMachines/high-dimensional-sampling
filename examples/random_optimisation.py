@@ -31,7 +31,7 @@ class RandomOptimisation(hds.Procedure):
         while len(x) < self.n_sample:
             sample = self.get_point(ranges, 1, 1)
             try:
-                function.check_ranges(sample, 0.01)
+                function.check_ranges(sample)
                 x.append(sample)
             except Exception:
                 pass
