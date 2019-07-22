@@ -26,7 +26,7 @@ class TestFunction(ABC):
             raise Exception("TestFunction should define ranges.")
         self.counter = []
 
-    def __call__(self, x, derivative=False, epsilon=0.01):
+    def __call__(self, x, derivative=False, epsilon=0):
         """
         Request an evaluation of the (derivative of the) testfunction.
 
@@ -43,7 +43,7 @@ class TestFunction(ABC):
                 of the function is queried (if existing).
             epsilon: leeway parameter that is added to all minima and
                 subtracted from all maxima in the .check_ranges method. Default
-                is 0.01.
+                is 0.
 
         Returns:
             A numpy.ndarray of shape (nDatapoints, ?) containing the requested
@@ -114,7 +114,7 @@ class TestFunction(ABC):
                 "Provided data has dimensionality {}, but {} was expected".
                 format(dim_data, dim))
 
-    def get_ranges(self, epsilon=0):
+    def get_ranges(self, epsilon=0.01):
         """
         Get ranges of the test function.
 
@@ -124,7 +124,7 @@ class TestFunction(ABC):
 
         Args:
             epsilon: leeway parameter that is added to all minima and
-                subtracted from all maxima. Default is 0.
+                subtracted from all maxima. Default is 0.001.
         
         Returns:
             List of minima and maxima for all dimensions in the problem. The
