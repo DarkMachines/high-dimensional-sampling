@@ -14,9 +14,13 @@ class RandomOptimisation(hds.Procedure):
         self.reset()
 
     def __call__(self, function):
+        # Get ranges of the test function. The 0.001 moves the minima 0.001 up
+        # and the maxima 0.001 down, in order to make use the sampling is not
+        # by accident moving outside of the test function range.
+        ranges = function.get_ranges(0.01)
         if self.current_position is None:
             # Initial sampling
-            x = self.get_initial_position(function.ranges, self.n_initial)
+            x = self.get_initial_position(ranges, self.n_initial)
             y = function(x)
             i_best = np.argmin(y)
             self.current_position = x[i_best].reshape(1, len(x[i_best]))
@@ -25,9 +29,9 @@ class RandomOptimisation(hds.Procedure):
         # Get new point sampled from gaussian
         x = []
         while len(x) < self.n_sample:
-            sample = self.get_point(function.ranges, 1, 1)
+            sample = self.get_point(ranges, 1, 1)
             try:
-                function.check_ranges(sample)
+                function.check_ranges(sample, 0.01)
                 x.append(sample)
             except Exception:
                 pass

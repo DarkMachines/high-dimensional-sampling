@@ -26,7 +26,7 @@ class TestFunction(ABC):
             raise Exception("TestFunction should define ranges.")
         self.counter = []
 
-    def __call__(self, x, derivative=False):
+    def __call__(self, x, derivative=False, epsilon=0.01):
         """
         Request an evaluation of the (derivative of the) testfunction.
 
@@ -41,6 +41,9 @@ class TestFunction(ABC):
             derivative: If this boolean is False (default), the testfunction
                 will be queried for its value. If it is True, the derivative
                 of the function is queried (if existing).
+            epsilon: leeway parameter that is added to all minima and
+                subtracted from all maxima in the .check_ranges method. Default
+                is 0.01.
 
         Returns:
             A numpy.ndarray of shape (nDatapoints, ?) containing the requested
@@ -52,7 +55,7 @@ class TestFunction(ABC):
         x = self.to_numpy_array(x)
         # Check if dimensionality and ranges of the input are correct
         self.check_dimensionality(x.shape)
-        self.check_ranges(x)
+        self.check_ranges(x, epsilon)
         # Start time for function call
         t_start = get_time()
         # Return requested result(s)
@@ -111,7 +114,27 @@ class TestFunction(ABC):
                 "Provided data has dimensionality {}, but {} was expected".
                 format(dim_data, dim))
 
-    def check_ranges(self, x):
+    def get_ranges(self, epsilon=0):
+        """
+        Get ranges of the test function.
+
+        Returns the ranges for the test function. When numerical precision is a
+        problem, a leeway parameter epsilon can be provided, which will be
+        added to all minima and subtracted from all maxima.
+
+        Args:
+            epsilon: leeway parameter that is added to all minima and
+                subtracted from all maxima. Default is 0.
+        
+        Returns:
+            List of minima and maxima for all dimensions in the problem. The
+            list has a length equal to the number of dimensions. Each entry in
+            this list is a list with two entries: the minimum and the maximum
+            for this dimension.
+        """
+        return np.array([[r[0]+epsilon, r[1]-epsilon] for r in self.ranges])
+
+    def check_ranges(self, x, epsilon=0):
         """
         Checks if the input data lies within the ranges expected by the
         defined testfunction. If not, an Exception is raised.
@@ -119,13 +142,16 @@ class TestFunction(ABC):
         Args:
             x: numpy.ndarray of shape (nDatapoints, nVariables) containing the
                 data to query the testfunction for.
+            epsilon: leeway parameter that is added to all minima and
+                subtracted from all maxima. Default is 0.
 
         Raises:
             Exception: Data does not fall withing the expected ranges: ?.
         """
+        ranges = self.get_ranges(epsilon)
         # Transform data
-        d = x - self.ranges[:, 0]
-        d = d / (self.ranges[:, 1] - self.ranges[:, 0])
+        d = x - ranges[:, 0]
+        d = d / (ranges[:, 1] - ranges[:, 0])
         # Check if any entry smaller than 0 exists
         if np.any(d < 0.0) or np.any(d > 1.0):
             raise Exception(
@@ -347,7 +373,6 @@ class FunctionFeeder:
                     load = [func for func in load if func in function_names[g]]
                 else:
                     load = function_names[g]
-        print(load)
         # Loop over function names and load each function
         if parameters is None:
             parameters = {}

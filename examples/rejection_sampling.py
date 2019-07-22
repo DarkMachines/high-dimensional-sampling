@@ -18,8 +18,12 @@ class RejectionSampling(hds.Procedure):
             self.sample_for_extrama(function)
         # Get point
         found = False
+        # Get ranges of the test function. The 0.01 moves the minima 0.01 up
+        # and the maxima 0.01 down, in order to make use the sampling is not
+        # by accident moving outside of the test function range.
+        ranges = function.get_ranges(0.01)
         while not found:
-            x = self.get_point(function.ranges)
+            x = self.get_point(ranges)
             y = function(x)
             r = np.random.rand()
             s = (y - self.minimum) / (self.maximum - self.minimum)
@@ -35,7 +39,9 @@ class RejectionSampling(hds.Procedure):
         return x
 
     def sample_for_extrama(self, function):
-        x = self.get_point(function.ranges, 100000)
+        ranges = function.get_ranges(0.01)
+        print(ranges)
+        x = self.get_point(ranges, 100000)
         y = function(x)
         self.maximum = np.max(y)
         self.minimum = np.min(y)
