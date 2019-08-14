@@ -672,10 +672,10 @@ class Sphere(TestFunction):
         super(Sphere, self).__init__()
 
     def _evaluate(self, x):
-        return np.sum(np.power(x, 2), axis=1)
+        return np.sum(np.power(x, 2), axis=1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return 2 * x
+        return (2 * x).reshape(-1, 1)
 
 
 class Ackley(TestFunction):

@@ -19,5 +19,5 @@ Added
 
 Fixed
 -----
-* Ackley and Easom test functions returned data in an incorrect shape. This has
-  been corrected
+* Ackley, Easom and Sphere test functions returned data in an incorrect shape.
+  This has been corrected.
