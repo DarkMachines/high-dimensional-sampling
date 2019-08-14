@@ -710,12 +710,20 @@ class Easom(TestFunction):
     Easom function as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    This is a 2-dimensional function with an application range bounded by -100
-    and 100 for both of these input dimensions. No derivative has been defined.
+    This is a 2-dimensional function with an application range bounded by 
+    a box between -x and x for both dimensions, where x can be defined by
+    the user (100 is default). No derivative has been defined.
+
+    Args:
+        absolute_range: Absolute value of the boundaries of the application
+            range for the function. Both dimensions will be bounded to the
+            range [-1 * absolute_range, absolute_range]. Is set to 100 by
+            default, as is customary for this function.
     """
 
-    def __init__(self):
-        self.ranges = [[-100, 100], [-100, 100]]
+    def __init__(self, absolute_range=100):
+        self.ranges = np.array([[-1, 1], [-1, 1]])
+        self.ranges *= absolute_range
         super(Easom, self).__init__()
 
     def _evaluate(self, x):
@@ -973,7 +981,7 @@ class GaussianShells(TestFunction):
         super(GaussianShells, self).__init__()
 
     def _shell(self, x, c, r, w):
-        return (np.exp(-1 * np.power(np.linalg.norm(x - c) - r, 2) /
+        return (np.exp(-1 * np.power(np.linalg.norm(x - c, axis=1) - r, 2) /
                        (2 * w * w)) / np.sqrt(2 * np.pi * w * w))
 
     def _evaluate(self, x):
