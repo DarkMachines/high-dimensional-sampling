@@ -16,8 +16,16 @@ Added
   it.
 * The TestFunction `__call__` and `check_ranges` methods now also implement the
   epsilon argument (see first addition above).
+* Users requested a smaller range for the Easom test function. Although the
+  range [-100, 100] is normal for this function, to accommodate this wish the
+  boundaries of this application box are now configurable at initialisation
+  of the test function.
+* The plot_testfunction example script has been splitted into two separate
+  scripts: one for 1d and another for 2d test functions.
 
 Fixed
 -----
 * Ackley, Easom and Sphere test functions returned data in an incorrect shape.
   This has been corrected.
+* The GaussianShells test function mapped multi-point input to a single output
+  value. This has been fixed.
