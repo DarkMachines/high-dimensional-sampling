@@ -10,12 +10,12 @@ from mpl_toolkits.mplot3d import Axes3D
 
 """ CONFIGURATION """
 # Function to plot
-f = hds.functions.Easom()
+f = hds.functions.Reciprocal()
 # Plot derivative instead of normal function
 # Will only work if a derivative is defined in the TestFunction
 plot_derivative = False
 # Plot the logarithmic value of the functional value
-z_axis_logarithmic = False
+z_axis_logarithmic = True
 # Resolution of the plot in terms of number of samples per axis
 resolution_x = 1000
 resolution_y = 1000
@@ -33,8 +33,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 # Limit ranges if is ranging to infinity
-ranges =  f.ranges
-ranges = [[-25, 25],[-25, 25]]
+ranges =  f.get_ranges()
 if np.abs(ranges[0][0]) == np.inf:
     for i in range(len(ranges)):
         ranges[i] = [-100, 100]
