@@ -146,7 +146,7 @@ class TestFunction(ABC):
                 subtracted from all maxima. Default is 0.
 
         Raises:
-            Exception: Data does not fall withing the expected ranges: ?.
+            Exception: Data does not lie withing the expected ranges: ?.
         """
         ranges = self.get_ranges(epsilon)
         # Transform data
@@ -155,8 +155,8 @@ class TestFunction(ABC):
         # Check if any entry smaller than 0 exists
         if np.any(d < 0.0) or np.any(d > 1.0):
             raise Exception(
-                "Data does not fall within expected ranges: {}.".format(
-                    self.ranges))
+                "Data does not lie within expected ranges: {}.".format(
+                    self.ranges.tolist()))
 
     def to_numpy_array(self, x):
         """
