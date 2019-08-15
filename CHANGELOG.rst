@@ -27,8 +27,8 @@ Added
   the logged time includes also the overhead introduced by the HDS package
   itself.
 * The following test functions are added:
-  * BreitWigner
-  * Reciprocal
+    - BreitWigner
+    - Reciprocal
 
 Changed
 -------
