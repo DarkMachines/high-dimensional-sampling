@@ -295,8 +295,9 @@ class FunctionFeeder:
                 BukinNmbr6, Mayas, LeviNmbr13, Himmelblau, ThreeHumpCamel,
                 Sphere, Ackley, Easom, Linear
             posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
-                MultivariateNormal, GaussianShells, Linear
-            with_derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel
+                MultivariateNormal, GaussianShells, Linear, Reciprocal
+            with_derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel,
+                Reciprocal
             no_derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas,
                 LeviNmbr13, Himmelblau, ThreeHumpCamel, Ackley, Easom, Block,
                 Eggbox, MultivariateNormal, GaussianShells,
@@ -304,7 +305,7 @@ class FunctionFeeder:
             bounded: Rastrigin, Beale, Booth, BukinNmbr6, Matyas, LeviNmbr13,
                 Himmelblau, ThreeHumpCamel, Ackley, Easom, Bessel,
                 ModifiedBessel, Eggbox, MultivariateNormal, GaussianShells,
-                Linear
+                Linear, Reciprocal
             unbounded: Rosenbrock, Sphere, Block
 
         All functions are loaded with default configuration, unless
@@ -330,14 +331,16 @@ class FunctionFeeder:
             'optimisation': [
                 'Rastrigin', 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6',
                 'Matyas', 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel',
-                'Sphere', 'Ackley', 'Easom', 'Linear'
+                'Sphere', 'Ackley', 'Easom', 'Linear', 'Reciprocal'
             ],
             'posterior': [
                 'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
                 'MultivariateNormal', 'GaussianShells', 'Linear'
             ],
-            'with_derivative':
-            ['Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel'],
+            'with_derivative': [
+                'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel',
+                'Reciprocal'
+            ],
             'no_derivative': [
                 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
                 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
@@ -348,7 +351,7 @@ class FunctionFeeder:
                 'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
                 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
                 'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                'MultivariateNormal', 'GaussianShells', 'Linear'
+                'MultivariateNormal', 'GaussianShells', 'Linear', 'Reciprocal'
             ],
             'unbounded': ['Rosenbrock', 'Sphere', 'Block']
         }
@@ -1016,3 +1019,31 @@ class Linear(TestFunction):
 
     def _derivative(self, x):
         raise NoDerivativeError()
+
+class Reciprocal(TestFunction):
+    """
+    Test function defined by
+    
+        prod_i x_i^(-1)
+    
+    The application range of this function is 0.001 to 1 for each fo the input
+    dimensions. No derivative is defined.
+
+    Args:
+        dimensionality: Number of dimensions for input of the function. By
+            default this argument is set to 2.
+    """
+    def __init__(self, dimensionality=2):
+        self.ranges = self.construct_ranges(dimensionality, 0.001, 1)
+        super(Reciproce, self).__init__()
+    
+    def _evaluate(self, x):
+        return np.prod(np.power(x, -1), 1).reshape(-1, 1)
+    
+    def _derivative(self, x):
+        dimensionality = len(self.ranges)
+        derivative = -1 * np.ones((len(x), dimensionality)) * self._evaluate(x)
+        for d in range(dimensionality):
+            derivative[:,d] *= np.power(x[:,d], -1)
+        return derivative
+
