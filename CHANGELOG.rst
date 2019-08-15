@@ -22,11 +22,16 @@ Added
   of the test function.
 * The plot_testfunction example script has been splitted into two separate
   scripts: one for 1d and another for 2d test functions.
+* When an experiment ends, the results (i.e. the elapsed time and the number
+  of total function calls) are stored in the experiment.yaml file. Note that
+  the logged time includes also the overhead introduced by the HDS package
+  itself.
 
 Changed
 -------
 * Increased the readability of the error message given when a test function is
   queried for its value outside of the box defined by its ranges parameter.
+* The `utils.get_time` method now returns time in seconds
 
 Fixed
 -----
