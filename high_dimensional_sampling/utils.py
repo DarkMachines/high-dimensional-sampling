@@ -12,7 +12,7 @@ def get_time():
     Returns:
         Integer representing the current time in milliseconds
     """
-    return int(round(time.time() * 1000))
+    return int(round(time.time() * 1000.0))
 
 
 def get_datetime():

@@ -82,6 +82,8 @@ class Experiment(ABC):
         # Perform sampling as long as procedure is not finished
         is_finished = False
         n_sampled = 0
+        n_functioncalls = 0
+        t_experiment_start = get_time()
         while not is_finished:
             self.logger.procedure_calls += 1
             # Perform an procedure iteration and keep track of time elapsed
@@ -96,12 +98,17 @@ class Experiment(ABC):
             if log_data:
                 self.logger.log_samples(x, y)
             # Log function calls and reset the counter
+            n_functioncalls += len(self.function.counter)
             self.logger.log_function_calls(self.function)
             self.function.reset()
             # Check if the experiment has to stop and update the while
             # condition to control this.
             is_finished = (self.procedure.is_finished()
                            or self._stop_experiment(x, y))
+        # Log total time elapsed for experiment
+        t_experiment_end = get_time()
+        dt = (t_experiment_end - t_experiment_start)/1000.0
+        self.logger.log_results(n_functioncalls, dt)
         # Delete the logger to close all handles
         del (self.logger)
 
@@ -343,3 +350,24 @@ class Logger:
                     experiment.procedure, prop)
             # Convert information to yaml and write to file
             yaml.dump(info, handle, default_flow_style=False)
+
+    def log_results(self, n_functioncalls, dt):
+        """
+        Log the results of the experiment in the experiment.yaml file
+
+        This method should be called *before* the first experiment iteration.
+
+        Args:
+            n_functioncalls: Number of function calls made in total
+            dt: Time elapsed during experiment
+        """
+        # Parse experiment yaml file and add results
+        with open(self.path + os.sep + "experiment.yaml", 'r') as stream:
+            experiment = yaml.safe_load(stream)
+        experiment['results'] = {
+            'time': dt,
+            'n_functioncalls': n_functioncalls
+        }
+        # Write new content to file
+        with open(self.path + os.sep + "experiment.yaml", 'w') as handle:
+            yaml.dump(experiment, handle, default_flow_style=False)
