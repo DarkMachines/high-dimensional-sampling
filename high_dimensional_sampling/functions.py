@@ -722,8 +722,8 @@ class Easom(TestFunction):
     """
 
     def __init__(self, absolute_range=100):
-        self.ranges = np.array([[-1, 1], [-1, 1]])
-        self.ranges *= absolute_range
+        self.ranges = [[-absolute_range, absolute_range],
+                       [-absolute_range, absolute_range]]
         super(Easom, self).__init__()
 
     def _evaluate(self, x):

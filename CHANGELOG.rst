@@ -23,6 +23,11 @@ Added
 * The plot_testfunction example script has been splitted into two separate
   scripts: one for 1d and another for 2d test functions.
 
+Changed
+-------
+* Increased the readability of the error message given when a test function is
+  queried for its value outside of the box defined by its ranges parameter.
+
 Fixed
 -----
 * Ackley, Easom and Sphere test functions returned data in an incorrect shape.
