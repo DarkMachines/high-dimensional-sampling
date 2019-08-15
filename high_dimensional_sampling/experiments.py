@@ -107,7 +107,7 @@ class Experiment(ABC):
                            or self._stop_experiment(x, y))
         # Log total time elapsed for experiment
         t_experiment_end = get_time()
-        dt = (t_experiment_end - t_experiment_start)/1000.0
+        dt = (t_experiment_end - t_experiment_start)
         self.logger.log_results(n_functioncalls, dt)
         # Delete the logger to close all handles
         del (self.logger)

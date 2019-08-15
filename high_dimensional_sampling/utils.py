@@ -7,12 +7,12 @@ import numpy as np
 
 def get_time():
     """
-    Returns the current time in milliseconds
+    Returns the current time in seconds
 
     Returns:
-        Integer representing the current time in milliseconds
+        Integer representing the current time in seconds
     """
-    return int(round(time.time() * 1000.0))
+    return int(round(time.time() * 1000.0))/1000.0
 
 
 def get_datetime():
