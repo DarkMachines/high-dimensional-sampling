@@ -295,9 +295,10 @@ class FunctionFeeder:
                 BukinNmbr6, Mayas, LeviNmbr13, Himmelblau, ThreeHumpCamel,
                 Sphere, Ackley, Easom, Linear
             posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
-                MultivariateNormal, GaussianShells, Linear, Reciprocal
+                MultivariateNormal, GaussianShells, Linear, Reciprocal, 
+                BreitWigner
             with_derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel,
-                Reciprocal
+                Reciprocal, BreitWigner
             no_derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas,
                 LeviNmbr13, Himmelblau, ThreeHumpCamel, Ackley, Easom, Block,
                 Eggbox, MultivariateNormal, GaussianShells,
@@ -305,7 +306,7 @@ class FunctionFeeder:
             bounded: Rastrigin, Beale, Booth, BukinNmbr6, Matyas, LeviNmbr13,
                 Himmelblau, ThreeHumpCamel, Ackley, Easom, Bessel,
                 ModifiedBessel, Eggbox, MultivariateNormal, GaussianShells,
-                Linear, Reciprocal
+                Linear, Reciprocal, BreitWigner
             unbounded: Rosenbrock, Sphere, Block
 
         All functions are loaded with default configuration, unless
@@ -335,11 +336,11 @@ class FunctionFeeder:
             ],
             'posterior': [
                 'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                'MultivariateNormal', 'GaussianShells', 'Linear'
+                'MultivariateNormal', 'GaussianShells', 'Linear', 'BreitWigner'
             ],
             'with_derivative': [
                 'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel',
-                'Reciprocal'
+                'Reciprocal', 'BreitWigner'
             ],
             'no_derivative': [
                 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
@@ -351,7 +352,8 @@ class FunctionFeeder:
                 'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
                 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
                 'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                'MultivariateNormal', 'GaussianShells', 'Linear', 'Reciprocal'
+                'MultivariateNormal', 'GaussianShells', 'Linear', 'Reciprocal',
+                'BreitWigner'
             ],
             'unbounded': ['Rosenbrock', 'Sphere', 'Block']
         }
@@ -1035,7 +1037,7 @@ class Reciprocal(TestFunction):
     """
     def __init__(self, dimensionality=2):
         self.ranges = self.construct_ranges(dimensionality, 0.001, 1)
-        super(Reciproce, self).__init__()
+        super(Reciprocal, self).__init__()
     
     def _evaluate(self, x):
         return np.prod(np.power(x, -1), 1).reshape(-1, 1)
@@ -1047,3 +1049,37 @@ class Reciprocal(TestFunction):
             derivative[:,d] *= np.power(x[:,d], -1)
         return derivative
 
+class BreitWigner(TestFunction):
+    """
+    Test function defined by
+    https://en.wikipedia.org/wiki/Relativistic_Breit–Wigner_distribution.
+
+    The application range of this function is 0 to 100. No derivative is
+    defined.
+
+    Args:
+        m: Configuration parameter of the distribution. In terms of physics
+            it corresponds to the mass of the particle creating the
+            resonance that is shaped like the Breit-Wigner distribution. Set
+            to 50 by default.
+        width: Configuration parameter of the distribution. In terms of physics
+            it corresponds to the decay width of the particle of the resonance.
+            Set to 15 by default.
+    """
+    def __init__(self, m=50, width=15):
+        self.m = m
+        self.width = width
+        self.ranges = [[0, 100]]
+        super(BreitWigner, self).__init__()
+    
+    def _k(self):
+        return 2*np.sqrt(2)*self.m*self.width*self._gamma() / (np.pi * np.sqrt(self.m**2 + self._gamma()))
+    
+    def _gamma(self):
+        return np.sqrt(self.m**2 * (self.m**2 + self.width**2))
+    
+    def _evaluate(self, x):
+        return self._k() / (np.power(np.power(x,2) - self.m**2,2) + self.m**2 * self.width**2)
+    
+    def _derivative(self, x):
+        return -4*self._k()*x*(np.power(x, 2) - self.m**2) / np.power(self.width**2 * self.m**2 + np.power(np.power(x, 2) - self.m**2,2),2)
