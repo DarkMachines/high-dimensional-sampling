@@ -43,8 +43,8 @@ of the package:
 | Sphere | (3) | Yes |  https://en.wikipedia.org/wiki/Test_functions_for_optimization |
 | Ackley | 2 | No | https://en.wikipedia.org/wiki/Test_functions_for_optimization |
 | Easom | 2 | No | https://en.wikipedia.org/wiki/Test_functions_for_optimization |
-| Cosine | 1 | Yes | $\cos( x )$ |
-| Block | (3) | No | $a + b*\theta(|x|_0)$ |
+| Cosine | 1 | Yes | $$\cos( x )$$ |
+| Block | (3) | No | $$a + b*\theta(\|x\|_0)$$ |
 | Bessel | 1 | Yes | https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.jv.html |
 | | | | https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.j0.html |
 | ModifiedBessel | 1 | Yes | https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.kv.html |
@@ -52,7 +52,9 @@ of the package:
 | Eggbox | 2 | No | https://arxiv.org/pdf/0809.3437.pdf |
 | MultivariateNormal | (2) | No | https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.multivariate_normal.html |
 | GaussianShells | 2 | No | https://arxiv.org/pdf/0809.3437.pdf |
-| Linear | (2) | No | $\sum_i | x_i |$ |
+| Linear | (2) | No | $$\sum_i \| x_i \|$$ |
+| BreitWigner | 1 | Yes | https://en.wikipedia.org/wiki/Relativistic_Breit–Wigner_distribution |
+| Reciprocal | (2) | Yes | $$\prod_i x_i^{-1}$$ |
 
 Dimensionalities provided between parentheses can be configured at
 initialisation.
