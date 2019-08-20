@@ -72,6 +72,8 @@ which functions are part of these groups.
 | MultivariateNormal |   | x |   | x | x |   |
 | GaussianShells     |   | x |   | x | x |   |
 | Linear             | x | x |   | x | x |   |
+| BreitWigner        |   | x | x |   | x |   |
+| Reciprocal         |   | x | x |   | x |   |
 
 ## Adding testfunctions by hand
 Although the `FunctionFeeder` takes care of the correct initialisation and
