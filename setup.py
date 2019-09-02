@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -22,9 +22,10 @@ setup(
     author="Joeri Hermans, Bob Stienen",
     author_email='joeri.hermans@doct.uliege.be, b.stienen@science.ru.nl',
     url='https://github.com/darkMmchines/high_dimensional_sampling',
-    packages=[
-        'high_dimensional_sampling',
-    ],
+    #packages=[
+    #    'high_dimensional_sampling',
+    #],
+    packages=find_packages(exclude=('tests',)),
     package_dir={'high_dimensional_sampling':
                  'high_dimensional_sampling'},
     include_package_data=True,
