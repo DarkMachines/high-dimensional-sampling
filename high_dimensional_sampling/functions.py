@@ -158,6 +158,38 @@ class TestFunction(ABC):
                 "Data does not lie within expected ranges: {}.".format(
                     self.ranges.tolist()))
 
+    def count_calls(self, select="all"):
+        """
+        Counts the number of performed function calls.
+
+        Args:
+            select: String indicating which function calls to count. If "all",
+                all calls will be counted (default). "normal" makes the
+                method only count non-derivate evaluations, whereas 
+                "derivative" counts the number of derivates evaluated.
+        
+        Returns:
+            Number of function calls of the selected type.
+        
+        Raises:
+            Exception: Cannot count function calls of unknown type '?'. Will be
+                raised if the select argument is not recognised.
+        """
+        if select is "all":
+            return len(self.counter)
+        elif select is "normal":
+            n = 0
+            for x in self.counter:
+                n += 1 - 1*x[1]
+            return round(n)
+        elif select is "derivative":
+            n = 0
+            for x in self.counter:
+                n += 1*x[1]
+            return round(n)
+        else:
+            raise Exception("Cannot count function calls of unknown type '{}'".format(select))
+
     def to_numpy_array(self, x):
         """
         Converts data to an numpy array

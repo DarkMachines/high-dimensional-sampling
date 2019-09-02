@@ -84,6 +84,7 @@ class Experiment(ABC):
         is_finished = False
         n_sampled = 0
         n_functioncalls = 0
+        n_derivativecalls = 0
         t_experiment_start = get_time()
         while not is_finished:
             self.logger.procedure_calls += 1
@@ -100,7 +101,8 @@ class Experiment(ABC):
             if log_data:
                 self.logger.log_samples(x, y)
             # Log function calls and reset the counter
-            n_functioncalls += len(self.function.counter)
+            n_functioncalls += self.function.count_calls()
+            n_derivativecalls += self.function.count_calls("derivative")
             self.logger.log_function_calls(self.function)
             self.function.reset()
             # Check if the experiment has to stop and update the while
@@ -112,7 +114,8 @@ class Experiment(ABC):
         t_experiment_end = get_time()
         metrics = {
             'time': (t_experiment_end - t_experiment_start),
-            'n_functioncalls': n_functioncalls
+            'n_functioncalls': n_functioncalls,
+            'n_derivativecalls': n_derivativecalls
         }
         metrics = {**metrics, **self.make_metrics()}
         self.logger.log_results(metrics)
