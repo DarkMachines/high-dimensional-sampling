@@ -490,9 +490,13 @@ class Logger:
                 'user': getpass.getuser(),
             }
             # Get properties of function
+            func_props = copy.copy(vars(function))
+            for prop in func_props:
+                if isinstance(func_props[prop], np.ndarray):
+                    func_props[prop] = func_props[prop].tolist()
             info['function'] = {
                 'name': type(function).__name__,
-                'properties': copy.copy(vars(function))
+                'properties': func_props
             }
             del (info['function']['properties']['counter'])
             # Get properties of experiment
