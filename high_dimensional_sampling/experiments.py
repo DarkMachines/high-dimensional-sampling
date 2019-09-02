@@ -71,6 +71,7 @@ class Experiment(ABC):
             raise Exception(
                 """Provided function should have functions.TestFunction as
                 base class.""")
+        self._event_start_experiment()
         # Setup logger
         self.logger = Logger(self.path, (type(function).__name__).lower())
         self.logger.log_experiment(self, function)
@@ -90,6 +91,7 @@ class Experiment(ABC):
             t_start = get_time()
             x, y = self.procedure(self.function)
             dt = get_time() - t_start
+            self._event_new_samples(x, y)
             # Log procedure call
             n = len(x)
             n_sampled += n
@@ -105,10 +107,15 @@ class Experiment(ABC):
             # condition to control this.
             is_finished = (self.procedure.is_finished()
                            or self._stop_experiment(x, y))
-        # Log total time elapsed for experiment
+        self._event_end_experiment()
+        # Log result metrics
         t_experiment_end = get_time()
-        dt = (t_experiment_end - t_experiment_start)
-        self.logger.log_results(n_functioncalls, dt)
+        metrics = {
+            'time': (t_experiment_end - t_experiment_start),
+            'n_functioncalls': n_functioncalls
+        }
+        metrics = {**metrics, **self.make_metrics()}
+        self.logger.log_results(metrics)
         # Delete the logger to close all handles
         del (self.logger)
 
@@ -131,6 +138,57 @@ class Experiment(ABC):
         if self.n_sampled >= self.finish_line:
             return True
         return False
+
+    @abstractmethod
+    def make_metrics(self):
+        """
+        Creates metrics to report in experiment.yaml
+
+        This is an abstract method and should be implemented in
+        Experiment-specific classes derived from this one.
+
+        Returns:
+            Dictionary containing the metrics by name.
+        """
+        return {}
+
+    @abstractmethod
+    def _event_start_experiment(self):
+        """
+        Event that is run when a new experiment is started.
+
+        This is an abstract method and should be implemented in
+        Experiment-specific classes derived from this one.
+        """
+        pass
+    
+    @abstractmethod
+    def _event_end_experiment(self):
+        """
+        Event that is run when an experiment is ended, but before the metrics
+        are stored to the experiment.yaml file.
+
+        This is an abstract method and should be implemented in
+        Experiment-specific classes derived from this one.
+        """
+        pass
+    
+    @abstractmethod
+    def _event_new_samples(self, x, y):
+        """
+        Event that is run when new samples are obtained from the specified
+        procedure.
+
+        This is an abstract method and should be implemented in
+        Experiment-specific classes derived from this one.
+
+        Args:
+            x: Sampled data in the form of a numpy.ndarray of shape
+                (nDatapoints, nVariables).
+            y: Function values for the samples datapoints of shape
+                (nDatapoints, ?)
+        """
+        pass
 
     def run(self, function, finish_line=1000, log_data=True):
         """
@@ -160,15 +218,109 @@ class Experiment(ABC):
 
 
 class OptimisationExperiment(Experiment):
-    pass
+    """
+    Experiment class for optimisation experiments
+    
+    Implements automatic logging of best obtained result to the experiment.yaml
+    file.
+    """
+
+    def _event_start_experiment(self):
+        """ 
+        Event that is run when a new experiment is started.
+        """
+        self.best_point = None
+    
+    def _event_end_experiment(self):
+        """
+        Event that is run when a experiment ends.
+        """
+        pass
+
+    def _event_new_samples(self, x, y):
+        """
+        Event that is run when new samples are obtained from the specified
+        procedure.
+
+        This implementation checks all sampled points and their function values
+        and stores the (x,y) pair that has the lowest function value.
+
+        Args:
+            x: Sampled data in the form of a numpy.ndarray of shape
+                (nDatapoints, nVariables).
+            y: Function values for the samples datapoints of shape
+                (nDatapoints, ?)
+        """
+        for i in range(len(x)):
+            if self.best_point is None:
+                self.best_point = (x[i], y[i])
+            elif y[i] < self.best_point[1]:
+                self.best_point = (x[i], y[i])
+
+    def make_metrics(self):
+        """
+        Creates metrics to report in results.yaml. Specifically: it reports the
+        best found point (i.e. the point with the lowest function value).
+
+        Returns:
+            Dictionary containing the metrics by name.
+        """
+        if self.best_point is None:
+            return {}
+        return {
+            'best_point': self.best_point[0].tolist(),
+            'best_value': self.best_point[1].tolist()
+        }
 
 
 class OptimizationExperiment(OptimisationExperiment):
+    """
+    Experiment class for optimisation experiments. This class is a copy of
+    OptimisationExperiment and its purpose is solely to support multiple
+    language conventions.
+    """
     pass
 
 
 class PosteriorSamplingExperiment(Experiment):
-    pass
+    """
+    Experiment class for posterior sampling experiments.
+    """
+
+    def _event_start_experiment(self):
+        """ 
+        Event that is run when a new experiment is started.
+        """
+        pass
+    
+    def _event_end_experiment(self):
+        """
+        Event that is run when a experiment ends.
+        """
+        pass
+
+    def _event_new_samples(self, x, y):
+        """
+        Event that is run when new samples are obtained from the specified
+        procedure.
+
+        Args:
+            x: Sampled data in the form of a numpy.ndarray of shape
+                (nDatapoints, nVariables).
+            y: Function values for the samples datapoints of shape
+                (nDatapoints, ?)
+        """
+        pass
+
+    def make_metrics(self):
+        """
+        Creates metrics to report in results.yaml. Specifically: it reports the
+        best found point (i.e. the point with the lowest function value).
+
+        Returns:
+            Dictionary containing the metrics by name.
+        """
+        return {}
 
 
 class Logger:
@@ -351,23 +503,20 @@ class Logger:
             # Convert information to yaml and write to file
             yaml.dump(info, handle, default_flow_style=False)
 
-    def log_results(self, n_functioncalls, dt):
+    def log_results(self, metrics):
         """
         Log the results of the experiment in the experiment.yaml file
 
         This method should be called *before* the first experiment iteration.
 
         Args:
-            n_functioncalls: Number of function calls made in total
-            dt: Time elapsed during experiment
+            metrics: Dictionary containing the result metrics to store. Keys
+                represent the name with which the values should be stored.
         """
         # Parse experiment yaml file and add results
         with open(self.path + os.sep + "experiment.yaml", 'r') as stream:
             experiment = yaml.safe_load(stream)
-        experiment['results'] = {
-            'time': dt,
-            'n_functioncalls': n_functioncalls
-        }
+        experiment['results'] = metrics
         # Write new content to file
         with open(self.path + os.sep + "experiment.yaml", 'w') as handle:
             yaml.dump(experiment, handle, default_flow_style=False)
