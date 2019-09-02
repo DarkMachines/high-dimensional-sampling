@@ -5,6 +5,32 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Unreleased
+**********
+
+Added
+-----
+* The Experiment class how is an abstract class with abstract methods that
+  function as events. This allows users to more easily create Experiment
+  classes that extend the functionality of the Experiment class.
+* The `experiment.yaml` log now also contains entries on the experiment type
+  (e.g. OptimisationExperiment) and the number of calls for the derivative
+  of the TestFunction.
+
+Changed
+-------
+* The examples now use relative path indications for storage of their results,
+  so that the examples can be used out of the box without errors.
+* The package indicator in setup.py now is more general, allowing for easier
+  inclusion of submodules.
+
+Fixed
+-----
+* An error was raised when GaussianShells was logged, as this function stores
+  its parameters internally as numpy arrays. These don't translate well to
+  .yaml files. This has been solved by forcing the storage of function 
+  properties as lists if they are numpy arrays.
+
 Version 0.1.1 (Tuesday August 20th, 2019)
 *****************************************
 
