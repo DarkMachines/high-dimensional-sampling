@@ -497,6 +497,9 @@ class Logger:
                 'name': type(experiment.procedure).__name__,
                 'properties': {}
             }
+            info['experiment'] = {
+                'type': experiment.__class__.__name__,
+            }
             for prop in experiment.procedure.store_parameters:
                 info['procedure']['properties'][prop] = getattr(
                     experiment.procedure, prop)
