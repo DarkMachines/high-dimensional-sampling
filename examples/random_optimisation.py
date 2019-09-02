@@ -64,7 +64,7 @@ class RandomOptimisation(hds.Procedure):
 
 
 procedure = RandomOptimisation(n_initial=5)
-experiment = hds.OptimisationExperiment(procedure, '/Users/jdoe/Desktop/hds')
+experiment = hds.OptimisationExperiment(procedure, './hds')
 feeder = hds.functions.FunctionFeeder()
 feeder.load_function_group(['optimisation', 'bounded'])
 

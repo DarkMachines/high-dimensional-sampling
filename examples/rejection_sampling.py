@@ -54,8 +54,7 @@ class RejectionSampling(hds.Procedure):
 
 
 procedure = RejectionSampling()
-experiment = hds.PosteriorSamplingExperiment(procedure,
-                                             '/Users/jdoe/Desktop/hds')
+experiment = hds.PosteriorSamplingExperiment(procedure, './hds')
 feeder = hds.functions.FunctionFeeder()
 feeder.load_function_group(
     'posterior', {
