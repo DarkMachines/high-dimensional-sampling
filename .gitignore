@@ -20,3 +20,9 @@ docs/apidocs
 .idea
 .eclipse
 .vscode
+
+# Example results
+examples/hds/*
+examples/*.png
+examples/*.tex
+examples/*.csv
