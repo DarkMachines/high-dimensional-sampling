@@ -98,3 +98,28 @@ def benchmark_sha_hashing():
         o = hashlib.sha1(s)
         s = bytes(o.hexdigest(), 'utf-8')
     return get_time() - t_start
+
+
+def require_extension(path, allowed_extensions):
+    """
+    Checks if the extension for a provided path is in a set of predefined
+    extensions.
+
+    If the extension matches one of the predefined ones, the found extension
+    is returned (in lowercase). If it does not, an Exception is raised.
+
+    Args:
+        path: Path of which the extension should be checked
+        allowed_extensions: List of allowed extensions, without preceding '.'
+
+    Returns:
+        The found extension, fully in lowercase
+    
+    Raises:
+        Exception: Extension '?' not supported
+    """
+    provided = path.split('.')[-1]
+    for ext in allowed_extensions:
+        if ext.lower() == provided.lower():
+            return ext.lower()
+    raise Exception("Extension '{}' not supported.".format(provided))
