@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/DarkMachines/high-dimensional-sampling.svg?branch=master)](https://travis-ci.org/DarkMachines/high-dimensional-sampling)
+
 # High-Dimensional Sampling Framework
 
 Framework for the high-dimensional sampling challenge of DarkMachines.org. In
