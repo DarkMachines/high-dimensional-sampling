@@ -1,10 +1,10 @@
 import os
 import getpass
-import pandas as pd
 import yaml
 import copy
 
-from .utils import get_time, get_datetime, create_unique_folder, benchmark_matrix_inverse, benchmark_sha_hashing
+from .utils import (get_time, get_datetime, create_unique_folder,
+                    benchmark_matrix_inverse, benchmark_sha_hashing)
 from .methods import Method
 from .functions import TestFunction
 
@@ -27,7 +27,7 @@ class Experiment:
     def __init__(self, method, path):
         if not isinstance(method, Method):
             raise Exception(
-                """SamplingExperiments should be provided an instance of a 
+                """SamplingExperiments should be provided an instance of a
                 class derived from the methods.Sampler class.""")
         self.path = path
         self.method = method
@@ -65,7 +65,7 @@ class Experiment:
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
             raise Exception(
-                """Provided function should have functions.TestFunction as 
+                """Provided function should have functions.TestFunction as
                 base class.""")
         # Setup logger
         self.logger = Logger(self.path, (type(function).__name__).lower())

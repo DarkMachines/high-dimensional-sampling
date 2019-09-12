@@ -156,7 +156,7 @@ class TestFunction(ABC):
         if isinstance(x, pd.DataFrame):
             return x.values()
         raise Exception(
-            """"Testfunctions don't accept {} as input: only numpy arrays, 
+            """"Testfunctions don't accept {} as input: only numpy arrays,
             lists and pandas dataframes are allowed.""".format(
                 type(x).__name__))
 
@@ -227,7 +227,7 @@ class NoDerivativeError(Exception):
 
 class Rastrigin(TestFunction):
     """
-    Testfunction as defined by 
+    Testfunction as defined by
     https://en.wikipedia.org/wiki/Rastrigin_function
     """
 
@@ -363,7 +363,7 @@ class LeviNmbr13(TestFunction):
 
 class Himmelblau(TestFunction):
     """
-    Testfunction as defined by 
+    Testfunction as defined by
     https://en.wikipedia.org/wiki/Himmelblau%27s_function
 
     No derivative implemented
