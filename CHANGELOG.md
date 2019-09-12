@@ -13,7 +13,7 @@ Added
 * A submodule `results` that implements functionality to visualise or format
   the results of one or more experiments into neat little plots and tables.
   Accompanying this new submodule is a new example script.
-* The Experiment class how is an abstract class with abstract methods that
+* The Experiment class now is an abstract class with abstract methods that
   function as events. This allows users to more easily create Experiment
   classes that extend the functionality of the Experiment class.
 * The `experiment.yaml` log now also contains entries on the experiment type
