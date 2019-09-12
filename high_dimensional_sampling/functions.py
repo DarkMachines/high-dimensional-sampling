@@ -132,7 +132,8 @@ class TestFunction(ABC):
             this list is a list with two entries: the minimum and the maximum
             for this dimension.
         """
-        return np.array([[r[0]+epsilon, r[1]-epsilon] for r in self.ranges])
+        return np.array([[r[0] + epsilon, r[1] - epsilon]
+                         for r in self.ranges])
 
     def check_ranges(self, x, epsilon=0):
         """
@@ -180,15 +181,17 @@ class TestFunction(ABC):
         elif select is "normal":
             n = 0
             for x in self.counter:
-                n += 1 - 1*x[1]
+                n += 1 - 1 * x[1]
             return round(n)
         elif select is "derivative":
             n = 0
             for x in self.counter:
-                n += 1*x[1]
+                n += 1 * x[1]
             return round(n)
         else:
-            raise Exception("Cannot count function calls of unknown type '{}'".format(select))
+            raise Exception(
+                "Cannot count function calls of unknown type '{}'".format(
+                    select))
 
     def to_numpy_array(self, x):
         """
@@ -236,7 +239,7 @@ class TestFunction(ABC):
         for _ in range(dimensionality):
             ranges.append([minimum, maximum])
         return ranges
-    
+
     def get_simple_interface(self):
         """
         Get this function, wrapped in the SimpleFunctionWrapper. This wrapped
@@ -305,11 +308,14 @@ class SimpleFunctionWrapper:
         Exception: SimpleFunctionWrapper can only wrap instances of the
             TestFunction class
     """
+
     def __init__(self, function):
         if not isinstance(function, TestFunction):
-            raise Exception("SimpleFunctionWrapper can only wrap instances of the TestFunction class.")
+            raise Exception(
+                "SimpleFunctionWrapper can only wrap instances of the TestFunction class."
+            )
         self.function = function
-    
+
     def __call__(self, *args, **kwargs):
         """
         Call the wrapped testfunction through an altered interface. Instead
@@ -347,17 +353,19 @@ class SimpleFunctionWrapper:
         """
         # Check dimensionality of the input
         if len(args) != len(self.function.ranges):
-            raise Exception("Number of provided unnamed arguments should match the dimensionality of the wrapped TestFunction.")
+            raise Exception(
+                "Number of provided unnamed arguments should match the dimensionality of the wrapped TestFunction."
+            )
         # Construct input array for the wrapped TestFunction
         x = self._create_input_array(args)
         # Get valid keyword arguments
         kwargs = self._select_keyword_arguments(kwargs)
         # Evaluate function and change type/form before returning its result
         evaluation = self.function(x, **kwargs)
-        if evaluation.shape == (1,1):
-            return evaluation[0,0]
+        if evaluation.shape == (1, 1):
+            return evaluation[0, 0]
         return evaluation
-    
+
     def _create_input_array(self, args):
         """
         Combine variable-separated input arguments into a single numpy array.
@@ -379,7 +387,7 @@ class SimpleFunctionWrapper:
         if len(x.shape) == 1:
             x = x.reshape(1, -1)
         return x
-    
+
     def _select_keyword_arguments(self, kwargs_dict):
         """
         Filter out elements of the provided dictionary with keys 'derivative'
@@ -1177,6 +1185,7 @@ class Linear(TestFunction):
     def _derivative(self, x):
         raise NoDerivativeError()
 
+
 class Reciprocal(TestFunction):
     """
     Test function defined by
@@ -1190,19 +1199,21 @@ class Reciprocal(TestFunction):
         dimensionality: Number of dimensions for input of the function. By
             default this argument is set to 2.
     """
+
     def __init__(self, dimensionality=2):
         self.ranges = self.construct_ranges(dimensionality, 0.001, 1)
         super(Reciprocal, self).__init__()
-    
+
     def _evaluate(self, x):
         return np.prod(np.power(x, -1), 1).reshape(-1, 1)
-    
+
     def _derivative(self, x):
         dimensionality = len(self.ranges)
         derivative = -1 * np.ones((len(x), dimensionality)) * self._evaluate(x)
         for d in range(dimensionality):
-            derivative[:,d] *= np.power(x[:,d], -1)
+            derivative[:, d] *= np.power(x[:, d], -1)
         return derivative
+
 
 class BreitWigner(TestFunction):
     """
@@ -1221,20 +1232,25 @@ class BreitWigner(TestFunction):
             it corresponds to the decay width of the particle of the resonance.
             Set to 15 by default.
     """
+
     def __init__(self, m=50, width=15):
         self.m = m
         self.width = width
         self.ranges = [[0, 100]]
         super(BreitWigner, self).__init__()
-    
+
     def _k(self):
-        return 2*np.sqrt(2)*self.m*self.width*self._gamma() / (np.pi * np.sqrt(self.m**2 + self._gamma()))
-    
+        return 2 * np.sqrt(2) * self.m * self.width * self._gamma() / (
+            np.pi * np.sqrt(self.m**2 + self._gamma()))
+
     def _gamma(self):
         return np.sqrt(self.m**2 * (self.m**2 + self.width**2))
-    
+
     def _evaluate(self, x):
-        return self._k() / (np.power(np.power(x,2) - self.m**2,2) + self.m**2 * self.width**2)
-    
+        return self._k() / (np.power(np.power(x, 2) - self.m**2, 2) +
+                            self.m**2 * self.width**2)
+
     def _derivative(self, x):
-        return -4*self._k()*x*(np.power(x, 2) - self.m**2) / np.power(self.width**2 * self.m**2 + np.power(np.power(x, 2) - self.m**2,2),2)
+        return -4 * self._k() * x * (np.power(x, 2) - self.m**2) / np.power(
+            self.width**2 * self.m**2 +
+            np.power(np.power(x, 2) - self.m**2, 2), 2)

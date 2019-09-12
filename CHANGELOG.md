@@ -15,6 +15,12 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * The `experiment.yaml` log now also contains entries on the experiment type
   (e.g. OptimisationExperiment) and the number of calls for the derivative
   of the TestFunction.
+* The interface to TestFunctions was not working for all users. An interface
+  class (SimpleFunctionWrapper) has been added that allows the user to provide
+  the input parameters each as a separate argument. The interface can be
+  activated by calling the `get_simple_interface` method of a TestFunction. An
+  example using the different interfaces has been added
+  (`testfunction_interfaces.py`).
 
 ### Changed
 * The examples now use relative path indications for storage of their results,
