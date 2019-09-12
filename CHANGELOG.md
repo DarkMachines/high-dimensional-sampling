@@ -1,15 +1,11 @@
-###########
-Change Log
-###########
+# Changelog
 
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Unreleased
-**********
+## Unreleased
 
-Added
------
+### Added
 * A submodule `results` that implements functionality to visualise or format
   the results of one or more experiments into neat little plots and tables.
   Accompanying this new submodule is a new example script.
@@ -20,25 +16,21 @@ Added
   (e.g. OptimisationExperiment) and the number of calls for the derivative
   of the TestFunction.
 
-Changed
--------
+### Changed
 * The examples now use relative path indications for storage of their results,
   so that the examples can be used out of the box without errors.
 * The package indicator in setup.py now is more general, allowing for easier
   inclusion of submodules.
 
-Fixed
------
+### Fixed
 * An error was raised when GaussianShells was logged, as this function stores
   its parameters internally as numpy arrays. These don't translate well to
   .yaml files. This has been solved by forcing the storage of function 
   properties as lists if they are numpy arrays.
+---
+## Version 0.1.1 (Tuesday August 20th, 2019)
 
-Version 0.1.1 (Tuesday August 20th, 2019)
-*****************************************
-
-Added
------
+### Added
 * A `get_ranges` method in the TestFunction class. It returns the ranges of the
   test function, taking a leeway parameter epsilon provided to the method into
   account: all minima will be raised by epsilon, all maxima will be reduced by
@@ -59,14 +51,12 @@ Added
     * BreitWigner
     * Reciprocal
 
-Changed
--------
+### Changed
 * Increased the readability of the error message given when a test function is
   queried for its value outside of the box defined by its ranges parameter.
 * The `utils.get_time` method now returns time in seconds
 
-Fixed
------
+### Fixed
 * Ackley, Easom and Sphere test functions returned data in an incorrect shape.
   This has been corrected.
 * The GaussianShells test function mapped multi-point input to a single output
