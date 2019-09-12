@@ -5,9 +5,6 @@
 """
 import pytest
 
-from high_dimensional_sampling import high_dimensional_sampling
-
-
 def test_something():
     assert True
 
