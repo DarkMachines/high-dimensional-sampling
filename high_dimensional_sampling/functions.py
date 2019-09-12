@@ -236,6 +236,17 @@ class TestFunction(ABC):
         for _ in range(dimensionality):
             ranges.append([minimum, maximum])
         return ranges
+    
+    def get_simple_interface(self):
+        """
+        Get this function, wrapped in the SimpleFunctionWrapper. This wrapped
+        function has a different __call__ interface. See the documentation
+        for the wrapper for more information.
+
+        Returns:
+            This TestFunction wrapped in a SimpleFunctionWrapper instance.
+        """
+        return SimpleFunctionWrapper(self)
 
     @abstractmethod
     def _evaluate(self, x):
@@ -275,6 +286,118 @@ class TestFunction(ABC):
             NoDerivativeError: No derivative is known for this testfunction.
         """
         pass
+
+
+class SimpleFunctionWrapper:
+    """
+    Class that can be used to wrap a TestFunction instance. Wrapped functions 
+    will be callable by providing each parameter as a separate argument,
+    instead of in a single numpy array.
+
+        func = Rosenbrock()
+        simple_func = LeviNmbr13(func)
+        y = simple_func(1, 2)
+
+    Args:
+        function: TestFunction to be wrapped
+    
+    Raises:
+        Exception: SimpleFunctionWrapper can only wrap instances of the
+            TestFunction class
+    """
+    def __init__(self, function):
+        if not isinstance(function, TestFunction):
+            raise Exception("SimpleFunctionWrapper can only wrap instances of the TestFunction class.")
+        self.function = function
+    
+    def __call__(self, *args, **kwargs):
+        """
+        Call the wrapped testfunction through an altered interface. Instead
+        of providing the data as a numpy array, the data is provided as a 
+        separate argument for each parameter. These parameters can be given as
+        a numpy array, to evaluate multiple datapoints at the same time.
+
+            func = Rosenbrock()
+            simple_func = LeviNmbr13(func)
+            y = simple_func(1, 2)
+        
+        Args:
+            *args: Each of the parameters for the function, provided as unnamed
+                arguments. Parameters may be provided as numbers (float/int) or
+                as numpy arrays of consistent length (allowing for the
+                evaluation of multiple datapoints at the same time).
+            derivative: If this boolean is False (default), the testfunction
+                will be queried for its value. If it is True, the derivative
+                of the function is queried (if existing).
+            epsilon: leeway parameter that is added to all minima and
+                subtracted from all maxima in the .check_ranges method. Default
+                is 0.
+        
+        Returns:
+            If input was provided as numpy arrays or the output of the wrapped
+            TestFunction is multi-dimensional, a numpy.ndarray of shape
+            (nDatapoints, ?) containing the function evaluations will be
+            returned. If data was provided as numbers, the result of the
+            testfunction evaluation will be returned as a number or a list
+            (depending on the dimensionality of the function output).
+        
+        Raises:
+            Exception: Number of provided unnamed arguments should
+                match the dimensionality of the wrapped TestFunction.
+        """
+        # Check dimensionality of the input
+        if len(args) != len(self.function.ranges):
+            raise Exception("Number of provided unnamed arguments should match the dimensionality of the wrapped TestFunction.")
+        # Construct input array for the wrapped TestFunction
+        x = self._create_input_array(args)
+        # Get valid keyword arguments
+        kwargs = self._select_keyword_arguments(kwargs)
+        # Evaluate function and change type/form before returning its result
+        evaluation = self.function(x, **kwargs)
+        if evaluation.shape == (1,1):
+            return evaluation[0,0]
+        return evaluation
+    
+    def _create_input_array(self, args):
+        """
+        Combine variable-separated input arguments into a single numpy array.
+
+        Args:
+            args: Tuple of numbers or numpy arrays, which should be combined
+                into a single numpy array to be provided to a TestFunction's
+                __call__ method.
+
+        Returns:
+            Numpy.ndarray of shape (nDatapoints, ?)
+        """
+        parameters = []
+        for parameter in args:
+            if isinstance(args, np.ndarray):
+                parameter = parameter.flatten()
+            parameters.append(parameter)
+        x = np.hstack(parameters)
+        if len(x.shape) == 1:
+            x = x.reshape(1, -1)
+        return x
+    
+    def _select_keyword_arguments(self, kwargs_dict):
+        """
+        Filter out elements of the provided dictionary with keys 'derivative'
+        and 'epsilon'.
+
+        Args:
+            kwargs_dict: Dictionary of which the elements should be filtered.
+        
+        Returns:
+            Dictionary containing only the entries of the input dictionary that
+            have keys 'dictionary' and 'epsilon'. If some, or all, of them do
+            not exist, no such key will appear in the output dictionary.
+        """
+        kwargs = {}
+        for k in kwargs_dict:
+            if k in ['derivative', 'epsilon']:
+                kwargs[k] = kwargs_dict[k]
+        return kwargs
 
 
 class NoDerivativeError(Exception):
