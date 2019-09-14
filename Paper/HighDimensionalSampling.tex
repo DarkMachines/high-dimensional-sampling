@@ -67,9 +67,25 @@ This paper is structured as follows. In Section~\ref{sec:algorithms}, we provide
 \subsection{Metric Gaussian Variational Inference}
 \emph{Author: Jakob Knollmueller}
 
-\subsection{MCMC}
+\subsection{Markov Chain Monte Carlo}
+\label{sec:MCMC}
+\emph{Author: Csaba Balazs, Martin White (Great and TWalk).} 
 
-\emph{Author: Martin White, Csaba Balazs (Great and TWalk).} 
+Markov Chain Monte Carlo (MCMC) is yet another method targeting the problem of the efficient sampling from a complicated distribution.  
+%
+MCMC is a generic name for a collection of specific algorithms, all utilizing the statistical properties of a Markov Chain.
+%
+A Markov Chain is a set of (discrete) random variables, $\{x_1, ..., x_n, ...\}$, with the property that the every element of the set is conditionally independent of the rest, except the immediately preceding one:
+\begin{equation}
+	P(x_n|x_1,...,x_{n-1}) = P(x_n|x_{n-1}) .
+\end{equation}
+
+One of the simplest examples of a Markov Chain is a random walk.
+
+Monte Carlo refers to generating a set of random numbers such that a fraction of these numbers obeys ~~~some property~~~
+[Metropolis, N. and Ulam, S. "The Monte Carlo Method." J. Amer. Stat. Assoc. 44, 335-341, 1949.]
+
+MCMCs are especially utile for sampling of complex likelihood functions or posterior distributions. 
 
 \section{Metrics for comparing sampling algorithms}
 \label{sec:metrics}
