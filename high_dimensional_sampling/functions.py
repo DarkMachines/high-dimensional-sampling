@@ -292,7 +292,7 @@ class TestFunction(ABC):
 
 class SimpleFunctionWrapper:
     """
-    Class that can be used to wrap a TestFunction instance. Wrapped functions 
+    Class that can be used to wrap a TestFunction instance. Wrapped functions
     will be callable by providing each parameter as a separate argument,
     instead of in a single numpy array.
 
@@ -302,7 +302,7 @@ class SimpleFunctionWrapper:
 
     Args:
         function: TestFunction to be wrapped
-    
+
     Raises:
         Exception: SimpleFunctionWrapper can only wrap instances of the
             TestFunction class
@@ -310,22 +310,21 @@ class SimpleFunctionWrapper:
 
     def __init__(self, function):
         if not isinstance(function, TestFunction):
-            raise Exception(
-                "SimpleFunctionWrapper can only wrap instances of the TestFunction class."
-            )
+            raise Exception("SimpleFunctionWrapper can only wrap instances of"
+                            "the TestFunction class.")
         self.function = function
 
     def __call__(self, *args, **kwargs):
         """
         Call the wrapped testfunction through an altered interface. Instead
-        of providing the data as a numpy array, the data is provided as a 
+        of providing the data as a numpy array, the data is provided as a
         separate argument for each parameter. These parameters can be given as
         a numpy array, to evaluate multiple datapoints at the same time.
 
             func = Rosenbrock()
             simple_func = LeviNmbr13(func)
             y = simple_func(1, 2)
-        
+
         Args:
             *args: Each of the parameters for the function, provided as unnamed
                 arguments. Parameters may be provided as numbers (float/int) or
@@ -337,7 +336,7 @@ class SimpleFunctionWrapper:
             epsilon: leeway parameter that is added to all minima and
                 subtracted from all maxima in the .check_ranges method. Default
                 is 0.
-        
+
         Returns:
             If input was provided as numpy arrays or the output of the wrapped
             TestFunction is multi-dimensional, a numpy.ndarray of shape
@@ -345,16 +344,15 @@ class SimpleFunctionWrapper:
             returned. If data was provided as numbers, the result of the
             testfunction evaluation will be returned as a number or a list
             (depending on the dimensionality of the function output).
-        
+
         Raises:
             Exception: Number of provided unnamed arguments should
                 match the dimensionality of the wrapped TestFunction.
         """
         # Check dimensionality of the input
         if len(args) != len(self.function.ranges):
-            raise Exception(
-                "Number of provided unnamed arguments should match the dimensionality of the wrapped TestFunction."
-            )
+            raise Exception("Number of provided unnamed arguments should match"
+                            "the dimensionality of the wrapped TestFunction.")
         # Construct input array for the wrapped TestFunction
         x = self._create_input_array(args)
         # Get valid keyword arguments
@@ -394,7 +392,7 @@ class SimpleFunctionWrapper:
 
         Args:
             kwargs_dict: Dictionary of which the elements should be filtered.
-        
+
         Returns:
             Dictionary containing only the entries of the input dictionary that
             have keys 'dictionary' and 'epsilon'. If some, or all, of them do
