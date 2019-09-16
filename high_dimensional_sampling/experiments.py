@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 import os
 import getpass
-import pandas as pd
 import yaml
 import copy
 import numpy as np
 
-from .utils import get_time, get_datetime, create_unique_folder, benchmark_matrix_inverse, benchmark_sha_hashing
+from .utils import (get_time, get_datetime, create_unique_folder,
+                    benchmark_matrix_inverse, benchmark_sha_hashing)
 from .procedures import Procedure
 from .functions import TestFunction
 
@@ -28,7 +28,7 @@ class Experiment(ABC):
 
     def __init__(self, procedure, path):
         if not isinstance(procedure, Procedure):
-            raise Exception("""Experimetns should be provided an instance of a
+            raise Exception("""Experiments should be provided an instance of a
                 class derived from the procedures.Procedure class.""")
         self.path = path
         self.procedure = procedure
@@ -164,7 +164,7 @@ class Experiment(ABC):
         Experiment-specific classes derived from this one.
         """
         pass
-    
+
     @abstractmethod
     def _event_end_experiment(self):
         """
@@ -175,7 +175,7 @@ class Experiment(ABC):
         Experiment-specific classes derived from this one.
         """
         pass
-    
+
     @abstractmethod
     def _event_new_samples(self, x, y):
         """
@@ -223,17 +223,17 @@ class Experiment(ABC):
 class OptimisationExperiment(Experiment):
     """
     Experiment class for optimisation experiments
-    
+
     Implements automatic logging of best obtained result to the experiment.yaml
     file.
     """
 
     def _event_start_experiment(self):
-        """ 
+        """
         Event that is run when a new experiment is started.
         """
         self.best_point = None
-    
+
     def _event_end_experiment(self):
         """
         Event that is run when a experiment ends.
@@ -291,11 +291,11 @@ class PosteriorSamplingExperiment(Experiment):
     """
 
     def _event_start_experiment(self):
-        """ 
+        """
         Event that is run when a new experiment is started.
         """
         pass
-    
+
     def _event_end_experiment(self):
         """
         Event that is run when a experiment ends.

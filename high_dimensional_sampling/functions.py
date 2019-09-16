@@ -125,7 +125,7 @@ class TestFunction(ABC):
         Args:
             epsilon: leeway parameter that is added to all minima and
                 subtracted from all maxima. Default is 0.001.
-        
+
         Returns:
             List of minima and maxima for all dimensions in the problem. The
             list has a length equal to the number of dimensions. Each entry in
@@ -166,32 +166,31 @@ class TestFunction(ABC):
         Args:
             select: String indicating which function calls to count. If "all",
                 all calls will be counted (default). "normal" makes the
-                method only count non-derivate evaluations, whereas 
+                method only count non-derivate evaluations, whereas
                 "derivative" counts the number of derivates evaluated.
-        
+
         Returns:
             Number of function calls of the selected type.
-        
+
         Raises:
             Exception: Cannot count function calls of unknown type '?'. Will be
                 raised if the select argument is not recognised.
         """
-        if select is "all":
+        if select == "all":
             return len(self.counter)
-        elif select is "normal":
+        elif select == "normal":
             n = 0
             for x in self.counter:
                 n += 1 - 1 * x[1]
             return round(n)
-        elif select is "derivative":
+        elif select == "derivative":
             n = 0
             for x in self.counter:
                 n += 1 * x[1]
             return round(n)
         else:
-            raise Exception(
-                "Cannot count function calls of unknown type '{}'".format(
-                    select))
+            raise Exception("Cannot count function calls of"
+                            "unknown type '{}'".format(select))
 
     def to_numpy_array(self, x):
         """
@@ -293,7 +292,7 @@ class TestFunction(ABC):
 
 class SimpleFunctionWrapper:
     """
-    Class that can be used to wrap a TestFunction instance. Wrapped functions 
+    Class that can be used to wrap a TestFunction instance. Wrapped functions
     will be callable by providing each parameter as a separate argument,
     instead of in a single numpy array.
 
@@ -303,7 +302,7 @@ class SimpleFunctionWrapper:
 
     Args:
         function: TestFunction to be wrapped
-    
+
     Raises:
         Exception: SimpleFunctionWrapper can only wrap instances of the
             TestFunction class
@@ -311,22 +310,21 @@ class SimpleFunctionWrapper:
 
     def __init__(self, function):
         if not isinstance(function, TestFunction):
-            raise Exception(
-                "SimpleFunctionWrapper can only wrap instances of the TestFunction class."
-            )
+            raise Exception("SimpleFunctionWrapper can only wrap instances of"
+                            "the TestFunction class.")
         self.function = function
 
     def __call__(self, *args, **kwargs):
         """
         Call the wrapped testfunction through an altered interface. Instead
-        of providing the data as a numpy array, the data is provided as a 
+        of providing the data as a numpy array, the data is provided as a
         separate argument for each parameter. These parameters can be given as
         a numpy array, to evaluate multiple datapoints at the same time.
 
             func = Rosenbrock()
             simple_func = LeviNmbr13(func)
             y = simple_func(1, 2)
-        
+
         Args:
             *args: Each of the parameters for the function, provided as unnamed
                 arguments. Parameters may be provided as numbers (float/int) or
@@ -338,7 +336,7 @@ class SimpleFunctionWrapper:
             epsilon: leeway parameter that is added to all minima and
                 subtracted from all maxima in the .check_ranges method. Default
                 is 0.
-        
+
         Returns:
             If input was provided as numpy arrays or the output of the wrapped
             TestFunction is multi-dimensional, a numpy.ndarray of shape
@@ -346,16 +344,15 @@ class SimpleFunctionWrapper:
             returned. If data was provided as numbers, the result of the
             testfunction evaluation will be returned as a number or a list
             (depending on the dimensionality of the function output).
-        
+
         Raises:
             Exception: Number of provided unnamed arguments should
                 match the dimensionality of the wrapped TestFunction.
         """
         # Check dimensionality of the input
         if len(args) != len(self.function.ranges):
-            raise Exception(
-                "Number of provided unnamed arguments should match the dimensionality of the wrapped TestFunction."
-            )
+            raise Exception("Number of provided unnamed arguments should match"
+                            "the dimensionality of the wrapped TestFunction.")
         # Construct input array for the wrapped TestFunction
         x = self._create_input_array(args)
         # Get valid keyword arguments
@@ -395,7 +392,7 @@ class SimpleFunctionWrapper:
 
         Args:
             kwargs_dict: Dictionary of which the elements should be filtered.
-        
+
         Returns:
             Dictionary containing only the entries of the input dictionary that
             have keys 'dictionary' and 'epsilon'. If some, or all, of them do
@@ -458,7 +455,7 @@ class FunctionFeeder:
                 BukinNmbr6, Mayas, LeviNmbr13, Himmelblau, ThreeHumpCamel,
                 Sphere, Ackley, Easom, Linear
             posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
-                MultivariateNormal, GaussianShells, Linear, Reciprocal, 
+                MultivariateNormal, GaussianShells, Linear, Reciprocal,
                 BreitWigner
             with_derivative: Rastrigin, Sphere, Cosine, Bessel, ModifiedBessel,
                 Reciprocal, BreitWigner
@@ -878,7 +875,7 @@ class Easom(TestFunction):
     Easom function as defined by
     https://en.wikipedia.org/wiki/Test_functions_for_optimization
 
-    This is a 2-dimensional function with an application range bounded by 
+    This is a 2-dimensional function with an application range bounded by
     a box between -x and x for both dimensions, where x can be defined by
     the user (100 is default). No derivative has been defined.
 
@@ -1189,9 +1186,9 @@ class Linear(TestFunction):
 class Reciprocal(TestFunction):
     """
     Test function defined by
-    
+
         prod_i x_i^(-1)
-    
+
     The application range of this function is 0.001 to 1 for each fo the input
     dimensions. No derivative is defined.
 
@@ -1240,17 +1237,17 @@ class BreitWigner(TestFunction):
         super(BreitWigner, self).__init__()
 
     def _k(self):
-        return 2 * np.sqrt(2) * self.m * self.width * self._gamma() / (
-            np.pi * np.sqrt(self.m**2 + self._gamma()))
+        return (2*np.sqrt(2)*self.m*self.width*self._gamma()
+                / (np.pi * np.sqrt(self.m**2 + self._gamma())))
 
     def _gamma(self):
         return np.sqrt(self.m**2 * (self.m**2 + self.width**2))
 
     def _evaluate(self, x):
-        return self._k() / (np.power(np.power(x, 2) - self.m**2, 2) +
-                            self.m**2 * self.width**2)
+        return self._k() / (np.power(np.power(x, 2) - self.m**2, 2)
+                            + self.m**2 * self.width**2)
 
     def _derivative(self, x):
-        return -4 * self._k() * x * (np.power(x, 2) - self.m**2) / np.power(
-            self.width**2 * self.m**2 +
-            np.power(np.power(x, 2) - self.m**2, 2), 2)
+        return (-4*self._k()*x*(np.power(x, 2) - self.m**2)
+                / np.power(self.width**2 * self.m**2
+                           + np.power(np.power(x, 2) - self.m**2, 2), 2))
