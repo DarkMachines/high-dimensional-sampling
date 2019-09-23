@@ -5,8 +5,8 @@ class Procedure(ABC):
     """
     Abstract base class for all sampling procedures
 
-    All sampling procedure subjected to an experiment should be derived from this
-    class. It requires the implementation of the __init__, __call__ and
+    All sampling procedure subjected to an experiment should be derived from
+    this class. It requires the implementation of the __init__, __call__ and
     is_finished methods.
 
     As it is an abstract base class, direct (i.e. not derived) instances of

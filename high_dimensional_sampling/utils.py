@@ -114,7 +114,7 @@ def require_extension(path, allowed_extensions):
 
     Returns:
         The found extension, fully in lowercase
-    
+
     Raises:
         Exception: Extension '?' not supported
     """
