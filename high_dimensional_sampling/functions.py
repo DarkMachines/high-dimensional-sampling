@@ -578,15 +578,13 @@ class FunctionFeeder:
         else:
             raise Exception("Group should be a string or a list of strings")
         # Create list of function names to load
-        load = None
+        load = []
         if isinstance(group, str):
             load = function_names[group]
-        else:
-            for g in group:
-                if load is not None:
-                    load = [func for func in load if func in function_names[g]]
-                else:
-                    load = function_names[g]
+        elif isinstance(group, list):
+            for groupname in group:
+                extending_with = [func for func in function_names[groupname] if func not in load]
+                load.extend( extending_with )
         # Loop over function names and load each function
         if parameters is None:
             parameters = {}
@@ -980,7 +978,7 @@ class Cosine(TestFunction):
     The ranges have been set to [-4*pi, 4*pi].
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-4 * np.pi, 4 * np.pi]]
         super(Cosine, self).__init__(**kwargs)
 
@@ -1071,12 +1069,12 @@ class Bessel(TestFunction):
     def _evaluate(self, x):
         if not self.fast:
             return special.jv(0, x) + 0.5
-        return special.j0(x) + 0.5
+        return special.j0(x) + 0.5 #pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.jv(1, x)
-        return special.j1(x)
+        return special.j1(x) #pylint:disable=E1101
 
 
 class ModifiedBessel(TestFunction):
@@ -1109,12 +1107,12 @@ class ModifiedBessel(TestFunction):
     def _evaluate(self, x):
         if not self.fast:
             return special.kv(0, x)
-        return special.k0(x)
+        return special.k0(x) #pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.kv(1, x)
-        return special.k1(x)
+        return special.k1(x) #pylint:disable=E1101
 
 
 class Eggbox(TestFunction):
