@@ -63,7 +63,7 @@ class RandomOptimisation(hds.Procedure):
         return False
     
     def check_testfunction(self, function):
-        return (function.is_differentiable())
+        return True
 
 
 procedure = RandomOptimisation(n_initial=5)
