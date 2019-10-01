@@ -3,7 +3,6 @@ Example of an optimisation experiment. Implemented procedure is explained at
 https://en.wikipedia.org/wiki/Random_optimization
 """
 import high_dimensional_sampling as hds
-from high_dimensional_sampling.optimisation import RandomOptimisation
 import numpy as np
 
 
