@@ -249,6 +249,46 @@ class TestFunction(ABC):
             This TestFunction wrapped in a SimpleFunctionWrapper instance.
         """
         return SimpleFunctionWrapper(self)
+    
+    def is_bounded(self):
+        """
+        Checks if the ranges of the TestFunction are bounded, i.e. that there
+        is no dimension with either np.inf or -np.inf as boundary (or both).
+
+        Returns:
+            Boolean indicating if the function is bounded.
+        """
+        for dim in self.ranges:
+            if abs(dim[0]) + abs(dim[1]) == np.inf:
+                return False
+        return True
+    
+    def is_differentiable(self):
+        """
+        Checks if the function is differentiable
+
+        Returns:
+            Boolean indicating if function is differentiable.
+        """
+        x = np.random.rand(self.get_dimensionality())
+        ranges = np.array(self.ranges)
+        sample = x * (ranges[:,1] - ranges[:,0]) + ranges[:,0]
+        try:
+            _ = self._derivative(sample)
+            return True
+        except NoDerivativeError:
+            return False
+
+    def get_dimensionality(self):
+        """
+        Returns the dimensionality of the TestFunction, based on the ranges
+        defined in the .ranges property.
+
+        Returns:
+            Number of dimensions as an integer.
+        """
+        return len(self.ranges)
+        
 
     @abstractmethod
     def _evaluate(self, x):
