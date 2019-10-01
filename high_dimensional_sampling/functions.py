@@ -273,6 +273,7 @@ class TestFunction(ABC):
         x = np.random.rand(self.get_dimensionality())
         ranges = np.array(self.ranges)
         sample = x * (ranges[:,1] - ranges[:,0]) + ranges[:,0]
+        sample = sample.reshape((1,-1))
         try:
             _ = self._derivative(sample)
             return True
@@ -1245,7 +1246,7 @@ class Reciprocal(TestFunction):
         return np.prod(np.power(x, -1), 1).reshape(-1, 1)
 
     def _derivative(self, x):
-        dimensionality = len(self.ranges)
+        dimensionality = self.get_dimensionality()
         derivative = -1 * np.ones((len(x), dimensionality)) * self._evaluate(x)
         for d in range(dimensionality):
             derivative[:, d] *= np.power(x[:, d], -1)
