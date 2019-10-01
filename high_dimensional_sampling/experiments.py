@@ -65,7 +65,7 @@ class Experiment(ABC):
         """
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
-            raise Exception("""Provided function should have 
+            raise Exception("""Provided function should have
                             functions.TestFunction as base class.""")
         # Test if the procedure can run on the provided test function
         if not self.procedure.check_testfunction(function):
