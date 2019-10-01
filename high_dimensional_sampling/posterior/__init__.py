@@ -1,1 +1,1 @@
-from .rejectionsampling import RejectionSampling
+from .rejectionsampling import RejectionSampling  # noqa: F401

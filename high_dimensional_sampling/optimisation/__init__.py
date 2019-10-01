@@ -1,1 +1,1 @@
-from .randomoptimisation import RandomOptimisation
+from .randomoptimisation import RandomOptimisation  # noqa: F401
