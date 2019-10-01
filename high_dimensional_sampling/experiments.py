@@ -69,16 +69,16 @@ class Experiment(ABC):
         # Test if the procedure can run on the provided test function
         if not self.procedure.check_testfunction(function):
             print("Test function '{}' can not be used for '{}'. Ignoring and continuing.".format(
-                type(function).__name__,
+                function.name,
                 type(self.procedure).__name__))
             return
         # Start experiment
         print("Run experiment for '{}' on function '{}'...".format(
             type(self.procedure).__name__,
-            type(function).__name__))
+            function.name))
         self._event_start_experiment()
         # Setup logger
-        self.logger = Logger(self.path, (type(function).__name__).lower())
+        self.logger = Logger(self.path, (function.name).lower())
         self.logger.log_experiment(self, function)
         self.logger.log_benchmarks()
         # Make function available both to the Experiment and the Procedure
@@ -497,10 +497,13 @@ class Logger:
             # Get properties of function
             func_props = copy.copy(vars(function))
             for prop in func_props:
+                if prop == 'name':
+                    continue
                 if isinstance(func_props[prop], np.ndarray):
                     func_props[prop] = func_props[prop].tolist()
             info['function'] = {
-                'name': type(function).__name__,
+                'name': function.name,
+                'testfunction': type(function).__name__,
                 'properties': func_props
             }
             del (info['function']['properties']['counter'])
