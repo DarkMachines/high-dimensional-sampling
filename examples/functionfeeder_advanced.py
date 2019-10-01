@@ -19,7 +19,7 @@ for f in feeder.functions:
   print("- {}".format(f.name))
 
 # Correct duplicates
-feeder.check_name_uniqueness(correct_duplicates=True)
+feeder.fix_duplicate_names()
 
 # Show names again
 print("\nTestFunction names after duplicate removal:")

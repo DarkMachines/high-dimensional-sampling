@@ -647,15 +647,10 @@ class FunctionFeeder:
                                the TestFunction base class.""")
         self.functions.append(function)
     
-    def check_name_uniqueness(self, correct_duplicates=True):
+    def fix_duplicate_names(self):
         """
-        Check if the names of the TestFunctions in the loader are all unique.
-        If not, correct them if requested.
-
-        Args:
-            correct_duplicates: Boolean indicating whether or not duplicate
-                names should be corrected. If `True` (default), they will be
-                appended with '_config*', where '*' is an increasing number.
+        Fix duplicate function names in the feeder by appending them with 
+        '_config*' if necessary.
         """
         known_names = []
         corrections = {}
@@ -665,11 +660,8 @@ class FunctionFeeder:
                 corrections[func.name] = 1
             known_names.append(func.name)
         del(known_names)
-        # Raise exception if correction not requested
+        # Correct duplicate names
         if len(corrections) > 0:
-            if not correct_duplicates:
-                raise Exception("TestFunction names not unique. Duplicates: {}.".format(', '.join(corrections.keys())))
-            # Correct names
             for i, func in enumerate(self.functions):
                 if func.name in corrections:
                     new_name = func.name+'_config'+str(corrections[func.name])
