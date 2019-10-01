@@ -61,7 +61,7 @@ class RandomOptimisation(hds.Procedure):
 
     def is_finished(self):
         return False
-    
+
     def check_testfunction(self, function):
         return True
 

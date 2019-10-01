@@ -257,7 +257,7 @@ class TestFunction(ABC):
             This TestFunction wrapped in a SimpleFunctionWrapper instance.
         """
         return SimpleFunctionWrapper(self)
-    
+
     def is_bounded(self):
         """
         Checks if the ranges of the TestFunction are bounded, i.e. that there
@@ -270,7 +270,7 @@ class TestFunction(ABC):
             if abs(dim[0]) + abs(dim[1]) == np.inf:
                 return False
         return True
-    
+
     def is_differentiable(self):
         """
         Checks if the function is differentiable
@@ -280,8 +280,8 @@ class TestFunction(ABC):
         """
         x = np.random.rand(self.get_dimensionality())
         ranges = np.array(self.ranges)
-        sample = x * (ranges[:,1] - ranges[:,0]) + ranges[:,0]
-        sample = sample.reshape((1,-1))
+        sample = x * (ranges[:, 1] - ranges[:, 0]) + ranges[:, 0]
+        sample = sample.reshape((1, -1))
         try:
             _ = self._derivative(sample)
             return True
@@ -297,7 +297,6 @@ class TestFunction(ABC):
             Number of dimensions as an integer.
         """
         return len(self.ranges)
-        
 
     @abstractmethod
     def _evaluate(self, x):
@@ -583,8 +582,11 @@ class FunctionFeeder:
             load = function_names[group]
         elif isinstance(group, list):
             for groupname in group:
-                extending_with = [func for func in function_names[groupname] if func not in load]
-                load.extend( extending_with )
+                extending_with = [
+                    func for func in function_names[groupname]
+                    if func not in load
+                ]
+                load.extend(extending_with)
         # Loop over function names and load each function
         if parameters is None:
             parameters = {}
@@ -644,7 +646,7 @@ class FunctionFeeder:
             raise Exception("""Cannot load a function that is not derived from
                                the TestFunction base class.""")
         self.functions.append(function)
-    
+
     def fix_duplicate_names(self):
         """
         Fix duplicate function names in the feeder by appending them with 
@@ -654,15 +656,17 @@ class FunctionFeeder:
         corrections = {}
         # Get all duplicate names
         for func in self.functions:
-            if func.name in known_names and func.name not in corrections.keys():
+            if func.name in known_names and func.name not in corrections.keys(
+            ):
                 corrections[func.name] = 1
             known_names.append(func.name)
-        del(known_names)
+        del (known_names)
         # Correct duplicate names
         if len(corrections) > 0:
             for i, func in enumerate(self.functions):
                 if func.name in corrections:
-                    new_name = func.name+'_config'+str(corrections[func.name])
+                    new_name = func.name + '_config' + str(
+                        corrections[func.name])
                     corrections[func.name] += 1
                     self.functions[i].name = new_name
 
@@ -1069,12 +1073,12 @@ class Bessel(TestFunction):
     def _evaluate(self, x):
         if not self.fast:
             return special.jv(0, x) + 0.5
-        return special.j0(x) + 0.5 #pylint:disable=E1101
+        return special.j0(x) + 0.5  #pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.jv(1, x)
-        return special.j1(x) #pylint:disable=E1101
+        return special.j1(x)  #pylint:disable=E1101
 
 
 class ModifiedBessel(TestFunction):
@@ -1107,12 +1111,12 @@ class ModifiedBessel(TestFunction):
     def _evaluate(self, x):
         if not self.fast:
             return special.kv(0, x)
-        return special.k0(x) #pylint:disable=E1101
+        return special.k0(x)  #pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.kv(1, x)
-        return special.k1(x) #pylint:disable=E1101
+        return special.k1(x)  #pylint:disable=E1101
 
 
 class Eggbox(TestFunction):
@@ -1307,17 +1311,17 @@ class BreitWigner(TestFunction):
         super(BreitWigner, self).__init__(**kwargs)
 
     def _k(self):
-        return (2*np.sqrt(2)*self.m*self.width*self._gamma()
-                / (np.pi * np.sqrt(self.m**2 + self._gamma())))
+        return (2 * np.sqrt(2) * self.m * self.width * self._gamma() /
+                (np.pi * np.sqrt(self.m**2 + self._gamma())))
 
     def _gamma(self):
         return np.sqrt(self.m**2 * (self.m**2 + self.width**2))
 
     def _evaluate(self, x):
-        return self._k() / (np.power(np.power(x, 2) - self.m**2, 2)
-                            + self.m**2 * self.width**2)
+        return self._k() / (np.power(np.power(x, 2) - self.m**2, 2) +
+                            self.m**2 * self.width**2)
 
     def _derivative(self, x):
-        return (-4*self._k()*x*(np.power(x, 2) - self.m**2)
-                / np.power(self.width**2 * self.m**2
-                           + np.power(np.power(x, 2) - self.m**2, 2), 2))
+        return (-4 * self._k() * x * (np.power(x, 2) - self.m**2) / np.power(
+            self.width**2 * self.m**2 +
+            np.power(np.power(x, 2) - self.m**2, 2), 2))

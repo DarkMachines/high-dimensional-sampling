@@ -45,13 +45,13 @@ class RejectionSampling(hds.Procedure):
         y = function(x)
         self.maximum = np.max(y)
         self.minimum = np.min(y)
-        
+
     def reset(self):
         pass
 
     def is_finished(self):
         return False
-    
+
     def check_testfunction(self):
         return True
 

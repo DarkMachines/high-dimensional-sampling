@@ -16,7 +16,7 @@ feeder.load_function("Easom", {'absolute_range': 32, 'name': 'Easom_specific'})
 # Show the names of the functions (see that duplicates exist)
 print("TestFunction names prior to duplicate removal:")
 for f in feeder.functions:
-  print("- {}".format(f.name))
+    print("- {}".format(f.name))
 
 # Correct duplicates
 feeder.fix_duplicate_names()
@@ -24,4 +24,4 @@ feeder.fix_duplicate_names()
 # Show names again
 print("\nTestFunction names after duplicate removal:")
 for f in feeder.functions:
-  print("- {}".format(f.name))
+    print("- {}".format(f.name))

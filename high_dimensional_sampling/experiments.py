@@ -65,17 +65,19 @@ class Experiment(ABC):
         """
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
-            raise Exception("Provided function should have functions.TestFunction as base class.")
+            raise Exception(
+                "Provided function should have functions.TestFunction as base class."
+            )
         # Test if the procedure can run on the provided test function
         if not self.procedure.check_testfunction(function):
-            print("Test function '{}' can not be used for '{}'. Ignoring and continuing.".format(
-                function.name,
-                type(self.procedure).__name__))
+            print(
+                "Test function '{}' can not be used for '{}'. Ignoring and continuing."
+                .format(function.name,
+                        type(self.procedure).__name__))
             return
         # Start experiment
         print("Run experiment for '{}' on function '{}'...".format(
-            type(self.procedure).__name__,
-            function.name))
+            type(self.procedure).__name__, function.name))
         self._event_start_experiment()
         # Setup logger
         self.logger = Logger(self.path, (function.name).lower())
