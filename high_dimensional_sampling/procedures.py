@@ -75,9 +75,9 @@ class Procedure(ABC):
         Checks if the Procedure can run on the provided test function.
 
         Args:
-            function: Ans instance of a test fucntion derived from the 
+            function: Ans instance of a test fucntion derived from the
                 TestFunction class.
-        
+
         Returns:
             Boolean indicating if the procedure can be used on the provided
             test function.

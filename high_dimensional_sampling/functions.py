@@ -649,7 +649,7 @@ class FunctionFeeder:
 
     def fix_duplicate_names(self):
         """
-        Fix duplicate function names in the feeder by appending them with 
+        Fix duplicate function names in the feeder by appending them with
         '_config*' if necessary.
         """
         known_names = []
@@ -1073,12 +1073,12 @@ class Bessel(TestFunction):
     def _evaluate(self, x):
         if not self.fast:
             return special.jv(0, x) + 0.5
-        return special.j0(x) + 0.5  #pylint:disable=E1101
+        return special.j0(x) + 0.5  # pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.jv(1, x)
-        return special.j1(x)  #pylint:disable=E1101
+        return special.j1(x)  # pylint:disable=E1101
 
 
 class ModifiedBessel(TestFunction):
@@ -1111,12 +1111,12 @@ class ModifiedBessel(TestFunction):
     def _evaluate(self, x):
         if not self.fast:
             return special.kv(0, x)
-        return special.k0(x)  #pylint:disable=E1101
+        return special.k0(x)  # pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.kv(1, x)
-        return special.k1(x)  #pylint:disable=E1101
+        return special.k1(x)  # pylint:disable=E1101
 
 
 class Eggbox(TestFunction):
