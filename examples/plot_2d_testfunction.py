@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 """ CONFIGURATION """
 # Function to plot
-f = hds.functions.Reciprocal()
+f = hds.functions.GoldsteinPrice()
 # Plot derivative instead of normal function
 # Will only work if a derivative is defined in the TestFunction
 plot_derivative = False
@@ -46,6 +46,7 @@ grid = np.vstack([x.ravel(), y.ravel()]).T
 
 # Get function values and plot them
 z = f(grid, plot_derivative)
+print(z)
 z = z.reshape(x.shape)
 if z_axis_logarithmic:
     z = np.log10(z)

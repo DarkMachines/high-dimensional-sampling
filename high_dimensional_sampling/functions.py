@@ -501,7 +501,7 @@ class FunctionFeeder:
 
             optimisation / optimization: Rastrigin, Rosenbrock, Beale, Booth,
                 BukinNmbr6, Mayas, LeviNmbr13, Himmelblau, ThreeHumpCamel,
-                Sphere, Ackley, Easom, Linear
+                Sphere, Ackley, Easom, Linear, Schwefel, GoldsteinPrice
             posterior: Cosine, Block, Bessel, ModifiedBessel, Eggbox,
                 MultivariateNormal, GaussianShells, Linear, Reciprocal,
                 BreitWigner
@@ -510,11 +510,11 @@ class FunctionFeeder:
             no_derivative: Rosenbrock, Beale, Booth, BukinNmbr6, Matyas,
                 LeviNmbr13, Himmelblau, ThreeHumpCamel, Ackley, Easom, Block,
                 Eggbox, MultivariateNormal, GaussianShells,
-                Linear
+                Linear, Schwefel, GoldsteinPrice
             bounded: Rastrigin, Beale, Booth, BukinNmbr6, Matyas, LeviNmbr13,
                 Himmelblau, ThreeHumpCamel, Ackley, Easom, Bessel,
                 ModifiedBessel, Eggbox, MultivariateNormal, GaussianShells,
-                Linear, Reciprocal, BreitWigner
+                Linear, Reciprocal, BreitWigner, Schwefel, GoldsteinPrice
             unbounded: Rosenbrock, Sphere, Block
 
         All functions are loaded with default configuration, unless
@@ -540,7 +540,8 @@ class FunctionFeeder:
             'optimisation': [
                 'Rastrigin', 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6',
                 'Matyas', 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel',
-                'Sphere', 'Ackley', 'Easom', 'Linear', 'Reciprocal'
+                'Sphere', 'Ackley', 'Easom', 'Linear', 'Reciprocal',
+                'Schwefel', 'GoldsteinPrice'
             ],
             'posterior': [
                 'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
@@ -554,14 +555,14 @@ class FunctionFeeder:
                 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
                 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
                 'Easom', 'Block', 'Eggbox', 'MultivariateNormal',
-                'GaussianShells', 'Linear'
+                'GaussianShells', 'Linear', 'Schwefel', 'GoldsteinPrice'
             ],
             'bounded': [
                 'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
                 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
                 'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
                 'MultivariateNormal', 'GaussianShells', 'Linear', 'Reciprocal',
-                'BreitWigner'
+                'BreitWigner', 'Schwefel', 'GoldsteinPrice'
             ],
             'unbounded': ['Rosenbrock', 'Sphere', 'Block']
         }
@@ -1229,7 +1230,7 @@ class GaussianShells(TestFunction):
         return (shell_1 + shell_2).reshape(-1, 1)
 
     def _derivative(self, x):
-        raise NoDerivativeError
+        raise NoDerivativeError()
 
 
 class Linear(TestFunction):
@@ -1263,7 +1264,7 @@ class Reciprocal(TestFunction):
 
         prod_i x_i^(-1)
 
-    The application range of this function is 0.001 to 1 for each fo the input
+    The application range of this function is 0.001 to 1 for each of the input
     dimensions. No derivative is defined.
 
     Args:
@@ -1325,3 +1326,53 @@ class BreitWigner(TestFunction):
         return (-4 * self._k() * x * (np.power(x, 2) - self.m**2) / np.power(
             self.width**2 * self.m**2 +
             np.power(np.power(x, 2) - self.m**2, 2), 2))
+
+
+class GoldsteinPrice(TestFunction):
+    """
+    Test function defined by
+    https://en.wikipedia.org/wiki/Test_functions_for_optimization
+
+    The application range of this function is -2 to 2 for both of the two input
+    dimensions.
+    """
+
+    def __init__(self):
+        self.ranges = [[-2, 2], [-2, 2]]
+        super(GoldsteinPrice, self).__init__()
+
+    def _evaluate(self, x):
+        return (1 + np.power(x[:, 0] + x[:, 1] + 1, 2) *
+                (19 - 14 * x[:, 0] + 3 * x[:, 0] * x[:, 0] - 14 * x[:, 1] +
+                 6 * x[:, 0] * x[:, 1] + 3 * x[:, 1] * x[:, 1])) * (
+                     30 + np.power(2 * x[:, 0] - 3 * x[:, 1], 2) *
+                     (18 - 32 * x[:, 0] + 12 * x[:, 0] * x[:, 0] + 48 * x[:, 1]
+                      - 36 * x[:, 0] * x[:, 1] + 27 * x[:, 1] * x[:, 1]))
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
+
+class Schwefel(TestFunction):
+    """
+    Test function as described by
+    http://benchmarkfcns.xyz/benchmarkfcns/schwefelfcn.html
+
+    The application range of this function is -500 to 500 for each of the input
+    dimensions.
+
+    Args:
+        dimensionality: Number of dimensions for input of the function. By
+            default this argument is set to 5.
+    """
+
+    def __init__(self, dimensionality=5):
+        self.ranges = self.construct_ranges(dimensionality, -500, 500)
+        super(Schwefel, self).__init__()
+
+    def _evaluate(self, x):
+        d = len(self.ranges)
+        return 418.9829 * d - np.sum(x * np.sin(np.sqrt(np.abs(x))), axis=1)
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
