@@ -70,6 +70,21 @@ class Procedure(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    def check_testfunction(self, function):
+        """
+        Checks if the Procedure can run on the provided test function.
+
+        Args:
+            function: Ans instance of a test fucntion derived from the
+                TestFunction class.
+
+        Returns:
+            Boolean indicating if the procedure can be used on the provided
+            test function.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
     def reset(self):
         """
         Resets all internal settings to the defaults

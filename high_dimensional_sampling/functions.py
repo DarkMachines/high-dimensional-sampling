@@ -16,15 +16,23 @@ class TestFunction(ABC):
     As this is an abstract class, instances of this class cannot be created or
     used.
 
+    Properties:
+        name: String indicating under which name the TestFunction will be
+            logged.
+
     Raises:
         Exception: Testfunction should define ranges.
     """
 
-    def __init__(self):
+    def __init__(self, name=None):
         if not hasattr(self, 'ranges'):
             self.ranges = []
             raise Exception("TestFunction should define ranges.")
         self.counter = []
+        if name is None:
+            self.name = type(self).__name__
+        else:
+            self.name = name
 
     def __call__(self, x, derivative=False, epsilon=0):
         """
@@ -249,6 +257,46 @@ class TestFunction(ABC):
             This TestFunction wrapped in a SimpleFunctionWrapper instance.
         """
         return SimpleFunctionWrapper(self)
+
+    def is_bounded(self):
+        """
+        Checks if the ranges of the TestFunction are bounded, i.e. that there
+        is no dimension with either np.inf or -np.inf as boundary (or both).
+
+        Returns:
+            Boolean indicating if the function is bounded.
+        """
+        for dim in self.ranges:
+            if abs(dim[0]) + abs(dim[1]) == np.inf:
+                return False
+        return True
+
+    def is_differentiable(self):
+        """
+        Checks if the function is differentiable
+
+        Returns:
+            Boolean indicating if function is differentiable.
+        """
+        x = np.random.rand(self.get_dimensionality())
+        ranges = np.array(self.ranges)
+        sample = x * (ranges[:, 1] - ranges[:, 0]) + ranges[:, 0]
+        sample = sample.reshape((1, -1))
+        try:
+            _ = self._derivative(sample)
+            return True
+        except NoDerivativeError:
+            return False
+
+    def get_dimensionality(self):
+        """
+        Returns the dimensionality of the TestFunction, based on the ranges
+        defined in the .ranges property.
+
+        Returns:
+            Number of dimensions as an integer.
+        """
+        return len(self.ranges)
 
     @abstractmethod
     def _evaluate(self, x):
@@ -530,15 +578,16 @@ class FunctionFeeder:
         else:
             raise Exception("Group should be a string or a list of strings")
         # Create list of function names to load
-        load = None
+        load = []
         if isinstance(group, str):
             load = function_names[group]
-        else:
-            for g in group:
-                if load is not None:
-                    load = [func for func in load if func in function_names[g]]
-                else:
-                    load = function_names[g]
+        elif isinstance(group, list):
+            for groupname in group:
+                extending_with = [
+                    func for func in function_names[groupname]
+                    if func not in load
+                ]
+                load.extend(extending_with)
         # Loop over function names and load each function
         if parameters is None:
             parameters = {}
@@ -599,6 +648,29 @@ class FunctionFeeder:
                                the TestFunction base class.""")
         self.functions.append(function)
 
+    def fix_duplicate_names(self):
+        """
+        Fix duplicate function names in the feeder by appending them with
+        '_config*' if necessary.
+        """
+        known_names = []
+        corrections = {}
+        # Get all duplicate names
+        for func in self.functions:
+            if func.name in known_names and func.name not in corrections.keys(
+            ):
+                corrections[func.name] = 1
+            known_names.append(func.name)
+        del (known_names)
+        # Correct duplicate names
+        if len(corrections) > 0:
+            for i, func in enumerate(self.functions):
+                if func.name in corrections:
+                    new_name = func.name + '_config' + str(
+                        corrections[func.name])
+                    corrections[func.name] += 1
+                    self.functions[i].name = new_name
+
 
 class Rastrigin(TestFunction):
     """
@@ -612,10 +684,10 @@ class Rastrigin(TestFunction):
         dimensionality: Number of input dimensions the function should take.
     """
 
-    def __init__(self, dimensionality=2):
+    def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -5.12, 5.12)
         self.a = 10
-        super(Rastrigin, self).__init__()
+        super(Rastrigin, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         n = len(self.ranges)
@@ -637,12 +709,12 @@ class Rosenbrock(TestFunction):
     unbounded. There is no derivative defined.
     """
 
-    def __init__(self, dimensionality=2):
+    def __init__(self, dimensionality=2, **kwargs):
         if dimensionality < 2:
             raise Exception("""Dimensionality of Rosenbrock function has to
                             be >=2.""")
         self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
-        super(Rosenbrock, self).__init__()
+        super(Rosenbrock, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         n = len(self.ranges)
@@ -665,9 +737,9 @@ class Beale(TestFunction):
     for both dimensions. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-4.5, 4.5], [-4.5, 4.5]]
-        super(Beale, self).__init__()
+        super(Beale, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = (np.power(1.5 - x[:, 0] + x[:, 0] * x[:, 1], 2) +
@@ -688,9 +760,9 @@ class Booth(TestFunction):
     dimensions. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
-        super(Booth, self).__init__()
+        super(Booth, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = np.power(x[:, 0] + 2 * x[:, 1] - 7, 2) + np.power(
@@ -711,9 +783,9 @@ class BukinNmbr6(TestFunction):
     variable. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-15, -5], [-3, 3]]
-        super(BukinNmbr6, self).__init__()
+        super(BukinNmbr6, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = 100 * np.sqrt(
@@ -734,9 +806,9 @@ class Matyas(TestFunction):
     and 10 for both input variables. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
-        super(Matyas, self).__init__()
+        super(Matyas, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = 0.26 * (np.power(x[:, 0], 2) +
@@ -756,9 +828,9 @@ class LeviNmbr13(TestFunction):
     and 10 for both input variables. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
-        super(LeviNmbr13, self).__init__()
+        super(LeviNmbr13, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = (np.power(np.sin(3 * np.pi * x[:, 0]), 2) +
@@ -781,9 +853,9 @@ class Himmelblau(TestFunction):
     and 5 for both input variables. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
-        super(Himmelblau, self).__init__()
+        super(Himmelblau, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         return (np.power(np.power(x[:, 0], 2) + x[:, 1] - 11, 2) +
@@ -803,9 +875,9 @@ class ThreeHumpCamel(TestFunction):
     and 5 for both input variables. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
-        super(ThreeHumpCamel, self).__init__()
+        super(ThreeHumpCamel, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         return (2.0 * np.power(x[:, 0], 2) - 1.05 * np.power(x[:, 0], 4) +
@@ -833,9 +905,9 @@ class Sphere(TestFunction):
     the application range is unbounded.
     """
 
-    def __init__(self, dimensionality=3):
+    def __init__(self, dimensionality=3, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
-        super(Sphere, self).__init__()
+        super(Sphere, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         return np.sum(np.power(x, 2), axis=1).reshape(-1, 1)
@@ -853,9 +925,9 @@ class Ackley(TestFunction):
     and 5 for each of these dimensions. No derivative has been defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
-        super(Ackley, self).__init__()
+        super(Ackley, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         a = -20 * np.exp(
@@ -887,10 +959,10 @@ class Easom(TestFunction):
             default, as is customary for this function.
     """
 
-    def __init__(self, absolute_range=100):
+    def __init__(self, absolute_range=100, **kwargs):
         self.ranges = [[-absolute_range, absolute_range],
                        [-absolute_range, absolute_range]]
-        super(Easom, self).__init__()
+        super(Easom, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = (-1 * np.cos(x[:, 0]) * np.cos(x[:, 1]) * np.exp(
@@ -911,9 +983,9 @@ class Cosine(TestFunction):
     The ranges have been set to [-4*pi, 4*pi].
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[-4 * np.pi, 4 * np.pi]]
-        super(Cosine, self).__init__()
+        super(Cosine, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         return (np.cos(x) + 1).reshape(-1, 1)
@@ -950,13 +1022,14 @@ class Block(TestFunction):
                  dimensionality=3,
                  block_size=1,
                  block_value=1,
-                 global_value=0):
+                 global_value=0,
+                 **kwargs):
         self.dimensionality = dimensionality
         self.block_size = block_size
         self.block_value = block_value
         self.global_value = global_value
         self.ranges = self.construct_ranges(dimensionality, -10, 10)
-        super(Block, self).__init__()
+        super(Block, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         boundary = np.array([self.block_size] * self.dimensionality)
@@ -993,20 +1066,20 @@ class Bessel(TestFunction):
             to use. See above for more information.
     """
 
-    def __init__(self, fast=False):
+    def __init__(self, fast=False, **kwargs):
         self.ranges = [[-100, 100]]
         self.fast = bool(fast)
-        super(Bessel, self).__init__()
+        super(Bessel, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         if not self.fast:
             return special.jv(0, x) + 0.5
-        return special.j0(x) + 0.5
+        return special.j0(x) + 0.5  # pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.jv(1, x)
-        return special.j1(x)
+        return special.j1(x)  # pylint:disable=E1101
 
 
 class ModifiedBessel(TestFunction):
@@ -1031,20 +1104,20 @@ class ModifiedBessel(TestFunction):
             to use. See above for more information.
     """
 
-    def __init__(self, fast=False):
+    def __init__(self, fast=False, **kwargs):
         self.ranges = [[0, 10]]
         self.fast = bool(fast)
-        super(ModifiedBessel, self).__init__()
+        super(ModifiedBessel, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         if not self.fast:
             return special.kv(0, x)
-        return special.k0(x)
+        return special.k0(x)  # pylint:disable=E1101
 
     def _derivative(self, x):
         if not self.fast:
             return special.kv(1, x)
-        return special.k1(x)
+        return special.k1(x)  # pylint:disable=E1101
 
 
 class Eggbox(TestFunction):
@@ -1058,9 +1131,9 @@ class Eggbox(TestFunction):
     derivative is defined.
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.ranges = [[0, 10 * np.pi], [0, 10 * np.pi]]
-        super(Eggbox, self).__init__()
+        super(Eggbox, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = np.exp(
@@ -1085,13 +1158,13 @@ class MultivariateNormal(TestFunction):
             matrix, making the function 2-dimensional.
     """
 
-    def __init__(self, covariance=None):
+    def __init__(self, covariance=None, **kwargs):
         if covariance is None:
             covariance = np.identity(2)
         self.covariance = covariance
         n_dim = len(covariance)
         self.ranges = self.construct_ranges(n_dim, -10, 10)
-        super(MultivariateNormal, self).__init__()
+        super(MultivariateNormal, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         mu = np.zeros(len(self.covariance))
@@ -1136,7 +1209,8 @@ class GaussianShells(TestFunction):
                  w_1=0.1,
                  c_2=[-2.5, 0],
                  r_2=2.0,
-                 w_2=0.1):
+                 w_2=0.1,
+                 **kwargs):
         self.c_1 = np.array(c_1)
         self.r_1 = r_1
         self.w_1 = w_1
@@ -1144,7 +1218,7 @@ class GaussianShells(TestFunction):
         self.r_2 = r_2
         self.w_2 = w_2
         self.ranges = [[-10, 10], [-10, 10]]
-        super(GaussianShells, self).__init__()
+        super(GaussianShells, self).__init__(**kwargs)
 
     def _shell(self, x, c, r, w):
         return (np.exp(-1 * np.power(np.linalg.norm(x - c, axis=1) - r, 2) /
@@ -1173,9 +1247,9 @@ class Linear(TestFunction):
             default this argument is set to 2.
     """
 
-    def __init__(self, dimensionality=2):
+    def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -10, 10)
-        super(Linear, self).__init__()
+        super(Linear, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         return np.sum(np.abs(x), 1).reshape(-1, 1)
@@ -1198,15 +1272,15 @@ class Reciprocal(TestFunction):
             default this argument is set to 2.
     """
 
-    def __init__(self, dimensionality=2):
+    def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, 0.001, 1)
-        super(Reciprocal, self).__init__()
+        super(Reciprocal, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         return np.prod(np.power(x, -1), 1).reshape(-1, 1)
 
     def _derivative(self, x):
-        dimensionality = len(self.ranges)
+        dimensionality = self.get_dimensionality()
         derivative = -1 * np.ones((len(x), dimensionality)) * self._evaluate(x)
         for d in range(dimensionality):
             derivative[:, d] *= np.power(x[:, d], -1)
@@ -1231,11 +1305,11 @@ class BreitWigner(TestFunction):
             Set to 15 by default.
     """
 
-    def __init__(self, m=50, width=15):
+    def __init__(self, m=50, width=15, **kwargs):
         self.m = m
         self.width = width
         self.ranges = [[0, 100]]
-        super(BreitWigner, self).__init__()
+        super(BreitWigner, self).__init__(**kwargs)
 
     def _k(self):
         return (2 * np.sqrt(2) * self.m * self.width * self._gamma() /
