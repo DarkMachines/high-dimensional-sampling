@@ -21,12 +21,20 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   activated by calling the `get_simple_interface` method of a TestFunction. An
   example using the different interfaces has been added
   (`testfunction_interfaces.py`).
+* Add methods to the TestFunctions that check properties of the function. These
+  include `is_differentiable`, `is_bounded` and `get_dimensionality`.
+* Subpackage for algorithm implementations. RandomOptimisation and
+  RejectionSampling (from the example scripts) have been added as examples of
+  how to add implementations.
 
 ### Changed
 * The examples now use relative path indications for storage of their results,
   so that the examples can be used out of the box without errors.
 * The package indicator in setup.py now is more general, allowing for easier
   inclusion of submodules.
+* Procedures should now implement a method called `check_testfunction` that
+  returns a boolean, indicating if the provided test function can be used in
+  the procedure.
 
 ### Fixed
 * An error was raised when GaussianShells was logged, as this function stores
