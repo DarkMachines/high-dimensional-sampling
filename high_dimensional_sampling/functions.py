@@ -604,7 +604,8 @@ class FunctionFeeder:
 
         Args:
             functionname: Classname of the function that needs to be loaded
-                and added to the FunctionFeeder container.
+                and added to the FunctionFeeder container. Note that this is
+                case-sensitive.
             parameters: Dictionary containing the parameters to configure
                 and the values that these parameters should take. Any parameter
                 not set in this dictionary will be set to its default value.

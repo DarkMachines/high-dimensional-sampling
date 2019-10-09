@@ -16,6 +16,8 @@ class TmpFunction(func.TestFunction):
 
 
 def test_function_properties():
+    # Test if function properties are correcty identified by the TestFunction's
+    # methods.
     tmp = TmpFunction()
     assert tmp.get_dimensionality() == 2
     assert tmp.is_bounded()
