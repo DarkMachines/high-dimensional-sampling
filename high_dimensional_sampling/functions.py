@@ -93,7 +93,6 @@ class TestFunction(ABC):
         specified. If either of these checks fails, an Exception is raised.
 
         Raises:
-            Exception: The testfunction has unknown differentiability.
             Exception: Testfunction has unknown ranges.
         """
         # Check if ranges are known
