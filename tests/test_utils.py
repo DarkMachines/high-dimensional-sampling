@@ -1,3 +1,5 @@
+import pytest
+import re
 import os
 import time
 import numpy as np
@@ -8,6 +10,10 @@ def test_get_time():
     # Check if time is equal to or larger than a time calculated in this func
     t = int(round(time.time() * 1000.0))/1000.0
     assert t <= utils.get_time()
+
+def test_datetime():
+    pattern = re.compile(r"^(\d{4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2}:\d{1,2}.\d{3,6})$")
+    assert pattern.match(utils.get_datetime())
 
 def test_create_unique_folder():
     # Get current folder
@@ -50,7 +56,7 @@ def test_require_extension():
     assert utils.require_extension(tmp_file, ['tXt'])
     assert utils.require_extension(tmp_file, ['txt', 'TXT'])
     assert utils.require_extension(tmp_file, ['TXT', 'jPeG'])
-    assert not utils.require_extension(tmp_file, ['jpeg'])
-    assert not utils.require_extension(tmp_file, ['JPEG'])
-    # Remove test file
-    os.remove(tmp_file)
+    with pytest.raises(Exception):
+        utils.require_extension(tmp_file, ['jpeg'])
+    with pytest.raises(Exception):
+        utils.require_extension(tmp_file, ['JPEG'])
