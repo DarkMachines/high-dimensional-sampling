@@ -1,4 +1,3 @@
-import numpy as np
 import high_dimensional_sampling.functions as func
 
 
@@ -13,6 +12,7 @@ def test_functionfeeder_manual():
     # Check reset
     feeder.reset()
     assert len(feeder) == 0
+
 
 def test_functionfeeder_loadbyname():
     # Create function feeder object
@@ -33,6 +33,7 @@ def test_functionfeeder_loadbyname():
     assert feeder.functions[3].get_dimensionality() == 10
     assert feeder.functions[4].get_dimensionality() == 3
     feeder.reset()
+
 
 def test_functionfeeder_names():
     # Create function feeder object
@@ -57,4 +58,4 @@ def test_functionfeeder_names():
             uniques.append(n)
     assert len(uniques) == len(names)
 
-#TODO: Function groups
+# TODO: Function groups
