@@ -15,7 +15,7 @@ before_script:
 
 # command to run tests
 script:
-    - pytest --cov=high-dimensional-sampling/
+    - python setup.py test
 
 after_success:
     - coveralls
