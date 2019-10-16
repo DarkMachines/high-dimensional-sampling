@@ -177,27 +177,33 @@ class TestFunction(ABC):
                 "derivative" counts the number of derivates evaluated.
 
         Returns:
-            Number of function calls of the selected type.
+            n_calls: number of function calls of the function
+            n_points: number of points evaluated
 
         Raises:
             Exception: Cannot count function calls of unknown type '?'. Will be
                 raised if the select argument is not recognised.
         """
-        if select == "all":
-            return len(self.counter)
-        elif select == "normal":
-            n = 0
+        n_calls = 0
+        n_points = 0
+        if select == "normal":
             for x in self.counter:
-                n += 1 - 1 * x[1]
-            return round(n)
+                if not x[2]:
+                    n_calls += 1
+                    n_points += x[0]
         elif select == "derivative":
-            n = 0
             for x in self.counter:
-                n += 1 * x[1]
-            return round(n)
+                if x[2]:
+                    n_calls += 1
+                    n_points += x[0]
+        elif select == "all":
+            for x in self.counter:
+                n_calls += 1
+                n_points += x[0]
         else:
             raise Exception("Cannot count function calls of"
                             "unknown type '{}'".format(select))
+        return (round(n_calls), round(n_points))
 
     def to_numpy_array(self, x):
         """
@@ -313,7 +319,7 @@ class TestFunction(ABC):
             Values returned by the function evaluation as numpy.ndarray of
             shape (nDatapoints, ?).
         """
-        pass
+        raise NotImplementedError # pragma: no cover
 
     @abstractmethod
     def _derivative(self, x):
@@ -334,7 +340,7 @@ class TestFunction(ABC):
         Raises:
             NoDerivativeError: No derivative is known for this testfunction.
         """
-        pass
+        raise NoDerivativeError # pragma: no cover
 
 
 class SimpleFunctionWrapper:
@@ -397,17 +403,15 @@ class SimpleFunctionWrapper:
                 match the dimensionality of the wrapped TestFunction.
         """
         # Check dimensionality of the input
-        if len(args) != len(self.function.ranges):
+        if len(args) != self.function.get_dimensionality():
             raise Exception("Number of provided unnamed arguments should match"
                             "the dimensionality of the wrapped TestFunction.")
         # Construct input array for the wrapped TestFunction
         x = self._create_input_array(args)
-        # Get valid keyword arguments
-        kwargs = self._select_keyword_arguments(kwargs)
         # Evaluate function and change type/form before returning its result
         evaluation = self.function(x, **kwargs)
-        if evaluation.shape == (1, 1):
-            return evaluation[0, 0]
+        if evaluation.shape == (1, ):
+            return float(evaluation[0])
         return evaluation
 
     def _create_input_array(self, args):
@@ -424,39 +428,20 @@ class SimpleFunctionWrapper:
         """
         parameters = []
         for parameter in args:
-            if isinstance(args, np.ndarray):
-                parameter = parameter.flatten()
+            if isinstance(parameter, np.ndarray):
+                parameter = parameter.flatten().reshape(-1, 1)
             parameters.append(parameter)
         x = np.hstack(parameters)
         if len(x.shape) == 1:
             x = x.reshape(1, -1)
         return x
 
-    def _select_keyword_arguments(self, kwargs_dict):
-        """
-        Filter out elements of the provided dictionary with keys 'derivative'
-        and 'epsilon'.
-
-        Args:
-            kwargs_dict: Dictionary of which the elements should be filtered.
-
-        Returns:
-            Dictionary containing only the entries of the input dictionary that
-            have keys 'dictionary' and 'epsilon'. If some, or all, of them do
-            not exist, no such key will appear in the output dictionary.
-        """
-        kwargs = {}
-        for k in kwargs_dict:
-            if k in ['derivative', 'epsilon']:
-                kwargs[k] = kwargs_dict[k]
-        return kwargs
-
-
-class NoDerivativeError(Exception):
+class NoDerivativeError(NotImplementedError):
     """
-    Exception indicating no derivative is known to queried testfunction
+    Error indicating no derivative is known to queried testfunction. Inherits
+    from NotImplementedError.
     """
-    pass
+    pass # pragma: no cover
 
 
 class FunctionFeeder:
