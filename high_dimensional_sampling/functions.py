@@ -221,7 +221,7 @@ class TestFunction(ABC):
         if isinstance(x, list):
             return np.array(x)
         if isinstance(x, pd.DataFrame):
-            return x.values()
+            return x.values
         raise Exception(
             """"Testfunctions don't accept {} as input: only numpy arrays,
             lists and pandas dataframes are allowed.""".format(
