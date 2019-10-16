@@ -56,6 +56,7 @@ setup(
         'pytest',
         'pytest-cov',
         'pycodestyle',
+        'coveralls'
     ],
     extras_require={
         'dev':  ['prospector[with_pyroma]', 'yapf', 'isort'],
