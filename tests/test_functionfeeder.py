@@ -27,11 +27,11 @@ def test_functionfeeder_loadbyname():
     feeder.load_function("Sphere")
     feeder.load_function("Sphere", {'dimensionality': 5})
     feeder.load_function("Sphere", {'dimensionality': 10})
-    feeder.load_function("Sphere", {'dimensionality': 2})
-    assert feeder.functions[0].dimensionality == 3
-    assert feeder.functions[1].dimensionality == 5
-    assert feeder.functions[2].dimensionality == 10
-    assert feeder.functions[3].dimensionality == 2
+    feeder.load_function("Sphere", {'dimensionality': 3})
+    assert feeder.functions[1].get_dimensionality() == 3
+    assert feeder.functions[2].get_dimensionality() == 5
+    assert feeder.functions[3].get_dimensionality() == 10
+    assert feeder.functions[4].get_dimensionality() == 3
     feeder.reset()
 
 def test_functionfeeder_names():
@@ -56,3 +56,5 @@ def test_functionfeeder_names():
         if n not in uniques:
             uniques.append(n)
     assert len(uniques) == len(names)
+
+#TODO: Function groups
