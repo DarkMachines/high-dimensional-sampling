@@ -10,12 +10,12 @@ from mpl_toolkits.mplot3d import Axes3D
 
 """ CONFIGURATION """
 # Function to plot
-f = hds.functions.GoldsteinPrice()
+f = hds.functions.BukinNmbr6()
 # Plot derivative instead of normal function
 # Will only work if a derivative is defined in the TestFunction
 plot_derivative = False
 # Plot the logarithmic value of the functional value
-z_axis_logarithmic = True
+z_axis_logarithmic = False
 # Resolution of the plot in terms of number of samples per axis
 resolution_x = 1000
 resolution_y = 1000
