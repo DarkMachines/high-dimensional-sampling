@@ -772,7 +772,8 @@ class BukinNmbr6(TestFunction):
         super(BukinNmbr6, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = 100 * np.sqrt(np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2))) + 0.01 * np.abs(x[:, 0] + 10)
+        y = 100 * np.sqrt(np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2))
+                          ) + 0.01 * np.abs(x[:, 0] + 10)
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1324,7 +1325,12 @@ class GoldsteinPrice(TestFunction):
         super(GoldsteinPrice, self).__init__()
 
     def _evaluate(self, x):
-        z = (1 + np.power(x[:, 0] + x[:, 1] + 1, 2) * (19 - 14 * x[:, 0] + 3 * x[:, 0] * x[:, 0] - 14 * x[:, 1] + 6 * x[:, 0] * x[:, 1] + 3 * x[:, 1] * x[:, 1])) * (30 + np.power(2 * x[:, 0] - 3 * x[:, 1], 2) * (18 - 32 * x[:, 0] + 12 * x[:, 0] * x[:, 0] + 48 * x[:, 1] - 36 * x[:, 0] * x[:, 1] + 27 * x[:, 1] * x[:, 1]))
+        z = (1 + np.power(x[:, 0] + x[:, 1] + 1, 2) *
+             (19 - 14 * x[:, 0] + 3 * x[:, 0] * x[:, 0] - 14 * x[:, 1] +
+              6 * x[:, 0] * x[:, 1] + 3 * x[:, 1] * x[:, 1])) * (
+                  30 + np.power(2 * x[:, 0] - 3 * x[:, 1], 2) *
+                  (18 - 32 * x[:, 0] + 12 * x[:, 0] * x[:, 0] + 48 * x[:, 1] -
+                   36 * x[:, 0] * x[:, 1] + 27 * x[:, 1] * x[:, 1]))
         return z.reshape(-1, 1)
 
     def _derivative(self, x):

@@ -59,30 +59,34 @@ def test_functionfeeder_names():
             uniques.append(n)
     assert len(uniques) == len(names)
 
+
 def test_functionfeeder_groups():
     feeder = func.FunctionFeeder()
     # Check if can load all known groups
-    for group in ['with_derivative', 'no_derivative', 'optimisation', 'posterior', 'bounded', 'unbounded', 'optimization']:
+    for group in [
+            'with_derivative', 'no_derivative', 'optimisation', 'posterior',
+            'bounded', 'unbounded', 'optimization'
+    ]:
         feeder.load_function_group(group)
         feeder.reset()
     # Validate that bounded/unbounded and with_derivative/no_derivative indeed
     # consist only of functions that have those properties
     feeder.load_function_group('with_derivative')
     for function in feeder:
-        assert function.is_differentiable() == True
+        assert function.is_differentiable() is True
     feeder.reset()
     feeder.load_function_group('no_derivative')
     for function in feeder:
-        assert function.is_differentiable() == False
+        assert function.is_differentiable() is False
     feeder.reset()
     feeder.load_function_group('bounded')
     for function in feeder:
-        assert function.is_bounded() == True
+        assert function.is_bounded() is True
     feeder.reset()
     feeder.load_function_group('unbounded')
     for function in feeder:
         print(type(function).__name__, function.is_bounded())
-        assert function.is_bounded() == False
+        assert function.is_bounded() is False
     feeder.reset()
     # Check if exception is raised when unknown group is provided
     with pytest.raises(Exception):
@@ -95,12 +99,14 @@ def test_functionfeeder_groups():
     with pytest.raises(Exception):
         feeder.load_function_group(['optimisation', 'not_existing_group'])
     # Load function with parameters
-    feeder.load_function_group('with_derivative', {
-        'Sphere': {'dimensionality': 5}
-    })
+    feeder.load_function_group('with_derivative',
+                               {'Sphere': {
+                                   'dimensionality': 5
+                               }})
     for function in feeder:
         if type(function).__name__ == "Sphere":
             assert function.get_dimensionality() == 5
+
 
 def test_load_function():
     feeder = func.FunctionFeeder()
@@ -119,6 +125,7 @@ def test_load_function():
         feeder.load_function('Sphere', "dim")
     with pytest.raises(Exception):
         feeder.load_function('Sphere', {'dimension': 7})
+
 
 def test_add_function():
     feeder = func.FunctionFeeder()
