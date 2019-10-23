@@ -35,6 +35,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Procedures should now implement a method called `check_testfunction` that
   returns a boolean, indicating if the provided test function can be used in
   the procedure.
+* The ranges of the Block testfunction now go all the way to `-np.inf` and 
+  `np.inf`, as is in accordance with the configuration of the function groups
+  in the FunctionFeeder.
 
 ### Fixed
 * An error was raised when GaussianShells was logged, as this function stores

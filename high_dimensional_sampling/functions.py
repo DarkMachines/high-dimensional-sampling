@@ -566,7 +566,7 @@ class FunctionFeeder:
         load = []
         if isinstance(group, str):
             load = function_names[group]
-        elif isinstance(group, list):
+        else:
             for groupname in group:
                 extending_with = [
                     func for func in function_names[groupname]
@@ -649,13 +649,10 @@ class FunctionFeeder:
             known_names.append(func.name)
         del (known_names)
         # Correct duplicate names
-        if len(corrections) > 0:
-            for i, func in enumerate(self.functions):
-                if func.name in corrections:
-                    new_name = func.name + '_config' + str(
-                        corrections[func.name])
-                    corrections[func.name] += 1
-                    self.functions[i].name = new_name
+        for i, func in enumerate(self.functions):
+            new_name = func.name + '_config' + str(corrections[func.name])
+            corrections[func.name] += 1
+            self.functions[i].name = new_name
 
 
 class Rastrigin(TestFunction):
@@ -1014,7 +1011,7 @@ class Block(TestFunction):
         self.block_size = block_size
         self.block_value = block_value
         self.global_value = global_value
-        self.ranges = self.construct_ranges(dimensionality, -10, 10)
+        self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
         super(Block, self).__init__(**kwargs)
 
     def _evaluate(self, x):
