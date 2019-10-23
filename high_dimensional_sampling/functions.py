@@ -768,12 +768,11 @@ class BukinNmbr6(TestFunction):
 
     def __init__(self, **kwargs):
         self.ranges = [[-15, -5], [-3, 3]]
+        print(self)
         super(BukinNmbr6, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = 100 * np.sqrt(
-            np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2)) +
-            0.01 * np.abs(x[:, 0] + 10))
+        y = 100 * np.sqrt(np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2))) + 0.01 * np.abs(x[:, 0] + 10)
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -896,7 +895,7 @@ class Sphere(TestFunction):
         return np.sum(np.power(x, 2), axis=1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return (2 * x).reshape(-1, 1)
+        return (2 * x)
 
 
 class Ackley(TestFunction):
@@ -974,7 +973,7 @@ class Cosine(TestFunction):
         return (np.cos(x) + 1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return (-np.sin(x) + 1).reshape(-1, 1)
+        return (-np.sin(x)).reshape(-1, 1)
 
 
 class Block(TestFunction):
