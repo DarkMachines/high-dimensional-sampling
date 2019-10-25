@@ -31,8 +31,8 @@ def tabulate_result(df, metric, experiment_name, functions=None, path=None):
             be formatted and stored.
 
     Returns:
-        content: Numpy `nd.array` containing the contents of the table. The
-            array has as shape (nFunctions, maxRuns).
+        content: List containing the contents of the table. The list has as
+            shape (nFunctions, maxRuns).
         row_labels: Names of the functions included in the table, ordered
             in such a way that they match the rows of the `content` array.
 
@@ -111,9 +111,6 @@ def tabulate_all_aggregated(df,
         aggregate: String indicating the function to use in order to aggregate
             the metric values. E.g. `'mean'`, `'max'`, `'min`. Default is
             `'mean'`.
-        experiment_name: Name of the experiment to tabulate the results of.
-            Name should match the name as it was given in the creation of the
-            dataframe `df`.
         experiment_names: List of the experiments that should be included in
             the table. The names should match the names of the experiments in
             the provided DataFrame `df`. If set to `None` (default), all
@@ -126,8 +123,8 @@ def tabulate_all_aggregated(df,
             be formatted and stored.
 
     Returns:
-        content: Numpy `nd.array` containing the contents of the table. The
-            array has as shape (nFunctions, maxRuns).
+        content: List containing the contents of the table. The list has as
+            shape (nFunctions, maxRuns).
         row_labels: Names of the functions included in the table, ordered
             in such a way that they match the rows of the `content` array.
 
@@ -172,13 +169,13 @@ def tabulate_all_aggregated(df,
         # Check if provided path ends with proper extension
         extension = require_extension(path, ['csv', 'tex'])
         # Make table content and store it
-        content = create_table_string(
+        table_content = create_table_string(
             content, row_labels, col_labels, extension,
             "{} {} for the run experiments (columns) on the"
             "selected test functions (rows)"
             .format(aggregate.title(), metric))
         with open(path, 'w') as handle:
-            handle.write(content)
+            handle.write(table_content)
     return (content, row_labels, col_labels)
 
 
