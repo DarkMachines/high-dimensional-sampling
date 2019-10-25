@@ -28,7 +28,7 @@ class Procedure(ABC):
         future compatibility all these input arguments should have defaults
         set.
         """
-        self.store_parameters = []
+        self.store_parameters = []  # pragma: no cover
 
     @abstractmethod
     def __call__(self, function):
@@ -51,7 +51,7 @@ class Procedure(ABC):
             y: Function values for the samples datapoints of shape
                 (nDatapoints, ?)
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def is_finished(self):
@@ -67,7 +67,7 @@ class Procedure(ABC):
             this happens, the experiment in which this Procedure is tested will
             stop.
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def check_testfunction(self, function):
@@ -82,11 +82,11 @@ class Procedure(ABC):
             Boolean indicating if the procedure can be used on the provided
             test function.
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def reset(self):
         """
         Resets all internal settings to the defaults
         """
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
