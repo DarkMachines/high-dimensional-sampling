@@ -8,26 +8,35 @@ from high_dimensional_sampling import experiments as exp
 from high_dimensional_sampling import procedures as proc
 from high_dimensional_sampling import functions as func
 
+
 class TmpProcedure(proc.Procedure):
     def __init__(self):
         self.store_parameters = ['a']
         self.a = 10
+
     def __call__(self, function):
-        return (np.random.rand(100, 3), np.random.rand(100,1))
+        return (np.random.rand(100, 3), np.random.rand(100, 1))
+
     def is_finished(self):
         return False
+
     def check_testfunction(self, function):
         return True
+
     def reset(self):
         pass
+
 
 class TmpExperimentCorrect(exp.Experiment):
     def make_metrics(self):
         return {'x': 9, 'best_value': [3, 1]}
+
     def _event_start_experiment(self):
         pass
+
     def _event_end_experiment(self):
         pass
+
     def _event_new_samples(self, x, y):
         pass
 
@@ -35,10 +44,13 @@ class TmpExperimentCorrect(exp.Experiment):
 class TmpExperimentCorrect2(exp.Experiment):
     def make_metrics(self):
         return {'x': 9}
+
     def _event_start_experiment(self):
         pass
+
     def _event_end_experiment(self):
         pass
+
     def _event_new_samples(self, x, y):
         pass
 
@@ -52,16 +64,17 @@ def test_results_result():
     procedure = TmpProcedure()
     experiment = TmpExperimentCorrect(procedure, path)
     experiment.run(func.GaussianShells())
-    # Test that results can now be properly be initialised, regardless of 
+    # Test that results can now be properly be initialised, regardless of
     # directory seperator at end of path
     r = results.Result(path)
-    _ = results.Result(path+'/')
-    assert r.path == path+os.sep
+    _ = results.Result(path + '/')
+    assert r.path == path + os.sep
     # Test that if benchmarks file is missing, results cannot be read
-    os.remove(path+'/benchmarks.yaml')
+    os.remove(path + '/benchmarks.yaml')
     with pytest.raises(Exception):
         _ = results.Result(path)
     shutil.rmtree(path)
+
 
 def test_results_submethods():
     # Create experiment
@@ -70,7 +83,7 @@ def test_results_submethods():
     experiment = TmpExperimentCorrect(procedure, path)
     experiment.run(func.GaussianShells(), finish_line=1000)
     r = results.Result(path)
-    # Check get_function_information 
+    # Check get_function_information
     assert r.get_function_information('testname') == ('testname', 0)
     assert r.get_function_information('testname_1') == ('testname', 1)
     assert r.get_function_information('test_name_3') == ('test_name', 3)
@@ -96,6 +109,7 @@ def test_results_submethods():
     # Remove folder
     shutil.rmtree(path)
 
+
 def test_results_df():
     # Create experiment
     procedure = TmpProcedure()
@@ -111,12 +125,13 @@ def test_results_df():
     # Create df through function
     df2 = results.make_dataframe({'standard': path})
     print(df2)
-    del(df2['experiment'])
+    del (df2['experiment'])
     assert df.equals(df2)
     # Check if indicating multiple folders works
-    _ = results.make_dataframe({'standard': path, 'other':path})
+    _ = results.make_dataframe({'standard': path, 'other': path})
     # Remove folder
     shutil.rmtree(path)
+
 
 def test_results_tables():
     # Create experiment
@@ -128,7 +143,7 @@ def test_results_tables():
     experiment.run(func.GaussianShells(), finish_line=1000)
     experiment.run(func.Sphere(), finish_line=1000)
     # Get results df
-    df = results.make_dataframe({'standard': path, 'other':path})
+    df = results.make_dataframe({'standard': path, 'other': path})
 
     # Check that exceptions are raised correctly
     with pytest.raises(Exception):
@@ -154,18 +169,31 @@ def test_results_tables():
     # Remove folder and output files
     os.remove('./tmp_out.csv')
     os.remove('./tmp_out.tex')
-    
+
     # Check that exceptions are raised correctly
     print(df)
     with pytest.raises(Exception):
-        _, _, _ = results.tabulate_all_aggregated(df, 'time', 'mean', experiment_names=['not-an-experiment'])
+        _, _, _ = results.tabulate_all_aggregated(
+            df, 'time', 'mean', experiment_names=['not-an-experiment'])
     with pytest.raises(Exception):
         _, _, _ = results.tabulate_all_aggregated(df, 'y', 'mean')
-    _, _, _ = results.tabulate_all_aggregated(df, 'time', 'mean', functions=['sphere'])
-    _, _, _ = results.tabulate_all_aggregated(df, 'time', 'mean', experiment_names=['standard'])
-    _, _, _ = results.tabulate_all_aggregated(df, 'time', 'mean', path='./tmp_out.csv')
+    _, _, _ = results.tabulate_all_aggregated(df,
+                                              'time',
+                                              'mean',
+                                              functions=['sphere'])
+    _, _, _ = results.tabulate_all_aggregated(df,
+                                              'time',
+                                              'mean',
+                                              experiment_names=['standard'])
+    _, _, _ = results.tabulate_all_aggregated(df,
+                                              'time',
+                                              'mean',
+                                              path='./tmp_out.csv')
     _ = pd.read_csv('./tmp_out.csv')
-    content, rows, cols = results.tabulate_all_aggregated(df, 'time', 'mean', path='./tmp_out.tex')
+    content, rows, cols = results.tabulate_all_aggregated(df,
+                                                          'time',
+                                                          'mean',
+                                                          path='./tmp_out.tex')
     assert isinstance(rows, list) is True
     assert isinstance(cols, list) is True
     assert isinstance(content, list)
@@ -184,16 +212,24 @@ def test_results_plots():
     experiment.run(func.GaussianShells(), finish_line=1000)
     experiment.run(func.Sphere(), finish_line=1000)
     # Get results df
-    df = results.make_dataframe({'standard': path, 'other':path})
+    df = results.make_dataframe({'standard': path, 'other': path})
 
     # Boxplot experiment
     with pytest.raises(Exception):
         results.boxplot_experiment(df, 'time', 'not-an-experiment')
     with pytest.raises(Exception):
         results.boxplot_experiment(df, 'not-a-metric', 'standard')
-    results.boxplot_experiment(df, 'time', 'standard', logarithmic=True, path='./plot.png')
+    results.boxplot_experiment(df,
+                               'time',
+                               'standard',
+                               logarithmic=True,
+                               path='./plot.png')
     assert os.path.exists('./plot.png') is True
-    results.boxplot_experiment(df, 'time', 'standard', logarithmic=False, path='./plot.png')
+    results.boxplot_experiment(df,
+                               'time',
+                               'standard',
+                               logarithmic=False,
+                               path='./plot.png')
     os.remove('./plot.png')
 
     # Boxplot function
@@ -201,9 +237,17 @@ def test_results_plots():
         results.boxplot_function(df, 'time', 'not-a-function')
     with pytest.raises(Exception):
         results.boxplot_function(df, 'not-a-metric', 'sphere')
-    results.boxplot_function(df, 'time', 'sphere', logarithmic=True, path='./plot.png')
+    results.boxplot_function(df,
+                             'time',
+                             'sphere',
+                             logarithmic=True,
+                             path='./plot.png')
     assert os.path.exists('./plot.png') is True
-    results.boxplot_function(df, 'time', 'sphere', logarithmic=False, path='./plot.png')
+    results.boxplot_function(df,
+                             'time',
+                             'sphere',
+                             logarithmic=False,
+                             path='./plot.png')
     os.remove('./plot.png')
 
     # Histogram experiment
@@ -211,9 +255,17 @@ def test_results_plots():
         results.histogram_experiment(df, 'time', 'not-an-experiment')
     with pytest.raises(Exception):
         results.histogram_experiment(df, 'not-a-metric', 'standard')
-    results.histogram_experiment(df, 'time', 'standard', logarithmic=True, path='./plot.png')
+    results.histogram_experiment(df,
+                                 'time',
+                                 'standard',
+                                 logarithmic=True,
+                                 path='./plot.png')
     assert os.path.exists('./plot.png') is True
-    results.histogram_experiment(df, 'time', 'standard', logarithmic=False, path='./plot.png')
+    results.histogram_experiment(df,
+                                 'time',
+                                 'standard',
+                                 logarithmic=False,
+                                 path='./plot.png')
     os.remove('./plot.png')
 
     # Histogram function
@@ -221,9 +273,17 @@ def test_results_plots():
         results.histogram_function(df, 'time', 'not-a-function')
     with pytest.raises(Exception):
         results.histogram_function(df, 'not-a-metric', 'sphere')
-    results.histogram_function(df, 'time', 'sphere', logarithmic=True, path='./plot.png')
+    results.histogram_function(df,
+                               'time',
+                               'sphere',
+                               logarithmic=True,
+                               path='./plot.png')
     assert os.path.exists('./plot.png') is True
-    results.histogram_function(df, 'time', 'sphere', logarithmic=False, path='./plot.png')
+    results.histogram_function(df,
+                               'time',
+                               'sphere',
+                               logarithmic=False,
+                               path='./plot.png')
     os.remove('./plot.png')
 
     shutil.rmtree(path)

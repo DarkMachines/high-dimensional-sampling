@@ -1,6 +1,4 @@
-import sys
 import inspect
-import pytest
 import shutil
 from high_dimensional_sampling import posterior
 from high_dimensional_sampling import optimisation

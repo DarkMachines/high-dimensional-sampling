@@ -5,12 +5,16 @@ from high_dimensional_sampling import procedures as proc
 class TmpProcedureCorrect(proc.Procedure):
     def __init__(self):
         self.store_parameters = []
+
     def __call__(self, function):
         return None
+
     def is_finished(self):
         return None
+
     def check_testfunction(self, function):
         return None
+
     def reset(self):
         return None
 
@@ -18,10 +22,13 @@ class TmpProcedureCorrect(proc.Procedure):
 class TmpProcedureWrong1(proc.Procedure):
     def __call__(self, function):
         return None
+
     def is_finished(self):
         return None
+
     def check_testfunction(self, function):
         return None
+
     def reset(self):
         return None
 
@@ -29,10 +36,13 @@ class TmpProcedureWrong1(proc.Procedure):
 class TmpProcedureWrong2(proc.Procedure):
     def __init__(self):
         self.store_parameters = []
+
     def is_finished(self):
         return None
+
     def check_testfunction(self, function):
         return None
+
     def reset(self):
         return None
 
@@ -40,10 +50,13 @@ class TmpProcedureWrong2(proc.Procedure):
 class TmpProcedureWrong3(proc.Procedure):
     def __init__(self):
         self.store_parameters = []
+
     def __call__(self, function):
         return None
+
     def check_testfunction(self, function):
         return None
+
     def reset(self):
         return None
 
@@ -51,10 +64,13 @@ class TmpProcedureWrong3(proc.Procedure):
 class TmpProcedureWrong4(proc.Procedure):
     def __init__(self):
         self.store_parameters = []
+
     def __call__(self, function):
         return None
+
     def is_finished(self):
         return None
+
     def reset(self):
         return None
 
@@ -62,10 +78,13 @@ class TmpProcedureWrong4(proc.Procedure):
 class TmpProcedureWrong5(proc.Procedure):
     def __init__(self):
         self.store_parameters = []
+
     def __call__(self, function):
         return None
+
     def is_finished(self):
         return None
+
     def check_testfunction(self, function):
         return None
 

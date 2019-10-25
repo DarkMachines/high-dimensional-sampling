@@ -141,8 +141,8 @@ def test_functionfeeder_iteration():
     feeder = func.FunctionFeeder()
     feeder.load_function_group('no_derivative')
     # Test is iteration is done over all loaded functions
-    N = len(feeder.functions)
+    n = len(feeder.functions)
     i = 0
     for _ in feeder:
         i += 1
-    assert N == i
+    assert n == i
