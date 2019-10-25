@@ -69,10 +69,9 @@ class Experiment(ABC):
                             functions.TestFunction as base class.""")
         # Test if the procedure can run on the provided test function
         if not self.procedure.check_testfunction(function):
-            print("""Test function '{}' can not be used for '{}'. Ignoring and
+            raise Exception("""Test function '{}' can not be used for '{}'. Ignoring and
                      continuing.""".format(function.name,
                                            type(self.procedure).__name__))
-            return
         # Start experiment
         print("Run experiment for '{}' on function '{}'...".format(
             type(self.procedure).__name__, function.name))
@@ -106,8 +105,8 @@ class Experiment(ABC):
             if log_data:
                 self.logger.log_samples(x, y)
             # Log function calls and reset the counter
-            n_functioncalls += self.function.count_calls()
-            n_derivativecalls += self.function.count_calls("derivative")
+            n_functioncalls += self.function.count_calls("normal")[1]
+            n_derivativecalls += self.function.count_calls("derivative")[1]
             self.logger.log_function_calls(self.function)
             self.function.reset()
             # Check if the experiment has to stop and update the while
@@ -158,7 +157,7 @@ class Experiment(ABC):
         Returns:
             Dictionary containing the metrics by name.
         """
-        return {}
+        return {}  # pragma: no cover
 
     @abstractmethod
     def _event_start_experiment(self):
@@ -168,7 +167,7 @@ class Experiment(ABC):
         This is an abstract method and should be implemented in
         Experiment-specific classes derived from this one.
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def _event_end_experiment(self):
@@ -179,7 +178,7 @@ class Experiment(ABC):
         This is an abstract method and should be implemented in
         Experiment-specific classes derived from this one.
         """
-        pass
+        pass  # pragma: no cover
 
     @abstractmethod
     def _event_new_samples(self, x, y):
@@ -196,7 +195,7 @@ class Experiment(ABC):
             y: Function values for the samples datapoints of shape
                 (nDatapoints, ?)
         """
-        pass
+        pass  # pragma: no cover
 
     def run(self, function, finish_line=1000, log_data=True):
         """
@@ -430,6 +429,7 @@ class Logger:
         ]
         line = list(map(str, line))
         self.handle_procedurecalls.write(','.join(line) + "\n")
+        self.handle_procedurecalls.flush()
 
     def log_function_calls(self, function):
         """
@@ -452,6 +452,7 @@ class Logger:
             ]
             line = list(map(str, line))
             self.handle_functioncalls.write(','.join(line) + "\n")
+            self.handle_functioncalls.flush()
 
     def log_benchmarks(self):
         """
