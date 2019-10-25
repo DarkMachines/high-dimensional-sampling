@@ -48,5 +48,5 @@ class RejectionSampling(hds.Procedure):
     def is_finished(self):
         return False
 
-    def check_testfunction(self):
+    def check_testfunction(self, function):
         return True
