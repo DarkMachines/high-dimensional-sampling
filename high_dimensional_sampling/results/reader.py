@@ -134,6 +134,8 @@ class Result:
         function_name = '_'.join(parts[:-1])
         if len(parts) > 1:
             run_number = int(parts[-1])
+        if len(parts) == 1:
+            function_name = parts[0]
         return function_name, run_number
 
     def read_procedure_calls(self, folder_name):

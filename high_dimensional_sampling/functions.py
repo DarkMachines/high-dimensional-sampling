@@ -93,7 +93,6 @@ class TestFunction(ABC):
         specified. If either of these checks fails, an Exception is raised.
 
         Raises:
-            Exception: The testfunction has unknown differentiability.
             Exception: Testfunction has unknown ranges.
         """
         # Check if ranges are known
@@ -178,27 +177,33 @@ class TestFunction(ABC):
                 "derivative" counts the number of derivates evaluated.
 
         Returns:
-            Number of function calls of the selected type.
+            n_calls: number of function calls of the function
+            n_points: number of points evaluated
 
         Raises:
             Exception: Cannot count function calls of unknown type '?'. Will be
                 raised if the select argument is not recognised.
         """
-        if select == "all":
-            return len(self.counter)
-        elif select == "normal":
-            n = 0
+        n_calls = 0
+        n_points = 0
+        if select == "normal":
             for x in self.counter:
-                n += 1 - 1 * x[1]
-            return round(n)
+                if not x[2]:
+                    n_calls += 1
+                    n_points += x[0]
         elif select == "derivative":
-            n = 0
             for x in self.counter:
-                n += 1 * x[1]
-            return round(n)
+                if x[2]:
+                    n_calls += 1
+                    n_points += x[0]
+        elif select == "all":
+            for x in self.counter:
+                n_calls += 1
+                n_points += x[0]
         else:
             raise Exception("Cannot count function calls of"
                             "unknown type '{}'".format(select))
+        return (round(n_calls), round(n_points))
 
     def to_numpy_array(self, x):
         """
@@ -222,7 +227,7 @@ class TestFunction(ABC):
         if isinstance(x, list):
             return np.array(x)
         if isinstance(x, pd.DataFrame):
-            return x.values()
+            return x.values
         raise Exception(
             """"Testfunctions don't accept {} as input: only numpy arrays,
             lists and pandas dataframes are allowed.""".format(
@@ -314,7 +319,7 @@ class TestFunction(ABC):
             Values returned by the function evaluation as numpy.ndarray of
             shape (nDatapoints, ?).
         """
-        pass
+        raise NotImplementedError  # pragma: no cover
 
     @abstractmethod
     def _derivative(self, x):
@@ -335,7 +340,7 @@ class TestFunction(ABC):
         Raises:
             NoDerivativeError: No derivative is known for this testfunction.
         """
-        pass
+        raise NoDerivativeError  # pragma: no cover
 
 
 class SimpleFunctionWrapper:
@@ -398,17 +403,15 @@ class SimpleFunctionWrapper:
                 match the dimensionality of the wrapped TestFunction.
         """
         # Check dimensionality of the input
-        if len(args) != len(self.function.ranges):
+        if len(args) != self.function.get_dimensionality():
             raise Exception("Number of provided unnamed arguments should match"
                             "the dimensionality of the wrapped TestFunction.")
         # Construct input array for the wrapped TestFunction
         x = self._create_input_array(args)
-        # Get valid keyword arguments
-        kwargs = self._select_keyword_arguments(kwargs)
         # Evaluate function and change type/form before returning its result
         evaluation = self.function(x, **kwargs)
-        if evaluation.shape == (1, 1):
-            return evaluation[0, 0]
+        if evaluation.shape == (1, ):
+            return float(evaluation[0])
         return evaluation
 
     def _create_input_array(self, args):
@@ -425,39 +428,21 @@ class SimpleFunctionWrapper:
         """
         parameters = []
         for parameter in args:
-            if isinstance(args, np.ndarray):
-                parameter = parameter.flatten()
+            if isinstance(parameter, np.ndarray):
+                parameter = parameter.flatten().reshape(-1, 1)
             parameters.append(parameter)
         x = np.hstack(parameters)
         if len(x.shape) == 1:
             x = x.reshape(1, -1)
         return x
 
-    def _select_keyword_arguments(self, kwargs_dict):
-        """
-        Filter out elements of the provided dictionary with keys 'derivative'
-        and 'epsilon'.
 
-        Args:
-            kwargs_dict: Dictionary of which the elements should be filtered.
-
-        Returns:
-            Dictionary containing only the entries of the input dictionary that
-            have keys 'dictionary' and 'epsilon'. If some, or all, of them do
-            not exist, no such key will appear in the output dictionary.
-        """
-        kwargs = {}
-        for k in kwargs_dict:
-            if k in ['derivative', 'epsilon']:
-                kwargs[k] = kwargs_dict[k]
-        return kwargs
-
-
-class NoDerivativeError(Exception):
+class NoDerivativeError(NotImplementedError):
     """
-    Exception indicating no derivative is known to queried testfunction
+    Error indicating no derivative is known to queried testfunction. Inherits
+    from NotImplementedError.
     """
-    pass
+    pass  # pragma: no cover
 
 
 class FunctionFeeder:
@@ -581,7 +566,7 @@ class FunctionFeeder:
         load = []
         if isinstance(group, str):
             load = function_names[group]
-        elif isinstance(group, list):
+        else:
             for groupname in group:
                 extending_with = [
                     func for func in function_names[groupname]
@@ -604,7 +589,8 @@ class FunctionFeeder:
 
         Args:
             functionname: Classname of the function that needs to be loaded
-                and added to the FunctionFeeder container.
+                and added to the FunctionFeeder container. Note that this is
+                case-sensitive.
             parameters: Dictionary containing the parameters to configure
                 and the values that these parameters should take. Any parameter
                 not set in this dictionary will be set to its default value.
@@ -663,13 +649,10 @@ class FunctionFeeder:
             known_names.append(func.name)
         del (known_names)
         # Correct duplicate names
-        if len(corrections) > 0:
-            for i, func in enumerate(self.functions):
-                if func.name in corrections:
-                    new_name = func.name + '_config' + str(
-                        corrections[func.name])
-                    corrections[func.name] += 1
-                    self.functions[i].name = new_name
+        for i, func in enumerate(self.functions):
+            new_name = func.name + '_config' + str(corrections[func.name])
+            corrections[func.name] += 1
+            self.functions[i].name = new_name
 
 
 class Rastrigin(TestFunction):
@@ -785,12 +768,12 @@ class BukinNmbr6(TestFunction):
 
     def __init__(self, **kwargs):
         self.ranges = [[-15, -5], [-3, 3]]
+        print(self)
         super(BukinNmbr6, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = 100 * np.sqrt(
-            np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2)) +
-            0.01 * np.abs(x[:, 0] + 10))
+        y = 100 * np.sqrt(np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2))
+                          ) + 0.01 * np.abs(x[:, 0] + 10)
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -913,7 +896,7 @@ class Sphere(TestFunction):
         return np.sum(np.power(x, 2), axis=1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return (2 * x).reshape(-1, 1)
+        return (2 * x)
 
 
 class Ackley(TestFunction):
@@ -991,7 +974,7 @@ class Cosine(TestFunction):
         return (np.cos(x) + 1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return (-np.sin(x) + 1).reshape(-1, 1)
+        return (-np.sin(x)).reshape(-1, 1)
 
 
 class Block(TestFunction):
@@ -1028,7 +1011,7 @@ class Block(TestFunction):
         self.block_size = block_size
         self.block_value = block_value
         self.global_value = global_value
-        self.ranges = self.construct_ranges(dimensionality, -10, 10)
+        self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
         super(Block, self).__init__(**kwargs)
 
     def _evaluate(self, x):
@@ -1342,12 +1325,13 @@ class GoldsteinPrice(TestFunction):
         super(GoldsteinPrice, self).__init__()
 
     def _evaluate(self, x):
-        return (1 + np.power(x[:, 0] + x[:, 1] + 1, 2) *
-                (19 - 14 * x[:, 0] + 3 * x[:, 0] * x[:, 0] - 14 * x[:, 1] +
-                 6 * x[:, 0] * x[:, 1] + 3 * x[:, 1] * x[:, 1])) * (
-                     30 + np.power(2 * x[:, 0] - 3 * x[:, 1], 2) *
-                     (18 - 32 * x[:, 0] + 12 * x[:, 0] * x[:, 0] + 48 * x[:, 1]
-                      - 36 * x[:, 0] * x[:, 1] + 27 * x[:, 1] * x[:, 1]))
+        z = (1 + np.power(x[:, 0] + x[:, 1] + 1, 2) *
+             (19 - 14 * x[:, 0] + 3 * x[:, 0] * x[:, 0] - 14 * x[:, 1] +
+              6 * x[:, 0] * x[:, 1] + 3 * x[:, 1] * x[:, 1])) * (
+                  30 + np.power(2 * x[:, 0] - 3 * x[:, 1], 2) *
+                  (18 - 32 * x[:, 0] + 12 * x[:, 0] * x[:, 0] + 48 * x[:, 1] -
+                   36 * x[:, 0] * x[:, 1] + 27 * x[:, 1] * x[:, 1]))
+        return z.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -1372,7 +1356,8 @@ class Schwefel(TestFunction):
 
     def _evaluate(self, x):
         d = len(self.ranges)
-        return 418.9829 * d - np.sum(x * np.sin(np.sqrt(np.abs(x))), axis=1)
+        z = 418.9829 * d - np.sum(x * np.sin(np.sqrt(np.abs(x))), axis=1)
+        return z.reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()

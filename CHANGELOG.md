@@ -26,6 +26,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Subpackage for algorithm implementations. RandomOptimisation and
   RejectionSampling (from the example scripts) have been added as examples of
   how to add implementations.
+* Unit tests for the entire package are added.
 
 ### Changed
 * The examples now use relative path indications for storage of their results,
@@ -35,12 +36,19 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Procedures should now implement a method called `check_testfunction` that
   returns a boolean, indicating if the provided test function can be used in
   the procedure.
+* The ranges of the Block testfunction now go all the way to `-np.inf` and 
+  `np.inf`, as is in accordance with the configuration of the function groups
+  in the FunctionFeeder.
 
 ### Fixed
 * An error was raised when GaussianShells was logged, as this function stores
   its parameters internally as numpy arrays. These don't translate well to
   .yaml files. This has been solved by forcing the storage of function 
   properties as lists if they are numpy arrays.
+* Updated outdated docstrings at various locations in the package
+* Fixed error causing testfunctions not to work with Pandas dataframes. They
+  work with dataframes now, as was intended.
+  
 ---
 ## Version 0.1.1 (Tuesday August 20th, 2019)
 

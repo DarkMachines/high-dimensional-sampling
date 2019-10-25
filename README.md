@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/DarkMachines/high-dimensional-sampling.svg?branch=master)](https://travis-ci.org/DarkMachines/high-dimensional-sampling)
+[![Coverage Status](https://coveralls.io/repos/github/bstienen/high-dimensional-sampling/badge.svg?branch=master)](https://coveralls.io/github/bstienen/high-dimensional-sampling?branch=master)
 
 # High-Dimensional Sampling Framework
 
