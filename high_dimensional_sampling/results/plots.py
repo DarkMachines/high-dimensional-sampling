@@ -60,10 +60,10 @@ def boxplot_experiment(df,
     if logarithmic:
         plt.yscale('log')
     # Show or store plot
-    if path is not None:  # pragma: no cover
-        plt.savefig(path)  # pragma: no cover
-    if path is None or show:  # pragma: no cover
-        plt.show()  # pragma: no cover
+    if path is not None:
+        plt.savefig(path)
+    if path is None or show:
+        plt.show()
 
 
 def boxplot_function(df,
@@ -123,10 +123,10 @@ def boxplot_function(df,
     if logarithmic:
         plt.yscale('log')
     # Show or store plot
-    if path is not None:  # pragma: no cover
-        plt.savefig(path)  # pragma: no cover
-    if path is None or show:  # pragma: no cover
-        plt.show()  # pragma: no cover
+    if path is not None:
+        plt.savefig(path)
+    if path is None or show:
+        plt.show()
 
 
 def histogram_experiment(df,
@@ -198,10 +198,10 @@ def histogram_experiment(df,
     if logarithmic:
         plt.xscale('log')
     # Show or store plot
-    if path is not None:  # pragma: no cover
-        plt.savefig(path)  # pragma: no cover
-    if path is None or show:  # pragma: no cover
-        plt.show()  # pragma: no cover
+    if path is not None:
+        plt.savefig(path)
+    if path is None or show:
+        plt.show()
 
 
 def histogram_function(df,
@@ -273,7 +273,7 @@ def histogram_function(df,
     if logarithmic:
         plt.xscale('log')
     # Show or store plot
-    if path is not None:  # pragma: no cover
-        plt.savefig(path)  # pragma: no cover
-    if path is None or show:  # pragma: no cover
-        plt.show()  # pragma: no cover
+    if path is not None:
+        plt.savefig(path)
+    if path is None or show:
+        plt.show()
