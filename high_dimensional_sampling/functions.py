@@ -319,7 +319,7 @@ class TestFunction(ABC):
             Values returned by the function evaluation as numpy.ndarray of
             shape (nDatapoints, ?).
         """
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
 
     @abstractmethod
     def _derivative(self, x):
@@ -340,7 +340,7 @@ class TestFunction(ABC):
         Raises:
             NoDerivativeError: No derivative is known for this testfunction.
         """
-        raise NoDerivativeError  # pragma: no cover
+        raise NoDerivativeError
 
 
 class SimpleFunctionWrapper:
@@ -442,7 +442,7 @@ class NoDerivativeError(NotImplementedError):
     Error indicating no derivative is known to queried testfunction. Inherits
     from NotImplementedError.
     """
-    pass  # pragma: no cover
+    pass
 
 
 class FunctionFeeder:

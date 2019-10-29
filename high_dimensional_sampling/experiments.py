@@ -157,7 +157,7 @@ class Experiment(ABC):
         Returns:
             Dictionary containing the metrics by name.
         """
-        return {}  # pragma: no cover
+        return {}
 
     @abstractmethod
     def _event_start_experiment(self):
@@ -167,7 +167,7 @@ class Experiment(ABC):
         This is an abstract method and should be implemented in
         Experiment-specific classes derived from this one.
         """
-        pass  # pragma: no cover
+        pass
 
     @abstractmethod
     def _event_end_experiment(self):
@@ -178,7 +178,7 @@ class Experiment(ABC):
         This is an abstract method and should be implemented in
         Experiment-specific classes derived from this one.
         """
-        pass  # pragma: no cover
+        pass
 
     @abstractmethod
     def _event_new_samples(self, x, y):
@@ -195,7 +195,7 @@ class Experiment(ABC):
             y: Function values for the samples datapoints of shape
                 (nDatapoints, ?)
         """
-        pass  # pragma: no cover
+        pass
 
     def run(self, function, finish_line=1000, log_data=True):
         """
