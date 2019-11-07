@@ -224,8 +224,6 @@ class TestFunction(ABC):
                 arrays, list and pandas dataframes are allowed.
         """
 
-        print('x is:',x)
-        
         if isinstance(x, np.ndarray):
             return x
         if isinstance(x, list):
