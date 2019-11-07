@@ -49,6 +49,7 @@ class TestFunction(ABC):
             A numpy.ndarray of shape (nDatapoints, ?) containing the requested
             values.
         """
+
         # Check if testfunction is fully configured
         self.check_configuration()
         # Convert input information to numpy array
@@ -207,6 +208,9 @@ class TestFunction(ABC):
             Exception: Testfunctions don't accept ? as input: only numpy
                 arrays, list and pandas dataframes are allowed.
         """
+
+        print('x is:',x)
+        
         if isinstance(x, np.ndarray):
             return x
         if isinstance(x, list):
