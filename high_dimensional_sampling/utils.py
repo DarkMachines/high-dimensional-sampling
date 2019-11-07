@@ -113,8 +113,8 @@ def require_extension(path, allowed_extensions):
         allowed_extensions: List of allowed extensions, without preceding '.'
 
     Returns:
-        The found extension, fully in lowercase
-    
+        The found extension in all lowercase
+
     Raises:
         Exception: Extension '?' not supported
     """

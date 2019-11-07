@@ -5,8 +5,8 @@ class Procedure(ABC):
     """
     Abstract base class for all sampling procedures
 
-    All sampling procedure subjected to an experiment should be derived from this
-    class. It requires the implementation of the __init__, __call__ and
+    All sampling procedure subjected to an experiment should be derived from
+    this class. It requires the implementation of the __init__, __call__ and
     is_finished methods.
 
     As it is an abstract base class, direct (i.e. not derived) instances of
@@ -66,6 +66,21 @@ class Procedure(ABC):
             A boolean that is True if the procedure is finished sampling. If
             this happens, the experiment in which this Procedure is tested will
             stop.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def check_testfunction(self, function):
+        """
+        Checks if the Procedure can run on the provided test function.
+
+        Args:
+            function: Ans instance of a test fucntion derived from the
+                TestFunction class.
+
+        Returns:
+            Boolean indicating if the procedure can be used on the provided
+            test function.
         """
         raise NotImplementedError
 

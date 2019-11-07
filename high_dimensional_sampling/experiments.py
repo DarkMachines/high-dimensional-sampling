@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 import os
 import getpass
-import pandas as pd
 import yaml
 import copy
 import numpy as np
 
-from .utils import get_time, get_datetime, create_unique_folder, benchmark_matrix_inverse, benchmark_sha_hashing
+from .utils import (get_time, get_datetime, create_unique_folder,
+                    benchmark_matrix_inverse, benchmark_sha_hashing)
 from .procedures import Procedure
 from .functions import TestFunction
 
@@ -28,7 +28,7 @@ class Experiment(ABC):
 
     def __init__(self, procedure, path):
         if not isinstance(procedure, Procedure):
-            raise Exception("""Experimetns should be provided an instance of a
+            raise Exception("""Experiments should be provided an instance of a
                 class derived from the procedures.Procedure class.""")
         self.path = path
         self.procedure = procedure
@@ -63,17 +63,21 @@ class Experiment(ABC):
             Exception: Provided function should have functions.TestFunction as
                 base class.
         """
-        print("Run experiment for '{}' on function '{}'...".format(
-            type(self.procedure).__name__,
-            type(function).__name__))
         # Test if function is a TestFunction instance
         if not isinstance(function, TestFunction):
-            raise Exception(
-                """Provided function should have functions.TestFunction as
-                base class.""")
+            raise Exception("""Provided function should have
+                            functions.TestFunction as base class.""")
+        # Test if the procedure can run on the provided test function
+        if not self.procedure.check_testfunction(function):
+            raise Exception("""Test function '{}' can not be used for '{}'. Ignoring and
+                     continuing.""".format(function.name,
+                                           type(self.procedure).__name__))
+        # Start experiment
+        print("Run experiment for '{}' on function '{}'...".format(
+            type(self.procedure).__name__, function.name))
         self._event_start_experiment()
         # Setup logger
-        self.logger = Logger(self.path, (type(function).__name__).lower())
+        self.logger = Logger(self.path, (function.name).lower())
         self.logger.log_experiment(self, function)
         self.logger.log_benchmarks()
         # Make function available both to the Experiment and the Procedure
@@ -101,8 +105,8 @@ class Experiment(ABC):
             if log_data:
                 self.logger.log_samples(x, y)
             # Log function calls and reset the counter
-            n_functioncalls += self.function.count_calls()
-            n_derivativecalls += self.function.count_calls("derivative")
+            n_functioncalls += self.function.count_calls("normal")[1]
+            n_derivativecalls += self.function.count_calls("derivative")[1]
             self.logger.log_function_calls(self.function)
             self.function.reset()
             # Check if the experiment has to stop and update the while
@@ -164,7 +168,7 @@ class Experiment(ABC):
         Experiment-specific classes derived from this one.
         """
         pass
-    
+
     @abstractmethod
     def _event_end_experiment(self):
         """
@@ -175,7 +179,7 @@ class Experiment(ABC):
         Experiment-specific classes derived from this one.
         """
         pass
-    
+
     @abstractmethod
     def _event_new_samples(self, x, y):
         """
@@ -223,17 +227,17 @@ class Experiment(ABC):
 class OptimisationExperiment(Experiment):
     """
     Experiment class for optimisation experiments
-    
+
     Implements automatic logging of best obtained result to the experiment.yaml
     file.
     """
 
     def _event_start_experiment(self):
-        """ 
+        """
         Event that is run when a new experiment is started.
         """
         self.best_point = None
-    
+
     def _event_end_experiment(self):
         """
         Event that is run when a experiment ends.
@@ -291,11 +295,11 @@ class PosteriorSamplingExperiment(Experiment):
     """
 
     def _event_start_experiment(self):
-        """ 
+        """
         Event that is run when a new experiment is started.
         """
         pass
-    
+
     def _event_end_experiment(self):
         """
         Event that is run when a experiment ends.
@@ -425,6 +429,7 @@ class Logger:
         ]
         line = list(map(str, line))
         self.handle_procedurecalls.write(','.join(line) + "\n")
+        self.handle_procedurecalls.flush()
 
     def log_function_calls(self, function):
         """
@@ -447,6 +452,7 @@ class Logger:
             ]
             line = list(map(str, line))
             self.handle_functioncalls.write(','.join(line) + "\n")
+            self.handle_functioncalls.flush()
 
     def log_benchmarks(self):
         """
@@ -492,10 +498,13 @@ class Logger:
             # Get properties of function
             func_props = copy.copy(vars(function))
             for prop in func_props:
+                if prop == 'name':
+                    continue
                 if isinstance(func_props[prop], np.ndarray):
                     func_props[prop] = func_props[prop].tolist()
             info['function'] = {
-                'name': type(function).__name__,
+                'name': function.name,
+                'testfunction': type(function).__name__,
                 'properties': func_props
             }
             del (info['function']['properties']['counter'])
