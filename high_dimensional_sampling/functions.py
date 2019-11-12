@@ -298,7 +298,7 @@ class TestFunction(ABC):
             return True
         except NoDerivativeError:
             return False
-    
+
     def invert(self, inverted=True):
         """
         Multiply the result of function evaluation through a function call by
@@ -452,30 +452,30 @@ class SimpleFunctionWrapper:
         if len(x.shape) == 1:
             x = x.reshape(1, -1)
         return x
-    
+
     def get_dimensionality(self):
         """ Get the dimensionality of the TestFunction. See documentation for
         TestFunction.get_dimensionality() for more information. """
         return self.function.get_dimensionality()
-    
+
     def is_bounded(self):
         """ Get the dimensionality of the TestFunction. See documentation for
         TestFunction.is_bounded() for more information. """
         return self.function.is_bounded()
-    
+
     def is_differentiable(self):
         """ Get the dimensionality of the TestFunction. See documentation for
         TestFunction.is_differentiable() for more information. """
         return self.function.is_differentiable()
-    
+
     def is_inverted(self):
         """ Returns a boolean indicating if the TestFunction is inverted, i.e.
         if the bare result of TestFunction evaluations is multiplied with -1.
         """
         return self.function.inverted
-    
+
     def invert(self, inverted=True):
-        """ Invert evaluations of the TestFunction (i.e. multiply them with 
+        """ Invert evaluations of the TestFunction (i.e. multiply them with
         -1). See documentation for TestFunction.invert() for more information.
         """
         return self.function.invert()
