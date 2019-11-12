@@ -149,7 +149,7 @@ def test_run_testfunction():
     tmp(x)  # assert is implicit
     tmp(x.tolist())  # assert is implicit
     tmp(pd.DataFrame(x))  # assert is implicit
-    # Check if invertion works
+    # Check if inversion works
     z = tmp(x)
     tmp.invert()
     assert np.array_equal(z, -1*tmp(x))
@@ -241,6 +241,12 @@ def test_simplefunctionwrapper_call():
     z = wrapped._create_input_array([x[:, 0], x[:, 1], x[:, 2]])
     assert x.shape == z.shape
     assert np.sum(1.0*(x == z)) == 300
+    # Check if inversion works
+    z2 = wrapped(x)
+    wrapped.invert()
+    assert np.array_equal(z2, -1*wrapped(z))
+    tmp.invert(False)
+    assert np.array_equal(z2, wrapped(z))
     # Test what happens when just numbers are provided
     z = wrapped._create_input_array([1, 2, 3])
     assert z.shape == (1, 3)
