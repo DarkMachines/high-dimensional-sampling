@@ -242,11 +242,11 @@ def test_simplefunctionwrapper_call():
     assert x.shape == z.shape
     assert np.sum(1.0*(x == z)) == 300
     # Check if inversion works
-    z2 = wrapped(x)
+    z_evaluated = wrapped(x[:, 0], x[:, 1], x[:, 2])
     wrapped.invert()
-    assert np.array_equal(z2, -1*wrapped(z))
+    assert np.array_equal(z_evaluated, -1*wrapped(x[:, 0], x[:, 1], x[:, 2]))
     tmp.invert(False)
-    assert np.array_equal(z2, wrapped(z))
+    assert np.array_equal(z_evaluated, wrapped(x[:, 0], x[:, 1], x[:, 2]))
     # Test what happens when just numbers are provided
     z = wrapped._create_input_array([1, 2, 3])
     assert z.shape == (1, 3)
