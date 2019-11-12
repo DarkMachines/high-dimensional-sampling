@@ -19,6 +19,9 @@ class TestFunction(ABC):
     Properties:
         name: String indicating under which name the TestFunction will be
             logged.
+        inverted: Boolean indicating if evaluations of the TestFunction through
+            the __call__ method should be multiplied by -1. This parameter
+            should be changed through the `invert()` method.
 
     Raises:
         Exception: Testfunction should define ranges.
@@ -28,6 +31,7 @@ class TestFunction(ABC):
         if not hasattr(self, 'ranges'):
             self.ranges = []
             raise Exception("TestFunction should define ranges.")
+        self.inverted = False
         self.counter = []
         if name is None:
             self.name = type(self).__name__
@@ -75,6 +79,8 @@ class TestFunction(ABC):
         # Store call and dt
         self.counter.append([len(x), get_time() - t_start, bool(derivative)])
         # Return value
+        if self.inverted:
+            return -1*value
         return value
 
     def reset(self):
@@ -292,6 +298,17 @@ class TestFunction(ABC):
             return True
         except NoDerivativeError:
             return False
+    
+    def invert(self, inverted=True):
+        """
+        Multiply the result of function evaluation through a function call by
+        -1, changing minimisation problems into a maximisation problems.
+
+        Args:
+            inverted: boolean indicating if function evaluations should be
+                multiplied with -1. Default is True.
+        """
+        self.inverted = bool(inverted)
 
     def get_dimensionality(self):
         """
@@ -435,6 +452,33 @@ class SimpleFunctionWrapper:
         if len(x.shape) == 1:
             x = x.reshape(1, -1)
         return x
+    
+    def get_dimensionality(self):
+        """ Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.get_dimensionality() for more information. """
+        return self.function.get_dimensionality()
+    
+    def is_bounded(self):
+        """ Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.is_bounded() for more information. """
+        return self.function.is_bounded()
+    
+    def is_differentiable(self):
+        """ Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.is_differentiable() for more information. """
+        return self.function.is_differentiable()
+    
+    def is_inverted(self):
+        """ Returns a boolean indicating if the TestFunction is inverted, i.e.
+        if the bare result of TestFunction evaluations is multiplied with -1.
+        """
+        return self.function.inverted
+    
+    def invert(self, inverted=True):
+        """ Invert evaluations of the TestFunction (i.e. multiply them with 
+        -1). See documentation for TestFunction.invert() for more information.
+        """
+        return self.function.invert()
 
 
 class NoDerivativeError(NotImplementedError):

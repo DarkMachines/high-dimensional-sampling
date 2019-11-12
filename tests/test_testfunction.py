@@ -149,6 +149,12 @@ def test_run_testfunction():
     tmp(x)  # assert is implicit
     tmp(x.tolist())  # assert is implicit
     tmp(pd.DataFrame(x))  # assert is implicit
+    # Check if invertion works
+    z = tmp(x)
+    tmp.invert()
+    assert np.array_equal(z, -1*tmp(x))
+    tmp.invert(False)
+    assert np.array_equal(z, tmp(x))
     # Check if dimensionality check is performed
     with pytest.raises(Exception):
         tmp(x.reshape(50, 4))
@@ -256,6 +262,17 @@ def test_simplefunctionwrapper_call():
     z = wrapped(1, 2, 3)
     print(z, type(z))
     assert isinstance(z, float)
+
+
+def test_simplefunctionwrapper_propertycheckers():
+    tmp = TmpFunction2()
+    wrapped = tmp.get_simple_interface()
+    # Make sure that property checkers of the SimpleFunctionWrapper get the
+    # correct properties from the wrapped function
+    assert wrapped.get_dimensionality() == tmp.get_dimensionality()
+    assert wrapped.is_differentiable() == tmp.is_differentiable()
+    assert wrapped.is_inverted() == tmp.inverted
+    assert wrapped.is_bounded() == tmp.is_bounded()
 
 
 def test_return_wrapper():
