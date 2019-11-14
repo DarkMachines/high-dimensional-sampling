@@ -2,6 +2,9 @@ import high_dimensional_sampling as hds
 from high_dimensional_sampling import results
 import numpy as np
 
+from string import ascii_lowercase
+import itertools
+
 ### PS stuff ###
 import pyscannerbit.scan as sb
 
@@ -13,7 +16,7 @@ new_scans = True
 ###
 
 
-class HDS_PS_INTERFACE(hds.Procedure):
+class HdsPsInterface(hds.Procedure):
     def __init__(self):
         self.store_parameters = []
         self.reset()
@@ -25,37 +28,42 @@ class HDS_PS_INTERFACE(hds.Procedure):
         ranges = function.get_ranges(0.01)
         ranges = np.array(ranges).tolist()
         
+        dimensions = function.get_dimensionality()
+
         simple = function.get_simple_interface()
-        # Can this be done without specifiying dimensionality? HDS and PS are looking for max/min respectively.
-        neg_f = lambda x,y: -simple(x,y)
+        simple.invert(True)
 
-        dimensions = len(ranges)
+        # Create list of function arguments
+        fargs = []
+        def iter_all_strings():
+            for size in itertools.count(1):
+                for t in itertools.product(ascii_lowercase, repeat=size):
+                    yield "".join(t)
+        for t in itertools.islice(iter_all_strings(), dimensions):
+            fargs.append(t)
 
-        myscan = sb.Scan(neg_f, bounds = ranges, prior_types=["flat"]*dimensions, scanner=s, settings=settings)
+        myscan = sb.Scan(simple, bounds = ranges, prior_types=["flat"]*dimensions, scanner=s, settings=settings,fargs=fargs)
         if new_scans:
             print("Running scan with {}".format(s))
             myscan.scan()
         else:
             print("Retrieving results from previous {} scan".format(s)) 
         results_ps = myscan.get_hdf5()
-        names = results_ps.get_param_names()
-           
-        no_samples = len(results_ps.get_params(names[0])[0])
-        #no_parameters = len(names)
 
         # Create array for sampled parameters
+        no_samples = len(results_ps.get_params(fargs[0])[0])
         x = np.zeros((no_samples,dimensions))
         i = 0
-        for name in names:
-            x[:, i] = results_ps.get_params(name)[0]
+        for farg in fargs:
+            x[:, i] = results_ps.get_params(farg)[0]
             i = i + 1
             # Print out best values for testing
-            print(results_ps.get_best_fit(name))
-        
+            print(format(farg), results_ps.get_best_fit(farg))
+
         # No way to get sampled function values from PyScannerbit, so recalculate
         y = function(x) 
      
-        return (x, y.reshape(-1, 1))
+        return (x, y)
 
     def reset(self):
         self.current_position = None
@@ -69,11 +77,11 @@ class HDS_PS_INTERFACE(hds.Procedure):
 
 
 
-procedure = HDS_PS_INTERFACE( )
-experiment = hds.OptimisationExperiment(procedure, '/home/zac/BayesianOptimisation/my_dm_clone/high-dimensional-sampling/pyscannerbit_interface_tests/results')
+procedure = HdsPsInterface( )
+experiment = hds.OptimisationExperiment(procedure, './hds')
 feeder = hds.functions.FunctionFeeder()
-#feeder.load_function('Rastrigin', {'dimensionality': 2})
-feeder.load_function('Beale')
+feeder.load_function('Rastrigin', {'dimensionality': 3})
+#feeder.load_function('Beale')
 
 ### More PS stuff ###
 # Try defining ps variables outside of class declaration
@@ -98,4 +106,4 @@ for s in scanners:
     for function in feeder:
         experiment.run(function, finish_line=1000)
 
-df = results.make_dataframe({'simple': '/home/zac/BayesianOptimisation/my_dm_clone/high-dimensional-sampling/pyscannerbit_interface_tests/results'})
+df = results.make_dataframe({'simple': './hds'})
