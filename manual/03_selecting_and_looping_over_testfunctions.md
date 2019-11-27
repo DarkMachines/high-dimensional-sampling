@@ -74,6 +74,8 @@ which functions are part of these groups.
 | Linear             | x | x |   | x | x |   |
 | BreitWigner        |   | x | x |   | x |   |
 | Reciprocal         |   | x | x |   | x |   |
+| Schwefel           | x |   |   | x | x |   |
+| GoldsteinPrice     | x |   |   | x | x |   |
 
 ## Adding testfunctions by hand
 Although the `FunctionFeeder` takes care of the correct initialisation and

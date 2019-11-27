@@ -14,9 +14,9 @@ def make_dataframe(result_paths):
 
     Args:
         result_paths: Dictionary. Keys indicate the name for the experiment,
-            the values indicate the path to the output folder for said 
+            the values indicate the path to the output folder for said
             experiment.
-    
+
     Returns:
         Pandas DataFrame containing the results of all experiments.
     """
@@ -58,7 +58,7 @@ class Result:
 
         Args:
             path: Path to the folder containing the results
-        
+
         Raises:
             Exception: Path provided to the Result does not seem to be a valid
                 experiment folder (benchmarks.yaml is missing).
@@ -69,8 +69,8 @@ class Result:
             path = path + os.sep
         if not os.path.exists(path + 'benchmarks.yaml'):
             raise Exception(
-                "Path provided to Result does not seem to be a valid experiment folder (benchmarks.yaml is missing)."
-            )
+                "Path provided to Result does not seem to be a valid"
+                "experiment  folder (benchmarks.yaml is missing).")
         self.path = path
 
     def get_results(self):
@@ -79,7 +79,7 @@ class Result:
         connected and return them.
 
         Returns:
-            Pandas DataFrame containing the found results. Results will be 
+            Pandas DataFrame containing the found results. Results will be
             ordered by function and run number.
         """
         results = None
@@ -125,15 +125,17 @@ class Result:
         Args:
             folder_name: Name of the folder from which the function name and
                 run number should be extracted.
-        
+
         Returns:
             Tuple containing the function name [0] and run number [1].
         """
         parts = folder_name.split('_')
         run_number = 0
-        function_name = parts[0]
+        function_name = '_'.join(parts[:-1])
         if len(parts) > 1:
-            run_number = int(parts[1])
+            run_number = int(parts[-1])
+        if len(parts) == 1:
+            function_name = parts[0]
         return function_name, run_number
 
     def read_procedure_calls(self, folder_name):
@@ -144,7 +146,7 @@ class Result:
         Args:
             folder_name: Name of the folder within the experiment output folder
                 from which the procedurecalls.csv file should be read.
-        
+
         Returns:
             Pandas DataFrame containing the content of the procedurecalls.csv
             file.
@@ -154,14 +156,14 @@ class Result:
 
     def extract_procedure_information(self, procedure_calls):
         """
-        Get the total time spend on procedure calls based on the DataFrame 
+        Get the total time spend on procedure calls based on the DataFrame
         created from the procedurecalls.csv
 
         Args:
             procedure_calls: Pandas DataFrame of the procedurecalls.csv file.
                 This object can be created with the `read_procedure_calls`
                 method of this object.
-        
+
         Returns:
             Total time speld on procedure calls (in seconds).
         """
@@ -175,7 +177,7 @@ class Result:
         Args:
             folder_name: Name of the folder from which the experiment.yaml file
                 should be read.
-        
+
         Returns:
             Dictionary containing the contents of the experiment.yaml file.
         """
@@ -197,7 +199,7 @@ class Result:
             yaml_contents: Dictionary with the contents of a experiment.yaml
                 file. This dictionary can be created with the
                 `read_experiment_yaml` method of this class.
-        
+
         Returns:
             Dictionary with relevant result information.
         """

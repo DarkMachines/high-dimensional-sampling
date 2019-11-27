@@ -1,9 +1,5 @@
-"""
-Example of an optimisation experiment. Implemented procedure is explained at
-https://en.wikipedia.org/wiki/Random_optimization
-"""
-import high_dimensional_sampling as hds
 import numpy as np
+import high_dimensional_sampling as hds
 
 
 class RandomOptimisation(hds.Procedure):
@@ -64,12 +60,3 @@ class RandomOptimisation(hds.Procedure):
 
     def check_testfunction(self, function):
         return True
-
-
-procedure = RandomOptimisation(n_initial=5)
-experiment = hds.OptimisationExperiment(procedure, './hds')
-feeder = hds.functions.FunctionFeeder()
-feeder.load_function_group(['optimisation', 'bounded'])
-
-for function in feeder:
-    experiment.run(function, finish_line=1000)

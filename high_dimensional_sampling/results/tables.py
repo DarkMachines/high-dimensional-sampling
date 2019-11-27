@@ -31,11 +31,11 @@ def tabulate_result(df, metric, experiment_name, functions=None, path=None):
             be formatted and stored.
 
     Returns:
-        content: Numpy `nd.array` containing the contents of the table. The
-            array has as shape (nFunctions, maxRuns).
-        row_labels: Names of the functions included in the table, ordered 
+        content: List containing the contents of the table. The list has as
+            shape (nFunctions, maxRuns).
+        row_labels: Names of the functions included in the table, ordered
             in such a way that they match the rows of the `content` array.
-    
+
     Raises:
         Exception: Experiment '?' not found in provided DataFrame.
         Exception: Metric '?' not found in provided DataFrame.
@@ -95,7 +95,7 @@ def tabulate_all_aggregated(df,
     will get its own column.
 
     The values in the table will be aggregated over all experimental runs.
-    Which function is used for this aggregation is configured through the 
+    Which function is used for this aggregation is configured through the
     `aggregate` argument of this function.
 
     The table can be outputted to a file. The path to which the table is
@@ -111,26 +111,23 @@ def tabulate_all_aggregated(df,
         aggregate: String indicating the function to use in order to aggregate
             the metric values. E.g. `'mean'`, `'max'`, `'min`. Default is
             `'mean'`.
-        experiment_name: Name of the experiment to tabulate the results of.
-            Name should match the name as it was given in the creation of the
-            dataframe `df`.
         experiment_names: List of the experiments that should be included in
             the table. The names should match the names of the experiments in
             the provided DataFrame `df`. If set to `None` (default), all
             experiments will be included in the table.
         functions: List of the functions that should be included in the table.
             If set to `None` (default), all functions will be included in the
-            table.            
+            table.
         path: Path to which the table should be stored. This path should end
             with either `.csv` or `.tex`. If set to `None`, the table will not
             be formatted and stored.
 
     Returns:
-        content: Numpy `nd.array` containing the contents of the table. The
-            array has as shape (nFunctions, maxRuns).
-        row_labels: Names of the functions included in the table, ordered 
+        content: List containing the contents of the table. The list has as
+            shape (nFunctions, maxRuns).
+        row_labels: Names of the functions included in the table, ordered
             in such a way that they match the rows of the `content` array.
-    
+
     Raises:
         Exception: Experiment '?' not found in provided DataFrame.
         Exception: Metric '?' not found in provided DataFrame.
@@ -172,12 +169,13 @@ def tabulate_all_aggregated(df,
         # Check if provided path ends with proper extension
         extension = require_extension(path, ['csv', 'tex'])
         # Make table content and store it
-        content = create_table_string(
+        table_content = create_table_string(
             content, row_labels, col_labels, extension,
-            "{} {} for the run experiments (columns) on the selected test functions (rows)"
+            "{} {} for the run experiments (columns) on the"
+            "selected test functions (rows)"
             .format(aggregate.title(), metric))
         with open(path, 'w') as handle:
-            handle.write(content)
+            handle.write(table_content)
     return (content, row_labels, col_labels)
 
 
@@ -195,13 +193,13 @@ def create_table_string(content, row_labels, col_labels, format, caption):
             row of the table.
         format: String indicating the formatting of the table. Currently
             supported are `csv` and `tex`.
-        caption: Caption that should be used for the table. Currently this 
+        caption: Caption that should be used for the table. Currently this
             option will only be used when creating a `tex` table.
-    
+
     Returns:
         A string containing the table formatted with the rules of the user
         indicated format.
-    
+
     Raises:
         Exception: Format '?' unknown for table creation. Currently supported
             are 'csv' and 'tex'.
@@ -232,6 +230,6 @@ def create_table_string(content, row_labels, col_labels, format, caption):
         output += "\\end{table}"
     else:
         raise Exception(
-            "Format '{}' unknown for table creation. Currently supported are 'csv' and 'tex'."
-            .format(format))
+            "Format '{}' unknown for table creation. Currently supported are"
+            "'csv' and 'tex'.".format(format))
     return output

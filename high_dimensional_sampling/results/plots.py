@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set()
@@ -144,7 +143,7 @@ def histogram_experiment(df,
 
     Data for plotting should be provided as a Pandas DataFrame created with the
     `results.make_dataframe()` function.
-    
+
     The values used in creating the histogram are aggregated from all runs for
     a specific function. Thorugh the `aggregate` argument the user can set how
     to aggregate these values. The histogram wil automatically be ordered in
@@ -219,7 +218,7 @@ def histogram_function(df,
 
     Data for plotting should be provided as a Pandas DataFrame created with the
     `results.make_dataframe()` function.
-    
+
     The values used in creating the histogram are aggregated from all runs for
     a specific function. Thorugh the `aggregate` argument the user can set how
     to aggregate these values. The histogram wil automatically be ordered in
