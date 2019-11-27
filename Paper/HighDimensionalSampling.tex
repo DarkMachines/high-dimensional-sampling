@@ -50,19 +50,16 @@ This paper is structured as follows. In Section~\ref{sec:algorithms}, we provide
     \centerline{%
         \includegraphics{nested_sampling.pdf}
     }
-    \caption{Nested sampling. Live points are in orange, dead points in blue. Posterior peaks are marked with a cross.}
+    \caption{Nested sampling. Live points are in orange, dead points in blue. Posterior peaks are marked with a cross.\label{fig:nested_sampling}}
 \end{figure}
 
 Nested sampling~\cite{Skilling:2006gxv} is an alternative sampling strategy which simultaneously computes the Bayesian evidence whilst generating samples from the posterior distribution.
-It achieves this by initially generating $n_\mathrm{live}\sim10^2-10^4$ samples from the prior. These points are then evolved these by deleting the points with the lowest likelihood, repopulating with new points drawn from the prior but at higher likelihood. The live points steadily evolve in an exponentially decreasing volume of the prior, tightening around the peak(s) of the likelihood.
+It achieves this by initially generating $n_\mathrm{live}\sim10^2-10^4$ samples from the prior. These points are then evolved these by deleting the points with the lowest likelihood and repopulating with new points drawn from the prior but at higher likelihood. The live points steadily evolve in an exponentially decreasing volume of the prior, tightening around the peak(s) of the likelihood (Figure~\ref{fig:nested_sampling}). The set of discarded ``dead'' points can then be used as posterior samples when appropriately weighted, and the same weighting may be used to compute the Bayesian evidence. The interplay between prior sampling with the likelihood entering via a constrained bound is what allows nested sampling to compute evidences. Furthermore, the set of discarded points may be weighted to produce posterior samples at any thermodynamic temperature, since nested sampling is an athermal algorithm~\cite{aeons}.
 
-The interplay between prior sampling with the likelihood entering via a constrained bound allows nested sampling to compute evidences. Furthermore, the set of discarded points may be weighted to produce posterior samples at any thermodynamic temperature, since nested sampling is an athermal algorithm~\cite{aeons}.
+Historically the procedure by which nested sampling repopulates the set of live points is the main distinguishing feature between nested sampling algorithms. For example,
+\texttt{MultiNest}~\cite{Feroz:2007kg,Feroz:2008xx,Feroz:2013hea} achieves this by constructing a hull of intersecting ellipsoids and then rejection sampling within them, whilst \texttt{PolyChord}~\cite{2015MNRAS.453.4384H,Handley:2015fda} utilises a slice-sampling~\cite{neal2003} approach in order to avoid the exponential inefficiency scaling with dimensionality associated with rejection sampling. Adjustments to the meta-algorithm of nested sampling have been suggested and implemented, for example dynamic~\cite{Higson:2019} and diffusive~\cite{Brewer2011} nested sampling.
 
-\texttt{PolyChord}~\cite{2015MNRAS.453.4384H,Handley:2015fda}
-\texttt{MultiNest}~\cite{Feroz:2007kg,Feroz:2008xx,Feroz:2013hea}
-\texttt{BAMBI}~\cite{Graff:2011gv}
-\texttt{SkyNet}~\cite{Graff:2013cla}
-\texttt{pyBAMBI}~\cite{pybambi}
+Another extension to nested sampling is the \texttt{BAMBI}~\cite{Graff:2011gv} algorithm (blind accelerated multimodal Bayesian inference). \texttt{BAMBI} was designed as a means to reduce the time spent on likelihood calls by training a neural network to act as a proxy for the true likelihood. Periodically a neural network is trained and tested on the current set of live and dead points. When the neural network forms a sufficiently accurate proxy, it is swapped with the true (substantially slower) likelihood. At the end of this process one is left with a set of trained neural networks that can also be used for further analyses. \texttt{BAMBI}~\cite{Graff:2011gv} was originally implemented in an early version of \texttt{MultiNest}, and has since been updated for later versions and other nested sampling software in \texttt{pyBAMBI}~\cite{pybambi}. In this update, the interface is in pure python, with the additional functionality implemented via dumper function interfaces, with the neural network code \texttt{TensorFlow} replacing \texttt{SkyNet}~\cite{Graff:2013cla}.
 
 
 \subsection{Sequential Neural Likelihoods}
