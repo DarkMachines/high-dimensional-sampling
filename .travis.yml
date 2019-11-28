@@ -12,7 +12,7 @@ addons:
 
 # command to install dependencies
 install:
-    - pip install flake8 coveralls
+    - pip install flake8 coveralls pyyaml
     - git clone https://github.com/bjfar/pyscannerbit.git; cd pyscannerbit; python setup.py install; cd ..
     - python setup.py install
 
