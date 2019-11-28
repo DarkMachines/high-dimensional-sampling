@@ -1,21 +1,6 @@
-\documentclass[12pt]{JHEP3}
+\documentclass[11pt]{article}
+\usepackage{jheppub}
 \bibliographystyle{JHEP}
-\usepackage{multicol}
-\usepackage[dvips]{epsfig,graphics}
-\usepackage{graphicx}
-\usepackage{cite}
-
-%% %%%%%%%%% Graphics macros %%%%%%%%%%%%%%
- \newlength{\wth}
- \setlength{\wth}{2.6in}
-
-\newcommand{\twographst}[2]{%
- \unitlength=1.1in
- \begin{picture}(5.8,2.6)(-0.15,0)
- \put(0,0){\epsfig{file=#1, width=\wth}}
- \put(2.7,0){\epsfig{file=#2, width=\wth}}
- \end{picture}
-}
 
 \title{A comparison of sampling algorithms for particle astrophysics applications}
 \author{The DarkMachines High Dimensional Sampling group: ...}
@@ -23,6 +8,8 @@
 \keywords{Sampling, Dark Matter}
 \begin{document}
 \section{Introduction}
+\maketitle
+
 The core of the scientific method in the physical sciences is the extraction of the parameters of theories that can explain a variety of observations. In the modern era, the increasing size of observed datasets, combined with the increasing complexity of physical theories, has introduced a substantial computational complexity in the elucidation of correct physical theories. This is exacerbated by the fact that we have passed the era where one experiment is likely to unambiguously determine the next theory of particle physics or cosmology, and we must instead combine clues from many different branches of observation. At the same time, one can argue that substantial increases in computing power have made scientists more ambitious in the scope of both the observations and the theoretical calculations that can be used to describe the physical world.
 
 It is often true that one can define a likelihood for a set of model parameters by, for example, simulating the results of a variety of observations, and using standard statistics to define the likelihood terms that result from each individual experiment. These can then be combined into a composite likelihood, and one can use this along with a Bayesian or frequentist statistical framework to define and obtain the ``best'' set of parameters of a given model, and the associated uncertainties. One can also use the same approach to perform model comparison. The difficulty is that the likelihood function is rarely known analytically, and can only be obtained by sampling. The simplest approach of naive random sampling is deficient for two reasons. Firstly, it is known to concentrate samples at the boundary of the space once the number of parameters is moderately large, leading to biased inferences. Secondly, it is highly inefficient in most physical examples, in which the high likelihood regions of the parameter space usually occupy a very small region of the total multidimensional volume. The past decades have thus seen the development of a series of novel sampling procedures, many of which have been utilised in particle astrophyics applications {\bf (MJW: Need a citation strategy here. I suggest a very generous citation of both the original techniques and particle astrophysics global fits that have used them)}. 
@@ -56,8 +43,24 @@ This paper is structured as follows. In Section~\ref{sec:algorithms}, we provide
 \emph{Author: Bob Stienen}
 
 \subsection{Nested sampling and pyBAMBI}
+%\printinunitsof{in}\prntlen{\textwidth}
 
 \emph{Author: Will Handley}
+\begin{figure}
+    \centerline{%
+        \includegraphics{nested_sampling.pdf}
+    }
+    \caption{Nested sampling. Live points are in orange, dead points in blue. Posterior peaks are marked with a cross.\label{fig:nested_sampling}}
+\end{figure}
+
+Nested sampling~\cite{Skilling:2006gxv} is an alternative sampling strategy which simultaneously computes the Bayesian evidence whilst generating samples from the posterior distribution.
+It achieves this by initially generating $n_\mathrm{live}\sim10^2-10^4$ samples from the prior. These points are then evolved these by deleting the points with the lowest likelihood and repopulating with new points drawn from the prior but at higher likelihood. The live points steadily evolve in an exponentially decreasing volume of the prior, tightening around the peak(s) of the likelihood (Figure~\ref{fig:nested_sampling}). The set of discarded ``dead'' points can then be used as posterior samples when appropriately weighted, and the same weighting may be used to compute the Bayesian evidence. The interplay between prior sampling with the likelihood entering via a constrained bound is what allows nested sampling to compute evidences. Furthermore, the set of discarded points may be weighted to produce posterior samples at any thermodynamic temperature, since nested sampling is an athermal algorithm~\cite{aeons}.
+
+Historically the procedure by which nested sampling repopulates the set of live points is the main distinguishing feature between nested sampling algorithms. For example,
+\texttt{MultiNest}~\cite{Feroz:2007kg,Feroz:2008xx,Feroz:2013hea} achieves this by constructing a hull of intersecting ellipsoids and then rejection sampling within them, whilst \texttt{PolyChord}~\cite{2015MNRAS.453.4384H,Handley:2015fda} utilises a slice-sampling~\cite{neal2003} approach in order to avoid the exponential inefficiency scaling with dimensionality associated with rejection sampling. Adjustments to the meta-algorithm of nested sampling have been suggested and implemented, for example dynamic~\cite{Higson:2019} and diffusive~\cite{Brewer2011} nested sampling.
+
+Another extension to nested sampling is the \texttt{BAMBI}~\cite{Graff:2011gv} algorithm (blind accelerated multimodal Bayesian inference). \texttt{BAMBI} was designed as a means to reduce the time spent on likelihood calls by training a neural network to act as a proxy for the true likelihood. Periodically a neural network is trained and tested on the current set of live and dead points. When the neural network forms a sufficiently accurate proxy, it is swapped with the true (substantially slower) likelihood. At the end of this process one is left with a set of trained neural networks that can also be used for further analyses. \texttt{BAMBI}~\cite{Graff:2011gv} was originally implemented in an early version of \texttt{MultiNest}, and has since been updated for later versions and other nested sampling software in \texttt{pyBAMBI}~\cite{pybambi}. In this update, the interface is in pure python, with the additional functionality implemented via dumper function interfaces, with the neural network code \texttt{TensorFlow} replacing \texttt{SkyNet}~\cite{Graff:2013cla}.
+
 
 \subsection{Sequential Neural Likelihoods}
 \emph{Author: Barry Dillon}
