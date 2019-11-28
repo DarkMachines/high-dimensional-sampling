@@ -3,6 +3,9 @@ language: python
 python:
     - "3.6"
 
+env:
+    - CMAKE_OPT="-DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so"
+
 addons:
     apt:
         packages:
@@ -13,7 +16,6 @@ addons:
 # command to install dependencies
 install:
     - pip install flake8 coveralls
-    - python3.5 -m pip install pyyaml --user
     - python setup.py install
 
 before_script:
