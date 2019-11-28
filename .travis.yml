@@ -15,7 +15,7 @@ addons:
             - axel
             - libblas-dev
             - liblapack-dev
-            - hdf5
+            - libhdf5-serial-dev
 
 # command to install dependencies
 install:
