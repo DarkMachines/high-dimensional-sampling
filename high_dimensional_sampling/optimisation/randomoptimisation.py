@@ -3,6 +3,7 @@ import high_dimensional_sampling as hds
 from string import ascii_lowercase
 import itertools
 import pyscannerbit.scan as sb
+from collections import defaultdict
 
 
 class RandomOptimisation(hds.Procedure):
@@ -101,8 +102,6 @@ class HdsPsInterface(hds.Procedure):
 
     def __call__(self, function):
         # Setting for pyscannerbit
-        from collections import defaultdict
-
         def rec_dd():
             return defaultdict(rec_dd)
         settings = rec_dd()
