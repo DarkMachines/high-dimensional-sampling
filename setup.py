@@ -43,14 +43,14 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     test_suite='tests',
-    install_requires=['pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'pyscannerbit'],  # FIXME: add your package's dependencies to this list
+    install_requires=['pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'pyscannerbit', 'yaml'],  # FIXME: add your package's dependencies to this list
     setup_requires=[
     #    # dependency for `python setup.py test`
         'pytest-runner',
     #    # dependencies for `python setup.py build_sphinx`
         'sphinx',
         'sphinx_rtd_theme',
-        'recommonmark'
+        'recommonmark',
     ],
     tests_require=[
         'pytest',
