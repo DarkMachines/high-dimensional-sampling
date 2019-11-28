@@ -67,7 +67,7 @@ class RandomOptimisation(hds.Procedure):
 
 class HdsPsInterface(hds.Procedure):
     def __init__(self,
-                 scanner,
+                 scanner="diver",
                  multinest_tol=0.5,
                  multinest_nlive=100,
                  polychord_tol=1.0,
