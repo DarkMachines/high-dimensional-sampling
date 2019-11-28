@@ -9,7 +9,7 @@ addons:
             - gfortran
             - openmpi-bin
             - libopenmpi-dev
-            - python-yaml
+            - python3-yaml
 
 # command to install dependencies
 install:
