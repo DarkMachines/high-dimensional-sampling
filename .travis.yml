@@ -3,6 +3,9 @@ language: python
 python:
     - "3.6"
 
+env:
+    - PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so
+
 addons:
     apt:
         packages:
@@ -14,8 +17,6 @@ addons:
 # command to install dependencies
 install:
     - pip install flake8 coveralls
-      #- pip install six pyyaml mpi4py scipy numpy
-      #- pip install pyscannerbit --install-option="cmake_args=['-DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so']"
     - python setup.py install
 
 before_script:
