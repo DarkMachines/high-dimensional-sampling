@@ -13,6 +13,8 @@ addons:
             - libeigen3-dev
             - libgsl-dev
             - axel
+            - libblas3
+            - liblapack3
 
 # command to install dependencies
 install:
