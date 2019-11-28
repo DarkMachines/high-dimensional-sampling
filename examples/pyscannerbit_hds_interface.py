@@ -117,4 +117,4 @@ for s in scanners:
     feeder.load_function('Rastrigin', {'dimensionality': 3})
     #feeder.load_function('Beale')
     for function in feeder:
-        experiment.run(function, finish_line=1000)
+        experiment.run(function, finish_line=1000) 
