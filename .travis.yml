@@ -3,6 +3,11 @@ language: python
 python:
     - "3.6"
 
+addons:
+    apt:
+        packages:
+            - gfortran
+
 # command to install dependencies
 install:
     - pip install -r requirements.txt
