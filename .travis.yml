@@ -13,7 +13,7 @@ install:
     - pip install -r requirements.txt
     - pip install flake8
     - pip install coveralls
-    - pip install pyscannerbit
+    - pip install pyscannerbit --install-option="cmake_args=['-DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so']"
     - python setup.py install
 
 before_script:
