@@ -11,6 +11,8 @@ addons:
             - libopenmpi-dev
             - libboost-all-dev
             - libeigen3-dev
+            - libgsl-dev
+            - axel
 
 # command to install dependencies
 install:
