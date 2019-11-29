@@ -51,6 +51,8 @@ setup(
         'sphinx',
         'sphinx_rtd_theme',
         'recommonmark',
+    #    # dependency for 3.5 downloads 
+        'jquery',
     ],
     tests_require=[
         'pytest',
