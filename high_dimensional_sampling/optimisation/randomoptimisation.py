@@ -3,7 +3,6 @@ import high_dimensional_sampling as hds
 from string import ascii_lowercase
 import itertools
 import pyscannerbit.scan as sb
-from collections import defaultdict
 
 
 class RandomOptimisation(hds.Procedure):
@@ -101,20 +100,16 @@ class HdsPsInterface(hds.Procedure):
         self.reset()
 
     def __call__(self, function):
-        # Setting for pyscannerbit
-        def rec_dd():
-            return defaultdict(rec_dd)
-        settings = rec_dd()
-        scan_pars = settings["Scanner"]["scanners"]
-        scan_pars["multinest"] = {"tol": self.multinest_tol,
-                                  "nlive": self.multinest_nlive}
-        scan_pars["polychord"] = {"tol": self.polychord_tol,
-                                  "nlive": self.polychord_nlive}
-        scan_pars["diver"] = {"convthresh": self.diver_convthresh,
-                              "NP": self.diver_NP}
-        scan_pars["twalk"] = {"sqrtR": self.twalk_sqrtr}
-        scan_pars["random"] = {"point_number": self.random_point_number}
-        scan_pars["toy_mcmc"] = {"point_number": self.toy_mcmc_point_number}
+        scanner_options = {}
+        scanner_options["multinest"] = {"tol": self.multinest_tol,
+                                        "nlive": self.multinest_nlive}
+        scanner_options["polychord"] = {"tol": self.polychord_tol,
+                                        "nlive": self.polychord_nlive}
+        scanner_options["diver"] = {"convthresh": self.diver_convthresh,
+                                    "NP": self.diver_NP}
+        scanner_options["twalk"] = {"sqrtR": self.twalk_sqrtr}
+        scanner_options["random"] = {"point_number": self.random_point_number}
+        scanner_options["toy_mcmc"] = {"point_number": self.toy_mcmc_point_number}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
         # and the maxima 0.001 down, in order to make use the sampling is not
@@ -141,7 +136,7 @@ class HdsPsInterface(hds.Procedure):
                          bounds=ranges,
                          prior_types=["flat"]*dimensions,
                          scanner=self.scanner,
-                         settings=settings,
+                         scanner_options=scanner_options[self.scanner],
                          fargs=fargs)
         print("Running scan with {}".format(self.scanner))
         myscan.scan()
