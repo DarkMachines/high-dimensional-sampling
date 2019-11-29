@@ -109,7 +109,8 @@ class HdsPsInterface(hds.Procedure):
                                     "NP": self.diver_NP}
         scanner_options["twalk"] = {"sqrtR": self.twalk_sqrtr}
         scanner_options["random"] = {"point_number": self.random_point_number}
-        scanner_options["toy_mcmc"] = {"point_number": self.toy_mcmc_point_number}
+        scanner_options["toy_mcmc"] = {"point_number":
+                                       self.toy_mcmc_point_number}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
         # and the maxima 0.001 down, in order to make use the sampling is not
