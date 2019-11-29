@@ -22,7 +22,8 @@ addons:
 
 # command to install dependencies
 install:
-    - pip install flake8 coveralls pyyaml
+    - pip install flake8 coveralls
+    - pip install pyyaml matplotlib
     - python setup.py install
 
 before_script:
