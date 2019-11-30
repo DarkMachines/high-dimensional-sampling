@@ -67,7 +67,7 @@ class RandomOptimisation(hds.Procedure):
 
 class HdsPsInterface(hds.Procedure):
     def __init__(self,
-                 scanner="diver",
+                 scanner="badass",
                  multinest_tol=0.5,
                  multinest_nlive=100,
                  polychord_tol=1.0,
@@ -76,7 +76,10 @@ class HdsPsInterface(hds.Procedure):
                  diver_NP=300,
                  twalk_sqrtr=1.05,
                  random_point_number=10000,
-                 toy_mcmc_point_number=10):
+                 toy_mcmc_point_number=10,
+                 badass_points=1000,
+                 badass_jumps=10,
+                 pso_NP=400):
         self.store_parameters = ['scanner',
                                  'multinest_tol',
                                  'multinest_nlive',
@@ -86,7 +89,10 @@ class HdsPsInterface(hds.Procedure):
                                  'diver_NP',
                                  'twalk_sqrtr',
                                  'random_point_number',
-                                 'toy_mcmc_point_number']
+                                 'toy_mcmc_point_number',
+                                 'badass_points',
+                                 'badass_jumps',
+                                 'pso_NP']
         self.scanner = scanner
         self.multinest_tol = multinest_tol
         self.multinest_nlive = multinest_nlive
@@ -97,6 +103,9 @@ class HdsPsInterface(hds.Procedure):
         self.twalk_sqrtr = twalk_sqrtr
         self.random_point_number = random_point_number
         self.toy_mcmc_point_number = toy_mcmc_point_number
+        self.badass_points = badass_points
+        self.badass_jumps = badass_jumps
+        self.pso_NP = pso_NP
         self.reset()
 
     def __call__(self, function):
@@ -109,8 +118,10 @@ class HdsPsInterface(hds.Procedure):
                                     "NP": self.diver_NP}
         scanner_options["twalk"] = {"sqrtR": self.twalk_sqrtr}
         scanner_options["random"] = {"point_number": self.random_point_number}
-        scanner_options["toy_mcmc"] = {"point_number":
-                                       self.toy_mcmc_point_number}
+        scanner_options["toy_mcmc"] = {"point_number": self.toy_mcmc_point_number}
+        scanner_options["badass"  ] = {"points": self.badass_points,
+                                       "jumps": self.badass_jumps}
+        scanner_options["pso"] = {"NP": self.pso_NP}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
         # and the maxima 0.001 down, in order to make use the sampling is not
@@ -119,8 +130,8 @@ class HdsPsInterface(hds.Procedure):
         ranges = np.array(ranges).tolist()
 
         dimensions = function.get_dimensionality()
-
-        simple = function.get_simple_interface()
+        
+        simple = function.get_simple_interface_with_scan()
         simple.invert(True)
 
         # Create list of function arguments
@@ -133,8 +144,15 @@ class HdsPsInterface(hds.Procedure):
         for t in itertools.islice(iter_all_strings(), dimensions):
             fargs.append(t)
 
+        def prior(vec, map):
+            iii = 0
+            for argument in fargs:
+                map[argument] = ranges[iii][0] + (ranges[iii][1]-ranges[iii][0])*vec[iii]
+                iii = iii + 1
+
         myscan = sb.Scan(simple,
                          bounds=ranges,
+                         prior_func=prior,
                          prior_types=["flat"]*dimensions,
                          scanner=self.scanner,
                          scanner_options=scanner_options[self.scanner],
