@@ -269,6 +269,18 @@ class TestFunction(ABC):
         """
         return SimpleFunctionWrapper(self)
 
+    def get_simple_interface_with_scan(self):
+        """
+        Get this function, wrapped in the SimpleFunctionWrapperWithScan. 
+        This wrapped function has a different __call__ interface. See the 
+        documentation for the wrapper for more information.
+
+        Returns:
+            This TestFunction wrapped in a SimpleFunctionWrapperWithScan 
+            instance.
+        """
+        return SimpleFunctionWrapperWithScan(self)
+
     def is_bounded(self):
         """
         Checks if the ranges of the TestFunction are bounded, i.e. that there
@@ -385,6 +397,128 @@ class SimpleFunctionWrapper:
         self.function = function
 
     def __call__(self, *args, **kwargs):
+        """
+        Call the wrapped testfunction through an altered interface. Instead
+        of providing the data as a numpy array, the data is provided as a
+        separate argument for each parameter. These parameters can be given as
+        a numpy array, to evaluate multiple datapoints at the same time.
+
+            func = Rosenbrock()
+            simple_func = LeviNmbr13(func)
+            y = simple_func(1, 2)
+
+        Args:
+            *args: Each of the parameters for the function, provided as unnamed
+                arguments. Parameters may be provided as numbers (float/int) or
+                as numpy arrays of consistent length (allowing for the
+                evaluation of multiple datapoints at the same time).
+            derivative: If this boolean is False (default), the testfunction
+                will be queried for its value. If it is True, the derivative
+                of the function is queried (if existing).
+            epsilon: leeway parameter that is added to all minima and
+                subtracted from all maxima in the .check_ranges method. Default
+                is 0.
+
+        Returns:
+            If input was provided as numpy arrays or the output of the wrapped
+            TestFunction is multi-dimensional, a numpy.ndarray of shape
+            (nDatapoints, ?) containing the function evaluations will be
+            returned. If data was provided as numbers, the result of the
+            testfunction evaluation will be returned as a number or a list
+            (depending on the dimensionality of the function output).
+
+        Raises:
+            Exception: Number of provided unnamed arguments should
+                match the dimensionality of the wrapped TestFunction.
+        """
+        # Check dimensionality of the input
+        if len(args) != self.function.get_dimensionality():
+            raise Exception("Number of provided unnamed arguments should match"
+                            "the dimensionality of the wrapped TestFunction.")
+        # Construct input array for the wrapped TestFunction
+        x = self._create_input_array(args)
+        # Evaluate function and change type/form before returning its result
+        evaluation = self.function(x, **kwargs)
+        if evaluation.shape == (1, ):
+            return float(evaluation[0])
+        return evaluation
+
+    def _create_input_array(self, args):
+        """
+        Combine variable-separated input arguments into a single numpy array.
+
+        Args:
+            args: Tuple of numbers or numpy arrays, which should be combined
+                into a single numpy array to be provided to a TestFunction's
+                __call__ method.
+
+        Returns:
+            Numpy.ndarray of shape (nDatapoints, ?)
+        """
+        parameters = []
+        for parameter in args:
+            if isinstance(parameter, np.ndarray):
+                parameter = parameter.flatten().reshape(-1, 1)
+            parameters.append(parameter)
+        x = np.hstack(parameters)
+        if len(x.shape) == 1:
+            x = x.reshape(1, -1)
+        return x
+
+    def get_dimensionality(self):
+        """ Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.get_dimensionality() for more information. """
+        return self.function.get_dimensionality()
+
+    def is_bounded(self):
+        """ Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.is_bounded() for more information. """
+        return self.function.is_bounded()
+
+    def is_differentiable(self):
+        """ Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.is_differentiable() for more information. """
+        return self.function.is_differentiable()
+
+    def is_inverted(self):
+        """ Returns a boolean indicating if the TestFunction is inverted, i.e.
+        if the bare result of TestFunction evaluations is multiplied with -1.
+        """
+        return self.function.inverted
+
+    def invert(self, inverted=True):
+        """ Invert evaluations of the TestFunction (i.e. multiply them with
+        -1). See documentation for TestFunction.invert() for more information.
+        """
+        return self.function.invert()
+
+
+class SimpleFunctionWrapperWithScan:
+    """
+    Class that can be used to wrap a TestFunction instance. Wrapped functions
+    will be callable by providing each parameter as a separate argument,
+    instead of in a single numpy array, with additional 'scan' argument, as
+    required by PyScannerbit.
+
+        func = Rosenbrock()
+        simple_func = LeviNmbr13(func)
+        y = simple_func(1, 2)
+
+    Args:
+        function: TestFunction to be wrapped
+
+    Raises:
+        Exception: SimpleFunctionWrapperWithScan can only wrap instances of 
+        the TestFunction class
+    """
+
+    def __init__(self, function):
+        if not isinstance(function, TestFunction):
+            raise Exception("SimpleFunctionWrapperWithScan can only wrap"
+                            "instances of the TestFunction class.")
+        self.function = function
+
+    def __call__(self, scan, *args, **kwargs):
         """
         Call the wrapped testfunction through an altered interface. Instead
         of providing the data as a numpy array, the data is provided as a
