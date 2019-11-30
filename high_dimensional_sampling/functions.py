@@ -271,12 +271,12 @@ class TestFunction(ABC):
 
     def get_simple_interface_with_scan(self):
         """
-        Get this function, wrapped in the SimpleFunctionWrapperWithScan. 
-        This wrapped function has a different __call__ interface. See the 
+        Get this function, wrapped in the SimpleFunctionWrapperWithScan.
+        This wrapped function has a different __call__ interface. See the
         documentation for the wrapper for more information.
 
         Returns:
-            This TestFunction wrapped in a SimpleFunctionWrapperWithScan 
+            This TestFunction wrapped in a SimpleFunctionWrapperWithScan
             instance.
         """
         return SimpleFunctionWrapperWithScan(self)
@@ -508,7 +508,7 @@ class SimpleFunctionWrapperWithScan:
         function: TestFunction to be wrapped
 
     Raises:
-        Exception: SimpleFunctionWrapperWithScan can only wrap instances of 
+        Exception: SimpleFunctionWrapperWithScan can only wrap instances of
         the TestFunction class
     """
 
