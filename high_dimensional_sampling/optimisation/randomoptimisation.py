@@ -118,9 +118,10 @@ class HdsPsInterface(hds.Procedure):
                                     "NP": self.diver_NP}
         scanner_options["twalk"] = {"sqrtR": self.twalk_sqrtr}
         scanner_options["random"] = {"point_number": self.random_point_number}
-        scanner_options["toy_mcmc"] = {"point_number": self.toy_mcmc_point_number}
-        scanner_options["badass"  ] = {"points": self.badass_points,
-                                       "jumps": self.badass_jumps}
+        scanner_options["toy_mcmc"] = {"point_number":
+                                       self.toy_mcmc_point_number}
+        scanner_options["badass"] = {"points": self.badass_points,
+                                     "jumps": self.badass_jumps}
         scanner_options["pso"] = {"NP": self.pso_NP}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
@@ -130,7 +131,7 @@ class HdsPsInterface(hds.Procedure):
         ranges = np.array(ranges).tolist()
 
         dimensions = function.get_dimensionality()
-        
+
         simple = function.get_simple_interface_with_scan()
         simple.invert(True)
 
@@ -147,7 +148,8 @@ class HdsPsInterface(hds.Procedure):
         def prior(vec, map):
             iii = 0
             for argument in fargs:
-                map[argument] = ranges[iii][0] + (ranges[iii][1]-ranges[iii][0])*vec[iii]
+                map[argument] = (ranges[iii][0]
+                                 + (ranges[iii][1]-ranges[iii][0])*vec[iii])
                 iii = iii + 1
 
         myscan = sb.Scan(simple,
