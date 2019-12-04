@@ -152,7 +152,7 @@ class HdsPsInterface(hds.Procedure):
                 iii = iii + 1
 
         # No way to get sampled function values from PS, so recalculate
-        y = np.zeros(5)
+        y = np.zeros((5, 1))
         x = np.zeros((5, dimensions))
 
         return (x, y)
