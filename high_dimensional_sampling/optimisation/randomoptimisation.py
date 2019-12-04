@@ -155,7 +155,7 @@ class HdsPsInterface(hds.Procedure):
         y = np.zeros(5)
         x = np.zeros((5, dimensions))
 
-        return (x, y)on
+        return (x, y)
 
     def reset(self):
         self.current_position = None
