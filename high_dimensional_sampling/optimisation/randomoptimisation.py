@@ -2,6 +2,10 @@ import numpy as np
 import high_dimensional_sampling as hds
 from string import ascii_lowercase
 import itertools
+import pyscannerbit.scan as sb
+from mpi4py import MPI
+rank = MPI.COMM_WORLD.Get_rank()
+size = MPI.COMM_WORLD.Get_size()
 
 
 class RandomOptimisation(hds.Procedure):
@@ -151,9 +155,29 @@ class HdsPsInterface(hds.Procedure):
                                  + (ranges[iii][1]-ranges[iii][0])*vec[iii])
                 iii = iii + 1
 
+        myscan = sb.Scan(simple,
+                         bounds=ranges,
+                         prior_func=prior,
+                         prior_types=["flat"]*dimensions,
+                         scanner=self.scanner,
+                         scanner_options=scanner_options[self.scanner],
+                         fargs=fargs)
+        print("Running scan with {}".format(self.scanner))
+        myscan.scan()
+        results_ps = myscan.get_hdf5()
+
+        # Create array for sampled parameters
+        no_samples = len(results_ps.get_params(fargs[0])[0])
+        x = np.zeros((no_samples, dimensions))
+        i = 0
+        for farg in fargs:
+            x[:, i] = results_ps.get_params(farg)[0]
+            i = i + 1
+            # Print out best values for testing
+            print(format(farg), results_ps.get_best_fit(farg))
+
         # No way to get sampled function values from PS, so recalculate
-        y = np.zeros((5, 1))
-        x = np.zeros((5, dimensions))
+        y = function(x)
 
         return (x, y)
 
