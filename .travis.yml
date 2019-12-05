@@ -3,28 +3,27 @@ language: python
 python:
     - "3.6"
 
-env:
-    - PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so
-
-addons:
-    apt:
-        packages:
-            - gfortran
-            - openmpi-bin
-            - libopenmpi-dev
-            - libboost-all-dev
-            - libeigen3-dev
-            - libgsl-dev
-            - axel
-            - libblas-dev
-            - liblapack-dev
-            - libhdf5-serial-dev
+# addons:
+#    apt:
+#        packages:
+#            - gfortran
+#            - openmpi-bin
+#            - libopenmpi-dev
+#            - libboost-all-dev
+#            - libeigen3-dev
+#            - libgsl-dev
+#            - axel
+#            - libblas-dev
+#            - liblapack-dev
+#            - libhdf5-serial-dev
 
 # command to install dependencies
 install:
     - pip install flake8 coveralls
-    - pip install pyyaml matplotlib
+#    - pip install pyyaml matplotlib
     - python setup.py install
+    - python pyscannerbit/setup.py sdist
+    - pip install pyscannerbit/dist/pyscannerbit-0.0.31.tar.gz    
 
 before_script:
     # Test for pep-compliance
