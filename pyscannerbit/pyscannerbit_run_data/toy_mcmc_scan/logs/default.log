@@ -1,0 +1,57 @@
+(Thu Dec  5 17:42:08 2019)(-0.128306 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python37/lib/python3.7/site-packages/pyscannerbit/ScannerBit/lib/libscanner_diver_1.0.0.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-req-build-gh_w962r/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(-0.128283 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python37/lib/python3.7/site-packages/pyscannerbit/ScannerBit/lib/libscanner_diver_1.0.2.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-req-build-gh_w962r/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(-0.116745 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python37/lib/python3.7/site-packages/pyscannerbit/ScannerBit/lib/libscanner_great.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-req-build-gh_w962r/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(-0.102699 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python37/lib/python3.7/site-packages/pyscannerbit/ScannerBit/lib/libscanner_multinest_3.10.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-req-build-gh_w962r/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0148937 [s])[Default,Utilities]:
+Random number engine mt19937_64 (default) selected with seed 323531098.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0153605 [s])[Default][Info]:
+No previous output file found, treating run as completely new.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0162533 [s])[Default,Core]:
+Starting scan.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.018551 [s])[Default,Printers][Info]:
+Assigned printer ID '0' to output quantity with label 'LogLike'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0186122 [s])[Default,Printers][Info]:
+Assigned printer ID '1' to output quantity with label 'pointID'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0186779 [s])[Default,Printers][Info]:
+Assigned printer ID '2' to output quantity with label 'MPIrank'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0205081 [s])[Default,Printers][Info]:
+Assigned printer ID '3' to output quantity with label 'default::z'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0206197 [s])[Default,Printers][Info]:
+Assigned printer ID '4' to output quantity with label 'default::x'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0206799 [s])[Default,Printers][Info]:
+Assigned printer ID '5' to output quantity with label 'default::y'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0209449 [s])[Default,Printers][Info]:
+Assigned printer ID '6' to output quantity with label 'unitCubeParameters'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 17:42:08 2019)(0.0295929 [s])[Default,Printers][Info]:
+Assigned printer ID '7' to output quantity with label 'mult'
+--<>--<>--<>--<>--<>--<>--<>--

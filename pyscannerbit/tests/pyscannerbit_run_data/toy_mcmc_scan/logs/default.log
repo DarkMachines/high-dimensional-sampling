@@ -1,0 +1,114 @@
+(Thu Dec  5 14:01:09 2019)(-0.124949 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python35/lib/python3.5/site-packages/pyscannerbit/ScannerBit/lib/libscanner_diver_1.0.0.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-install-b5e1jnpg/pyscannerbit/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(-0.124915 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python35/lib/python3.5/site-packages/pyscannerbit/ScannerBit/lib/libscanner_diver_1.0.2.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-install-b5e1jnpg/pyscannerbit/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(-0.112644 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python35/lib/python3.5/site-packages/pyscannerbit/ScannerBit/lib/libscanner_great.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-install-b5e1jnpg/pyscannerbit/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(-0.0983478 [s])[Default,Scanner][Warning][Non-fatal]:
+WARNING: A problem has been raised by ScannerBit.
+Could not find plugin library "/home/zac/anaconda3/envs/Python35/lib/python3.5/site-packages/pyscannerbit/ScannerBit/lib/libscanner_multinest_3.10.so".
+
+Raised at: line 102 in function Gambit::Scanner::Plugins::Plugin_Loader::Plugin_Loader() of /tmp/pip-install-b5e1jnpg/pyscannerbit/pyscannerbit/scannerbit/untar/ScannerBit/ScannerBit/src/plugin_loader.cpp.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0183548 [s])[Default,Utilities]:
+Random number engine mt19937_64 (default) selected with seed 226602160.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0188783 [s])[Default,Printers][Info]:
+Running shell command: rm -f pyscannerbit_run_data/toy_mcmc_scan/samples//results.hdf5
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0242699 [s])[Default,Core]:
+Starting scan.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.028637 [s])[Default,Printers][Info]:
+Assigned printer ID '0' to output quantity with label 'LogLike'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0287225 [s])[Default,Printers][Info]:
+Assigned printer ID '1' to output quantity with label 'pointID'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0287634 [s])[Default,Printers][Info]:
+Assigned printer ID '2' to output quantity with label 'MPIrank'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0307276 [s])[Default,Printers][Info]:
+Assigned printer ID '3' to output quantity with label 'default::y'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0309209 [s])[Default,Printers][Info]:
+Assigned printer ID '4' to output quantity with label 'default::x'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0310422 [s])[Default,Printers][Info]:
+Assigned printer ID '5' to output quantity with label 'default::z'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0314209 [s])[Default,Printers][Info]:
+Assigned printer ID '6' to output quantity with label 'unitCubeParameters'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0319494 [s])[Default,Printers][Info]:
+Assigned printer ID '7' to output quantity with label 'mult'
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0490305 [s])[Default,Printers][Info]:
+Gathering sync buffer data from all processes to rank 0 process...
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0491165 [s])[Default,Printers][Info]:
+Gathering data on number of points and buffers to be transmitted
+Number of points to send from this process: 97
+Number of buffers to send from this process: 9
+
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0491512 [s])[Default,Printers][Info]:
+Gathered data:
+Number of points to recv from each process: [97 ]
+Number of buffers to recv from each process: [9 ]
+
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0499754 [s])[Default,Printers][Info]:
+Gathering buffer data for processes [0 ]
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0524966 [s])[Default,Printers][Info]:
+Gathering buffer block size data (number of buffer blocks to transmit from this process: 10)
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0525405 [s])[Default,Printers][Info]:
+Performing Gatherv of buffer data blocks...
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0558008 [s])[Default,Printers][Info]:
+Resynchronising print buffers:
+   Buffer contains 97 items (name=LogLike)
+   Buffer contains 97 items (name=MPIrank)
+   Buffer contains 97 items (name=default::x)
+   Buffer contains 97 items (name=default::y)
+   Buffer contains 97 items (name=default::z)
+   Buffer contains 97 items (name=pointID)
+   Buffer contains 97 items (name=unitCubeParameters[0])
+   Buffer contains 97 items (name=unitCubeParameters[1])
+   Buffer contains 97 items (name=unitCubeParameters[2])
+
+  Initial N points   : 0
+  Final N points     : 97
+  Difference N points: 97
+
+Print buffer now contains 97 items.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0608651 [s])[Default,Printers][Info]:
+Final dataset size is 97
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0609828 [s])[Default,Printers][Info]:
+Gathering random-access print buffer data from all process to rank 0 process...
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0626003 [s])[Default,Printers][Info]:
+HDF5Printer2 output finalisation complete.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0627147 [s])[Default]:
+ScannerBit run completed successfully.
+--<>--<>--<>--<>--<>--<>--<>--
+(Thu Dec  5 14:01:09 2019)(0.0636278 [s])[Default,Core][Info]:
+Doing Iprobe to check for shutdown signals from other processes (with MPI tag 1). These will be discarded (since we are inside the 'discard_excess_shutdown_messages' routine)
+--<>--<>--<>--<>--<>--<>--<>--

@@ -1,0 +1,7 @@
+global-exclude *.git *.gitignore
+include README.md LICENSE CHANGES.txt CMakeLists.txt requirements.txt
+graft src
+graft pyscannerbit
+graft tests
+graft yaml-cpp
+graft pybind11

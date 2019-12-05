@@ -1,0 +1,17 @@
+Build and installation instructions for pyscannerbit 
+(Python interface to ScannerBit)
+
+---
+
+Let <root> be the main GAMBIT root directory.
+cd <root>/build
+cmake ..
+make ScannerBitCAPI
+
+This will build the C API for ScannerBit into a shared library
+
+cd <root>/contrib/pyscannerbit
+python setup.py install
+
+This will build and install pyscannerbit (which is a python wrapper of the ScannerBit C API)
+
