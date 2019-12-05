@@ -19,15 +19,12 @@ addons:
             - liblapack-dev
             - libhdf5-serial-dev
 
-# try to mandate python complier/interpreter matchup
-before_install:
-  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
-
 # command to install dependencies
 install:
     - pip install flake8 coveralls
     - pip install pyyaml matplotlib
     - python setup.py install
+    - pip install scipy==0.17
 
 before_script:
     # Test for pep-compliance
