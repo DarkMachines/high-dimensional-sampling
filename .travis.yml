@@ -32,7 +32,7 @@ before_script:
 
 # command to run tests
 script:
-    - travis_wait python setup.py test
+    - travis_wait 40 python setup.py test
 
 after_success:
     - coveralls
