@@ -1,7 +1,10 @@
 # Config file for automatic testing at travis-ci.org
 language: python
 python:
+    - "3.4"
+    - "3.5"
     - "3.6"
+    - "3.7"
 
 addons:
    apt:
@@ -20,14 +23,12 @@ addons:
 # command to install dependencies
 install:
     - pip install flake8 coveralls
-#    - pip install pyyaml matplotlib
+    - pip install pyyaml matplotlib
     - python setup.py install
-    - python pyscannerbit/setup.py sdist
-    - pip install pyscannerbit/dist/pyscannerbit-0.0.31.tar.gz    
 
 before_script:
     # Test for pep-compliance
-   # - flake8 high_dimensional_sampling tests
+    - flake8 high_dimensional_sampling tests
 
 # command to run tests
 script:
