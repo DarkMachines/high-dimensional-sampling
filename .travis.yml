@@ -3,6 +3,9 @@ language: python
 python:
     - "3.6"
 
+env:
+    - PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so
+
 addons:
     apt:
         packages:
