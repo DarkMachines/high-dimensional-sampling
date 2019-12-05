@@ -1,6 +1,7 @@
 # Config file for automatic testing at travis-ci.org
 language: python
 python:
+    - "3.4"
     - "3.5"
     - "3.6"
     - "3.7"
@@ -24,7 +25,6 @@ install:
     - pip install flake8 coveralls
     - pip install pyyaml matplotlib
     - python setup.py install
-    - pip install scipy==0.17
 
 before_script:
     # Test for pep-compliance
@@ -32,8 +32,7 @@ before_script:
 
 # command to run tests
 script:
-    - "travis_wait 15"
-    - python setup.py test
+    - travis_wait python setup.py test
 
 after_success:
     - coveralls
