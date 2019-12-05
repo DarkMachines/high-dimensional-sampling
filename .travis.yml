@@ -3,19 +3,19 @@ language: python
 python:
     - "3.6"
 
-# addons:
-#    apt:
-#        packages:
-#            - gfortran
-#            - openmpi-bin
-#            - libopenmpi-dev
-#            - libboost-all-dev
-#            - libeigen3-dev
-#            - libgsl-dev
-#            - axel
-#            - libblas-dev
-#            - liblapack-dev
-#            - libhdf5-serial-dev
+addons:
+   apt:
+       packages:
+           - gfortran
+           - openmpi-bin
+           - libopenmpi-dev
+           - libboost-all-dev
+           - libeigen3-dev
+           - libgsl-dev
+           - axel
+           - libblas-dev
+           - liblapack-dev
+           - libhdf5-serial-dev
 
 # command to install dependencies
 install:
