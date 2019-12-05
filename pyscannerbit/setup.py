@@ -75,8 +75,8 @@ class CMakeBuild(build_ext_orig):
                       '-DCMAKE_BUILD_WITH_INSTALL_RPATH:BOOL=ON',
                       '-DCMAKE_INSTALL_RPATH_USE_LINK_PATH:BOOL=ON',
                       '-DCMAKE_INSTALL_PREFIX:PATH=' + libout,
-                      '-DPYTHON_LIBRARY=/home/zac/anaconda3/envs/Python37/lib/libpython3.7m.so',
-                      '-DPYTHON_INCLUDE_DIR=/home/zac/anaconda3/envs/Python37/include/python3.7m',
+                      '-DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so',
+                      '-DPYTHON_INCLUDE_DIR=usr/include/python3.6m',
                       #'-DUSE_PYSB_YAML=1',
                       '-DWITH_MPI=True',
                     ]
