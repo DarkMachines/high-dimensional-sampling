@@ -27,7 +27,7 @@ install:
 
 before_script:
     # Test for pep-compliance
-    - flake8 high_dimensional_sampling tests
+   # - flake8 high_dimensional_sampling tests
 
 # command to run tests
 script:
