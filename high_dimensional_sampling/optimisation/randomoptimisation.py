@@ -13,8 +13,9 @@ except ImportError:
 try:
     rank = MPI.COMM_WORLD.Get_rank()
     size = MPI.COMM_WORLD.Get_size()
-except ExplicitException:
+except:
     pass
+
 
 class RandomOptimisation(hds.Procedure):
     def __init__(self, n_initial=10, n_sample=10):
