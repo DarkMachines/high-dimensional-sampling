@@ -2,7 +2,10 @@ import numpy as np
 import high_dimensional_sampling as hds
 from string import ascii_lowercase
 import itertools
-import pyscannerbit.scan as sb
+try:
+    import pyscannerbit.scan as sb
+except ImportError:
+    pass
 from mpi4py import MPI
 rank = MPI.COMM_WORLD.Get_rank()
 size = MPI.COMM_WORLD.Get_size()
