@@ -13,7 +13,7 @@ except ImportError:
 try:
     rank = MPI.COMM_WORLD.Get_rank()
     size = MPI.COMM_WORLD.Get_size()
-except:
+except NameError:
     pass
 
 
