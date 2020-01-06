@@ -6,10 +6,15 @@ try:
     import pyscannerbit.scan as sb
 except ImportError:
     pass
-from mpi4py import MPI
-rank = MPI.COMM_WORLD.Get_rank()
-size = MPI.COMM_WORLD.Get_size()
-
+try:
+    from mpi4py import MPI
+except ImportError:
+    pass
+try:
+    rank = MPI.COMM_WORLD.Get_rank()
+    size = MPI.COMM_WORLD.Get_size()
+except ExplicitException:
+    pass
 
 class RandomOptimisation(hds.Procedure):
     def __init__(self, n_initial=10, n_sample=10):
