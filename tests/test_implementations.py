@@ -1,15 +1,14 @@
 import inspect
 import shutil
-from high_dimensional_sampling import posterior
-from high_dimensional_sampling import optimisation
+from high_dimensional_sampling.posterior import RejectionSampling
+from high_dimensional_sampling.optimisation import RandomOptimisation
 from high_dimensional_sampling import functions as func
 from high_dimensional_sampling import procedures as proc
 from high_dimensional_sampling import experiments as exp
 
 
 def test_posterior_implementations(tmp_path):
-    all_classes = inspect.getmembers(posterior, inspect.isclass)
-    classes = [c[1] for c in all_classes if isinstance(c[1](), proc.Procedure)]
+    classes = [RejectionSampling]
     for procedure_class in classes:
         procedure = procedure_class()
         experiment = exp.PosteriorSamplingExperiment(procedure, str(tmp_path))
@@ -18,13 +17,8 @@ def test_posterior_implementations(tmp_path):
 
 
 def test_optimisation_implementations(tmp_path):
-    all_classes = inspect.getmembers(optimisation, inspect.isclass)
-    classes = [c[1] for c in all_classes if isinstance(c[1](), proc.Procedure)]
+    classes = [RandomOptimisation]
     for procedure_class in classes:
-        # Exempt Pyscannerbit interface due to issues with PS install
-        if procedure_class == 'high_dimensional_sampling.\
-             optimisation.randomoptimisation.HdsPsInterface':
-            continue
         procedure = procedure_class()
         experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
         experiment.run(func.Himmelblau(), finish_line=250)
