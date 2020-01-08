@@ -42,9 +42,13 @@ class PyScannerBit(hds.Procedure):
 
         # Check if import was succesfull
         # Raise Error if this fails (not all necessary packages are available)
-        if not sb:
+        try:
+            sb
+        except NameError:
             raise ImportError("The `pyscannerbit` package is not installed.")
-        if not MPI:
+        try:
+            MPI
+        except NameError:
             raise ImportError("The `mpi4py` package is not installed.")
 
         self.scanner = scanner
