@@ -1,7 +1,7 @@
 import inspect
 import shutil
 from high_dimensional_sampling.posterior import RejectionSampling
-from high_dimensional_sampling.optimisation import RandomOptimisation
+from high_dimensional_sampling.optimisation import RandomOptimisation, Ampgo
 from high_dimensional_sampling import functions as func
 from high_dimensional_sampling import procedures as proc
 from high_dimensional_sampling import experiments as exp
