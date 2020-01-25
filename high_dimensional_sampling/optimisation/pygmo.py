@@ -1,7 +1,10 @@
 import sys
 import high_dimensional_sampling as hds
-import pygmo as pg
-from pygmo import *
+try:
+    import pygmo as pg # noqa: F401
+    from pygmo import *  # noqa: F401
+except:
+    pass
 import numpy as np
 
 # based on https://esa.github.io/pagmo2
@@ -99,6 +102,11 @@ class Pygmo(hds.Procedure):
                  log_data=False,
                  verbose=0):
 
+        try:
+            pg
+        except NameError:
+            raise ImportError("The `pygmo` package is not installed.")
+        
         self.store_parameters = [
             'scanner', 'gen', 'variant', 'allowed_variants', 'variant_adptv',
             'ftol', 'xtol', 'ker', 'q', 'oracle', 'acc', 'threshold',
