@@ -14,6 +14,15 @@
 #  yaml-cpp and pybind11 weren't automatically cloning along
 #  with pyscannerbit, which can be fixed by manually cloning
 #  them to the provided folders.
+# 9) One possible error is a mismatch between the python co-
+#  mpiler and interpreter. This can be fixed by adding the
+#  following to the setup.py file in the pyscannerbit folder
+#  and reinstalling: Look for the cmake_args = [ ... ]
+#  in setup.py, and add:
+#  '-DPYTHON_LIBRARY=/home/.../lib/libpython3.6m.so',
+#  '-DPYTHON_INCLUDE_DIR=/home/.../include/python3.6m/',
+#  Note that you'll have to find the relevant pythonpaths
+#  for your machine.
 
 import high_dimensional_sampling as hds
 from high_dimensional_sampling.optimisation import PyScannerBit
