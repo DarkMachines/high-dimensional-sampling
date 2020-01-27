@@ -2,17 +2,31 @@
 language: python
 python:
     - "3.6"
+    - "3.7"
+
+addons:
+   apt:
+       packages:
+           - gfortran
+           - openmpi-bin
+           - libopenmpi-dev
+           - libboost-all-dev
+           - libeigen3-dev
+           - libgsl-dev
+           - axel
+           - libblas-dev
+           - liblapack-dev
+           - libhdf5-serial-dev
 
 # command to install dependencies
 install:
-    - pip install -r requirements.txt
-    - pip install flake8
-    - pip install coveralls
+    - pip install flake8 coveralls
+    - pip install pyyaml matplotlib
+    - python setup.py install
 
 before_script:
     # Test for pep-compliance
     - flake8 high_dimensional_sampling tests
-
 
 # command to run tests
 script:
