@@ -269,6 +269,18 @@ class TestFunction(ABC):
         """
         return SimpleFunctionWrapper(self)
 
+    def get_simple_interface_with_scan(self):
+        """
+        Get this function, wrapped in the SimpleFunctionWrapperWithScan.
+        This wrapped function has a different __call__ interface. See the
+        documentation for the wrapper for more information.
+
+        Returns:
+            This TestFunction wrapped in a SimpleFunctionWrapperWithScan
+            instance.
+        """
+        return SimpleFunctionWrapperWithScan(self)
+
     def is_bounded(self):
         """
         Checks if the ranges of the TestFunction are bounded, i.e. that there
@@ -479,6 +491,17 @@ class SimpleFunctionWrapper:
         -1). See documentation for TestFunction.invert() for more information.
         """
         return self.function.invert()
+
+
+class SimpleFunctionWrapperWithScan(SimpleFunctionWrapper):
+
+    def __call__(self, scan=None, *args, **kwargs):
+        """
+        Same as `SimpleFunctionWrapper`.__call__, but with an extra dummy input
+        argument 'scan' on the first argument position. This argument does not
+        alter the way the code works, but is needed for e.g. PyScannerBit.
+        """
+        return super().__call__(*args, **kwargs)
 
 
 class NoDerivativeError(NotImplementedError):

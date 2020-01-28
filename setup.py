@@ -38,9 +38,8 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     test_suite='tests',
     install_requires=['pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn'],  # FIXME: add your package's dependencies to this list
@@ -50,7 +49,7 @@ setup(
     #    # dependencies for `python setup.py build_sphinx`
         'sphinx',
         'sphinx_rtd_theme',
-        'recommonmark'
+        'recommonmark',
     ],
     tests_require=[
         'pytest',
