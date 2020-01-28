@@ -16,7 +16,7 @@ class CMAOptimisation(hds.Procedure):
         Initializes the algorithm.  The options dictionary is passed to the
         CMAOptions object
         """
-        self.store_parameters = ['opts']
+        self.store_parameters = []
         self.opts = cma.CMAOptions()
         self.opts.init(options)
         self.es = None
