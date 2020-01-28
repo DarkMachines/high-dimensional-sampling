@@ -58,6 +58,9 @@ class CMAOptimisation(hds.Procedure):
         # All points are returned
         return (np.array(x), y)
 
+    def check_testfunction(self, function):
+        return True
+
     def reset(self):
         self.es = None
 
