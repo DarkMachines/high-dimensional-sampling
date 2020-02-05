@@ -5,10 +5,10 @@
 import high_dimensional_sampling as hds
 import numpy as np
 
-import GPyOpt
+import GPyOpt as gp
 
 
-class Gpyopt(hds.Procedure):
+class GPyOpt(hds.Procedure):
     def __init__(self,
                  initial_design_numdata=5,
                  aquisition_type='EI',
@@ -52,7 +52,7 @@ class Gpyopt(hds.Procedure):
                                  'domain': (ranges[dim][0], ranges[dim][1]),
                                  'dimensionality': 1})
 
-        myBopt = GPyOpt.methods.BayesianOptimization(
+        myBopt = gp.methods.BayesianOptimization(
                     f=function,
                     domain=mixed_domain,
                     initial_design_numdata=self.initial_design_numdata,
