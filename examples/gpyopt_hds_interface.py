@@ -3,7 +3,7 @@
 # 2) pip install gpyopt
 
 import high_dimensional_sampling as hds
-from high_dimensional_sampling.optimisation import PyScannerBit
+from high_dimensional_sampling.optimisation import GPyOpt
 
 
 procedure = GPyOpt(initial_design_numdata=5,
