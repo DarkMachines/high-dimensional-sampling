@@ -8,7 +8,7 @@ import numpy as np
 import GPyOpt
 
 
-class HdsGpyoptInterface(hds.Procedure):
+class Gpyopt(hds.Procedure):
     def __init__(self,
                  initial_design_numdata=5,
                  aquisition_type='EI',
