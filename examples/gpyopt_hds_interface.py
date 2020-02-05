@@ -6,7 +6,7 @@ import high_dimensional_sampling as hds
 from high_dimensional_sampling.optimisation import PyScannerBit
 
 
-procedure = Gpyopt(initial_design_numdata=5,
+procedure = GPyOpt(initial_design_numdata=5,
                                aquisition_type='EI',
                                exact_feval=True,
                                de_duplication=True,
