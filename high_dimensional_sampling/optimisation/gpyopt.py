@@ -71,7 +71,7 @@ class GPyOpt(hds.Procedure):
         y = myBopt.get_evaluations()[1]
 
         # np.round(myBopt.X,2)
-        myBopt.save_report("gpyopt_report.txt")
+        # myBopt.save_report("gpyopt_report.txt")
         # myBopt.plot_acquisition()
         # myBopt.plot_convergence()
 
