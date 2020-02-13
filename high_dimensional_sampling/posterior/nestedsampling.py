@@ -2,9 +2,9 @@ import os
 import numpy as np
 import high_dimensional_sampling as hds
 import pypolychord as pc
-import pymultinest as mn
 from anesthetic import NestedSamples
 from pypolychord.settings import PolyChordSettings
+
 
 class PolyChord(hds.Procedure):
     def __init__(self):
@@ -16,10 +16,10 @@ class PolyChord(hds.Procedure):
         ranges = function.get_ranges()
 
         def prior(cube):
-            return cube * ranges[:,1] + (1-cube) * ranges[:,0]
+            return cube * ranges[:, 1] + (1-cube) * ranges[:, 0]
 
         def likelihood(theta):
-            return function([theta])[0,0], []
+            return function([theta])[0, 0], []
 
         def dumper(live, dead, logweights, logZ, logZerr):
             pass
@@ -43,11 +43,13 @@ class PolyChord(hds.Procedure):
             settings.read_resume = False
 
         if not self.is_finished():
-            pc.run_polychord(likelihood, nDims, nDerived, settings, prior, dumper)
+            pc.run_polychord(likelihood, nDims, nDerived,
+                             settings, prior, dumper)
 
         self._is_finished = True
-        samples = NestedSamples(root=os.path.join(settings.base_dir, settings.file_root))
-        x = samples.iloc[:,:nDims].to_numpy()
+        root = os.path.join(settings.base_dir, settings.file_root)
+        samples = NestedSamples(root=root)
+        x = samples.iloc[:, :nDims].to_numpy()
         y = np.array([samples.logL.to_numpy()]).T
 
         return (x, y)
