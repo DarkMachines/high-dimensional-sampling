@@ -2,10 +2,20 @@ import numpy as np
 import high_dimensional_sampling as hds
 from string import ascii_lowercase
 import itertools
-import pyscannerbit.scan as sb
-from mpi4py import MPI
-rank = MPI.COMM_WORLD.Get_rank()
-size = MPI.COMM_WORLD.Get_size()
+
+try:
+    import pyscannerbit.scan as sb
+except ImportError:
+    pass
+try:
+    from mpi4py import MPI
+except ImportError:
+    pass
+try:
+    _ = MPI.COMM_WORLD.Get_rank()
+    _ = MPI.COMM_WORLD.Get_size()
+except NameError:
+    pass
 
 
 class PyScannerBit(hds.Procedure):
@@ -36,19 +46,31 @@ class PyScannerBit(hds.Procedure):
                                  'badass_points',
                                  'badass_jumps',
                                  'pso_NP']
+
+        # Check if import was succesfull
+        # Raise Error if this fails (not all necessary packages are available)
+        try:
+            sb
+        except NameError:
+            raise ImportError("The `pyscannerbit` package is not installed.")
+        try:
+            MPI
+        except NameError:
+            raise ImportError("The `mpi4py` package is not installed.")
+
         self.scanner = scanner
         self.multinest_tol = multinest_tol
         self.multinest_nlive = multinest_nlive
         self.polychord_tol = polychord_tol
         self.polychord_nlive = polychord_nlive
         self.diver_convthresh = diver_convthresh
-        self.diver_NP = diver_np
+        self.diver_np = diver_np
         self.twalk_sqrtr = twalk_sqrtr
         self.random_point_number = random_point_number
         self.toy_mcmc_point_number = toy_mcmc_point_number
         self.badass_points = badass_points
         self.badass_jumps = badass_jumps
-        self.pso_NP = pso_np
+        self.pso_np = pso_np
         self.reset()
 
     def __call__(self, function):
@@ -85,6 +107,7 @@ class PyScannerBit(hds.Procedure):
             for size in itertools.count(1):
                 for t in itertools.product(ascii_lowercase, repeat=size):
                     yield "".join(t)
+
         for t in itertools.islice(iter_all_strings(), dimensions):
             fargs.append(t)
 
@@ -99,6 +122,8 @@ class PyScannerBit(hds.Procedure):
                          bounds=ranges,
                          prior_func=prior,
                          prior_types=["flat"]*dimensions,
+                         prior_types=["flat"] * dimensions,
+                         
                          scanner=self.scanner,
                          scanner_options=scanner_options[self.scanner],
                          fargs=fargs)
