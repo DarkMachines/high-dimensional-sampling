@@ -29,7 +29,7 @@ This class should implement at least the following four methods:
 This is Initialisation method in which anything can be done. At the very least
 it should define the `self.store_parameters` property as a list, containing
 the names of the parameters of the Procedure. These parameters will then 
-autometically be stored when an experiment is run. If no procedure parameters
+automatically be stored when an experiment is run. If no procedure parameters
 exist, `self.store_parameters` should be an empty list.
 
 Your implementation of this initialisation method is allowed to include extra
@@ -51,7 +51,7 @@ should be a numpy array of shape `(nDatapoints, nOutputVariables)`. Note that
 `nOutputVariables` will often be 1.
 
 Although it is not required, it is advisable to implement the `__call__` method
-in such a way that it returns a single data point at a time. Whether of not
+in such a way that it returns a single data point at a time. Whether or not
 this is possible depends of course on the implemented procedure, but following
 this guideline makes sure that the experiment is stopped as soon as possible
 and no further (possibly expensive) iterations are run. This makes comparison
@@ -64,7 +64,7 @@ stopped, or `False` if it should continue. If `True`, this overrides the
 `finish_line` condition set in [the Experiment](04_running_an_experiment.md).
 
 ### `reset(self)`
-This method should reset all internal variables conserning previous runs. For
+This method should reset all internal variables concerning previous runs. For
 instance: if your implementation keeps track of the number of points sampled
 in a property called `n_sampled`, the `reset()` method should set `n_sampled`
 to 0. It is called every time a new testfunction is provided to the Procedure.
