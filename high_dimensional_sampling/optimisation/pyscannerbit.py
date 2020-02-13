@@ -121,7 +121,7 @@ class PyScannerBit(hds.Procedure):
         myscan = sb.Scan(simple,
                          bounds=ranges,
                          prior_func=prior,
-                         prior_types=["flat"]*dimensions,                         
+                         prior_types=["flat"]*dimensions,
                          scanner=self.scanner,
                          scanner_options=scanner_options[self.scanner],
                          fargs=fargs)
