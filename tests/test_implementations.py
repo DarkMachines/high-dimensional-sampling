@@ -3,8 +3,8 @@ import shutil
 from high_dimensional_sampling import posterior
 from high_dimensional_sampling import optimisation
 from high_dimensional_sampling import functions as func
-from high_dimensional_sampling import procedures as proc
 from high_dimensional_sampling import experiments as exp
+from high_dimensional_sampling import procedures as proc
 
 
 def test_posterior_implementations(tmp_path):
@@ -19,7 +19,10 @@ def test_posterior_implementations(tmp_path):
 
 def test_optimisation_implementations(tmp_path):
     all_classes = inspect.getmembers(optimisation, inspect.isclass)
-    classes = [c[1] for c in all_classes if isinstance(c[1](), proc.Procedure)]
+    # Exempt Pyscannerbit interface due to issues with PS install on Travis
+    filtered = [c for c in all_classes if c[0] != 'PyScannerBit']
+    classes = [c[1] for c in filtered if isinstance(c[1](), proc.Procedure)]
+
     for procedure_class in classes:
         procedure = procedure_class()
         experiment = exp.OptimisationExperiment(procedure, str(tmp_path))

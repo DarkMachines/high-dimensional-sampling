@@ -38,24 +38,24 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
     ],
     test_suite='tests',
-    install_requires=['pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'pygmo'],  # FIXME: add your package's dependencies to this list
+    install_requires=['pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'pygmo', 'gpyopt'],  # FIXME: add your package's dependencies to this list
     setup_requires=[
     #    # dependency for `python setup.py test`
         'pytest-runner',
     #    # dependencies for `python setup.py build_sphinx`
         'sphinx',
         'sphinx_rtd_theme',
-        'recommonmark'
+        'recommonmark',
     ],
     tests_require=[
         'pytest',
         'pytest-cov',
-        'pycodestyle'
+        'pycodestyle',
+        'cma'
     ],
     extras_require={
         'dev':  ['prospector[with_pyroma]', 'yapf', 'isort'],
