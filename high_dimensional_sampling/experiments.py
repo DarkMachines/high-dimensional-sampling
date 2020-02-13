@@ -519,7 +519,10 @@ class Logger:
             for prop in experiment.procedure.store_parameters:
                 info['procedure']['properties'][prop] = getattr(
                     experiment.procedure, prop)
+                if isinstance(info['procedure']['properties'][prop], np.ndarray):
+                    info['procedure']['properties'][prop] = info['procedure']['properties'][prop].tolist()
             # Convert information to yaml and write to file
+            print(info)
             yaml.dump(info, handle, default_flow_style=False)
 
     def log_results(self, metrics):
