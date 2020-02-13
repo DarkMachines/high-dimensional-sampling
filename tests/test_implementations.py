@@ -18,10 +18,16 @@ def test_posterior_implementations(tmp_path):
 
 
 def test_optimisation_implementations(tmp_path):
-    all_classes = inspect.getmembers(optimisation, inspect.isclass)
-    # Exempt Pyscannerbit interface due to issues with PS install on Travis
-    filtered = [c for c in all_classes if c[0] != 'PyScannerBit']
-    classes = [c[1] for c in filtered if isinstance(c[1](), proc.Procedure)]
+    # These are the classes to test
+    classes = [
+        optimisation.RandomOptimisation,
+        optimisation.ParticleFilter,
+        optimisation.GPyOpt,
+        optimisation.CMAOptimisation,
+        optimisation.Ampgo,
+        # optimisation.Pygmo,  # excluded because of a mandatory install
+        # optimisation.PyScannerBit  # excluded because of a mandatory install
+    ]
 
     for procedure_class in classes:
         procedure = procedure_class()

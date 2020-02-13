@@ -1,4 +1,5 @@
 import sys
+import high_dimensional_sampling as hds
 from high_dimensional_sampling import functions as func
 
 import numpy as np
@@ -7,7 +8,7 @@ from scipy import stats
 import matplotlib.pyplot as plt
 
 
-class ParticleFilter:
+class ParticleFilter(hds.Procedure):
     def __init__(self,
                  seed_size=1000,
                  seed_distributions=None,
@@ -97,6 +98,7 @@ class ParticleFilter:
         ]
 
     def __call__(self, function):
+        self.check_testfunction(function)
         if self.previous_samples is None:
             # Sample seed using user defined seed distributions
             x, y = self.sample_seed(function)
@@ -126,6 +128,7 @@ class ParticleFilter:
         for d in set(self.seed_distributions):
             if d not in ['linear', 'log', 'uniform']:
                 return False
+        return True
 
     def is_finished(self):
         return False
@@ -184,6 +187,7 @@ class ParticleFilter:
     def sample_seed(self, function):
         x = np.zeros((self.seed_size, function.get_dimensionality()))
         # Loop over all dimensions and fill the samples array with values
+        print("ranges: {}".format(self.ranges))
         for i, (r, dist) in enumerate(zip(self.ranges,
                                           self.seed_distributions)):
             if dist == 'log':
@@ -361,8 +365,8 @@ if __name__ == "__main__":
     plt.legend()
     plt.show()
 
-algorithm = ParticleFilter(seed_size=100,
-                           iteration_size=100,
-                           width_decay=0.8,
-                           hard_ranges=True,
-                           width_scheduler=width_schedule_exponential)
+    algorithm = ParticleFilter(seed_size=100,
+                               iteration_size=100,
+                               width_decay=0.8,
+                               hard_ranges=True,
+                               width_scheduler=width_schedule_exponential)
