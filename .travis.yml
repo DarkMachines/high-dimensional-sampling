@@ -23,6 +23,7 @@ addons:
 install:
     - pip install flake8 coveralls
     - pip install pyyaml matplotlib
+    - pip install gpyopt
     - python setup.py install
 
 before_script:
