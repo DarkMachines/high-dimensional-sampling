@@ -13,6 +13,7 @@ def test_hiddenfunctions_general():
     print(function(x))
     assert function(x).shape[0] == len(x)
 
+
 def test_hiddenfunctions_all():
     function = func.HiddenFunction1()
     x = np.random(10, 2)
@@ -26,4 +27,3 @@ def test_hiddenfunctions_all():
     function = func.HiddenFunction4()
     x = np.random(1, 16)
     assert function(x).shape[0] == len(x)
-
