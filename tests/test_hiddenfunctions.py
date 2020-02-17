@@ -27,3 +27,5 @@ def test_hiddenfunctions_all():
     function = func.HiddenFunction4()
     x = np.random.rand(1, 16)
     assert function(x).shape[0] == len(x)
+
+#test_hiddenfunctions_all()
