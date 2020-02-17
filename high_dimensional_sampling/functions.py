@@ -506,6 +506,49 @@ class SimpleFunctionWrapperWithScan(SimpleFunctionWrapper):
         return super().__call__(*args, **kwargs)
 
 
+class HiddenFunction(TestFunction, ABC):
+    """
+    Base class for functions that get their evaluated value from a precompiled
+    binary.
+    """
+    def __init__(self):
+        self.packageloc = None
+        self.funcloc = None
+        super(HiddenFunction, self).__init__()
+
+    def _get_package_location(self):
+        """ Get location in which the package was installed """
+        this_dir, _ = os.path.split(__file__)
+        return this_dir
+
+    def _query(self, x):
+        """ Query individual point to the binary """
+        # Check if package location is known. If not, get it
+        if self.packageloc is None:
+            self.packageloc = self._get_package_location()
+        # Feed datapoint to binary
+        z = x.tolist()
+        data = " ".join(map(str, z))
+        cmd = "{}{}{} {}".format(self.packageloc, os.sep, self.funcloc, data)
+        stream = os.popen(cmd)
+        output = stream.read()
+        # Check if error occured
+        try:
+            output = float(output)
+        except ValueError:
+            raise Exception("Error ('{}') for input '{}'".format(output, data))
+        return output
+
+    def _evaluate(self, x):
+        y = np.zeros(len(x))
+        for i, xi in enumerate(x):
+            y[i] = self._query(xi)
+        return y
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
+
 class NoDerivativeError(NotImplementedError):
     """
     Error indicating no derivative is known to queried testfunction. Inherits
@@ -1427,40 +1470,6 @@ class Schwefel(TestFunction):
         d = len(self.ranges)
         z = 418.9829 * d - np.sum(x * np.sin(np.sqrt(np.abs(x))), axis=1)
         return z.reshape(-1, 1)
-
-    def _derivative(self, x):
-        raise NoDerivativeError()
-
-
-class HiddenFunction(TestFunction, ABC):
-    def __init__(self):
-        self.packageloc = None
-        self.funcloc = None
-        super(HiddenFunction, self).__init__()
-
-    def _get_package_location(self):
-        this_dir, _ = os.path.split(__file__)
-        return this_dir
-
-    def _query(self, x):
-        if self.packageloc is None:
-            self.packageloc = self._get_package_location()
-        z = x.tolist()
-        data = " ".join(map(str, z))
-        cmd = "{}{}{} {}".format(self.packageloc, os.sep, self.funcloc, data)
-        stream = os.popen(cmd)
-        output = stream.read()
-        try:
-            output = float(output)
-        except ValueError:
-            raise Exception("Error ('{}') for input '{}'".format(output, data))
-        return output
-
-    def _evaluate(self, x):
-        y = np.zeros(len(x))
-        for i, xi in enumerate(x):
-            y[i] = self._query(xi)
-        return y
 
     def _derivative(self, x):
         raise NoDerivativeError()
