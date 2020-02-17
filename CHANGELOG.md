@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-## Unreleased
+## Version 0.2.0 (Monday February 17th, 2020)
 
 ### Added
 * A submodule `results` that implements functionality to visualise or format
@@ -27,6 +27,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   RejectionSampling (from the example scripts) have been added as examples of
   how to add implementations.
 * Unit tests for the entire package are added.
+* Testfunctions from precompiled binaries were added, so that the exact
+  formula for them is unknown.
+* Several optimisation procedures were added.
 
 ### Changed
 * The examples now use relative path indications for storage of their results,
