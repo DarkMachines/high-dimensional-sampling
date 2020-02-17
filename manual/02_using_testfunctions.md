@@ -59,6 +59,25 @@ of the package:
 Dimensionalities provided between parentheses can be configured at
 initialisation.
 
+## Hidden TestFunctions
+For all functions in the table above the function can in principle be known 
+by the user performing the optimisation. This makes for a possible biassed
+optimisation, as the user can tune the parameters of the optimisation
+procedure. To counteract this, there are additionally four hidden functions
+implemented, which get their evaluated values from precompiled binaries. This
+makes their functional values unknown to the user.
+
+The `HiddenFunction`s are implemented in the `functions` module and have the
+following properties. None have their derivative implemented.
+
+| Function | #dimensions | Range minimum | Range maximum |
+| ------------- |:-------------:|:-------------:| -----:|
+| HiddenFunction1 | 2 | -30 | 30 |
+| HiddenFunction2 | 4 | -7 | 7 |
+| HiddenFunction3 | 6 | 0 | 1 |
+| HiddenFunction4 | 16 | -500 | 500 |
+
+
 ## Defining your own `TestFunction`s
 You can define your own testfunctions by creating a class that derives from the
 `functions.TestFunction` base class. Your new testfunction should implement
