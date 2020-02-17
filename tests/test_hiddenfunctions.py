@@ -16,14 +16,14 @@ def test_hiddenfunctions_general():
 
 def test_hiddenfunctions_all():
     function = func.HiddenFunction1()
-    x = np.random(10, 2)
+    x = np.random.rand(10, 2)
     assert function(x).shape[0] == len(x)
     function = func.HiddenFunction2()
-    x = np.random(7, 4)
+    x = np.random.rand(7, 4)
     assert function(x).shape[0] == len(x)
     function = func.HiddenFunction3()
-    x = np.random(99, 6)
+    x = np.random.rand(99, 6)
     assert function(x).shape[0] == len(x)
     function = func.HiddenFunction4()
-    x = np.random(1, 16)
+    x = np.random.rand(1, 16)
     assert function(x).shape[0] == len(x)
