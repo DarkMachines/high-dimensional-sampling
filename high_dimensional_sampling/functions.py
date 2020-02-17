@@ -1485,19 +1485,19 @@ class HiddenFunction1(HiddenFunction):
 class HiddenFunction2(HiddenFunction):
     def __init__(self):
         self.ranges = self.construct_ranges(4, -7.0, 7.0)
-        self.funcloc = 'hidden_functions{}test_func_2.bin'.format(os.sep)
         super(HiddenFunction2, self).__init__()
+        self.funcloc = 'hidden_functions{}test_func_2.bin'.format(os.sep)
 
 
 class HiddenFunction3(HiddenFunction):
     def __init__(self):
         self.ranges = self.construct_ranges(6, 0.0, 1.0)
+        super(HiddenFunction2, self).__init__()
         self.funcloc = 'hidden_functions{}test_func_3.bin'.format(os.sep)
-        super(HiddenFunction3, self).__init__()
 
 
 class HiddenFunction4(HiddenFunction):
     def __init__(self):
         self.ranges = self.construct_ranges(16, -500, 500)
-        self.funcloc = 'hidden_functions{}test_func_4.bin'.format(os.sep)
         super(HiddenFunction4, self).__init__()
+        self.funcloc = 'hidden_functions{}test_func_4.bin'.format(os.sep)
