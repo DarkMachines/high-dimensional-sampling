@@ -68,7 +68,7 @@ implemented, which get their evaluated values from precompiled binaries. This
 makes their functional values unknown to the user.
 
 The `HiddenFunction`s are implemented in the `functions` module and have the
-following properties. None have their derivative implemented.
+following properties.
 
 | Function | #dimensions | Range minimum | Range maximum |
 | ------------- |:-------------:|:-------------:| -----:|
@@ -77,6 +77,8 @@ following properties. None have their derivative implemented.
 | HiddenFunction3 | 6 | 0 | 1 |
 | HiddenFunction4 | 16 | -500 | 500 |
 
+None have their derivative implemented and they don't need take any arguments 
+at initialisation.
 
 ## Defining your own `TestFunction`s
 You can define your own testfunctions by creating a class that derives from the
