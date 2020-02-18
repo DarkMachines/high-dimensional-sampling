@@ -39,13 +39,13 @@ class PyScannerBit(hds.Procedure):
                                  'polychord_tol',
                                  'polychord_nlive',
                                  'diver_convthresh',
-                                 'diver_NP',
+                                 'diver_np',
                                  'twalk_sqrtr',
                                  'random_point_number',
                                  'toy_mcmc_point_number',
                                  'badass_points',
                                  'badass_jumps',
-                                 'pso_NP']
+                                 'pso_np']
 
         # Check if import was succesfull
         # Raise Error if this fails (not all necessary packages are available)
@@ -80,14 +80,14 @@ class PyScannerBit(hds.Procedure):
         scanner_options["polychord"] = {"tol": self.polychord_tol,
                                         "nlive": self.polychord_nlive}
         scanner_options["diver"] = {"convthresh": self.diver_convthresh,
-                                    "NP": self.diver_np}
-        scanner_options["twalk"] = {"sqrtR": self.twalk_sqrtr}
+                                    "np": self.diver_np}
+        scanner_options["twalk"] = {"sqrtr": self.twalk_sqrtr}
         scanner_options["random"] = {"point_number": self.random_point_number}
         scanner_options["toy_mcmc"] = {"point_number":
                                        self.toy_mcmc_point_number}
         scanner_options["badass"] = {"points": self.badass_points,
                                      "jumps": self.badass_jumps}
-        scanner_options["pso"] = {"NP": self.pso_np}
+        scanner_options["pso"] = {"np": self.pso_np}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
         # and the maxima 0.001 down, in order to make use the sampling is not
