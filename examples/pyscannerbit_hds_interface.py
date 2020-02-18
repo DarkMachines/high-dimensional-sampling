@@ -36,13 +36,13 @@ for s in scanners:
                              polychord_tol=1.0,
                              polychord_nlive=20,
                              diver_convthresh=1e-2,
-                             diver_NP=300,
+                             diver_np=300,
                              twalk_sqrtr=1.05,
                              random_point_number=10000,
                              toy_mcmc_point_number=10,
                              badass_points=1000,
                              badass_jumps=10,
-                             pso_NP=400)
+                             pso_np=400)
     experiment = hds.OptimisationExperiment(procedure, './hds')
     feeder = hds.functions.FunctionFeeder()
     feeder.load_function('Rastrigin', {'dimensionality': 3})
