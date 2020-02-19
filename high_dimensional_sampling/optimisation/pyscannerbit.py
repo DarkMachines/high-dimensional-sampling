@@ -142,7 +142,7 @@ class PyScannerBit(hds.Procedure):
         # No way to get sampled function values from PS, so recalculate
         y = function(x)
 
-        return (x, y.reshape(-1,1))
+        return (x, y.reshape(-1, 1))
 
     def reset(self):
         self.current_position = None
