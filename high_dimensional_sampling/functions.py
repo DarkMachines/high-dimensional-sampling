@@ -540,9 +540,9 @@ class HiddenFunction(TestFunction, ABC):
         return output
 
     def _evaluate(self, x):
-        y = np.zeros(len(x))
+        y = np.zeros((len(x), 1))
         for i, xi in enumerate(x):
-            y[i] = self._query(xi)
+            y[i, 0] = self._query(xi)
         return y
 
     def _derivative(self, x):
