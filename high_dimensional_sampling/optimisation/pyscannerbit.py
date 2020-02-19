@@ -39,13 +39,13 @@ class PyScannerBit(hds.Procedure):
                                  'polychord_tol',
                                  'polychord_nlive',
                                  'diver_convthresh',
-                                 'diver_NP',
+                                 'diver_np',
                                  'twalk_sqrtr',
                                  'random_point_number',
                                  'toy_mcmc_point_number',
                                  'badass_points',
                                  'badass_jumps',
-                                 'pso_NP']
+                                 'pso_np']
 
         # Check if import was succesfull
         # Raise Error if this fails (not all necessary packages are available)
