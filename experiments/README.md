@@ -10,7 +10,7 @@ In the remainder of this README we will assume you have a working procedure impl
 
 ## Creating the experiment code
 
-In the [experiments folder](https://github.com/DarkMachines/high-dimensional-sampling/tree/master/experiments) of the repository we have included a template script that you can use to test your procedure. To make this code work, you need to:
+In the [experiments folder](https://github.com/DarkMachines/high-dimensional-sampling/tree/master/experiments/experiments) of the repository we have included a template script that you can use to test your procedure. To make this code work, you need to:
 
 1. Set values for the configuration of the experiment script
 2. Initialise your procedure
