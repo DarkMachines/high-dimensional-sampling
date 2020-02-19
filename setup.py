@@ -42,7 +42,7 @@ setup(
         'Programming Language :: Python :: 3.7',
     ],
     test_suite='tests',
-    install_requires=['pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'gpyopt'],  # FIXME: add your package's dependencies to this list
+    install_requires=['pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'pygmo', 'gpyopt'],  # FIXME: add your package's dependencies to this list
     setup_requires=[
     #    # dependency for `python setup.py test`
         'pytest-runner',

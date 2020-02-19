@@ -25,7 +25,6 @@ class Experiment(ABC):
             tested in this experiment.
         path: Path to which the experiment should write its logs.
     """
-
     def __init__(self, procedure, path):
         if not isinstance(procedure, Procedure):
             raise Exception("""Experiments should be provided an instance of a
@@ -69,7 +68,8 @@ class Experiment(ABC):
                             functions.TestFunction as base class.""")
         # Test if the procedure can run on the provided test function
         if not self.procedure.check_testfunction(function):
-            raise Exception("""Test function '{}' can not be used for '{}'. Ignoring and
+            raise Exception(
+                """Test function '{}' can not be used for '{}'. Ignoring and
                      continuing.""".format(function.name,
                                            type(self.procedure).__name__))
         # Start experiment
@@ -231,7 +231,6 @@ class OptimisationExperiment(Experiment):
     Implements automatic logging of best obtained result to the experiment.yaml
     file.
     """
-
     def _event_start_experiment(self):
         """
         Event that is run when a new experiment is started.
@@ -293,7 +292,6 @@ class PosteriorSamplingExperiment(Experiment):
     """
     Experiment class for posterior sampling experiments.
     """
-
     def _event_start_experiment(self):
         """
         Event that is run when a new experiment is started.
@@ -344,7 +342,6 @@ class Logger:
             path. The folder is created with the utils.create_unique_folder
             function, so naming conflicts will be automatically resolved.
     """
-
     def __init__(self, path, prefered_subfolder):
         self.basepath = path
         self.path = create_unique_folder(path, prefered_subfolder)
@@ -519,7 +516,12 @@ class Logger:
             for prop in experiment.procedure.store_parameters:
                 info['procedure']['properties'][prop] = getattr(
                     experiment.procedure, prop)
+                if isinstance(info['procedure']['properties'][prop],
+                              np.ndarray):
+                    info['procedure']['properties'][prop] = info['procedure'][
+                        'properties'][prop].tolist()
             # Convert information to yaml and write to file
+            print(info)
             yaml.dump(info, handle, default_flow_style=False)
 
     def log_results(self, metrics):

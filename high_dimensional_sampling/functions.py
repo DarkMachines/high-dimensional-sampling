@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import os
+
 import numpy as np
 import pandas as pd
 from scipy import special, stats
@@ -502,6 +504,49 @@ class SimpleFunctionWrapperWithScan(SimpleFunctionWrapper):
         alter the way the code works, but is needed for e.g. PyScannerBit.
         """
         return super().__call__(*args, **kwargs)
+
+
+class HiddenFunction(TestFunction, ABC):
+    """
+    Base class for functions that get their evaluated value from a precompiled
+    binary.
+    """
+    def __init__(self):
+        self.packageloc = None
+        self.funcloc = None
+        super(HiddenFunction, self).__init__()
+
+    def _get_package_location(self):
+        """ Get location in which the package was installed """
+        this_dir, _ = os.path.split(__file__)
+        return this_dir
+
+    def _query(self, x):
+        """ Query individual point to the binary """
+        # Check if package location is known. If not, get it
+        if self.packageloc is None:
+            self.packageloc = self._get_package_location()
+        # Feed datapoint to binary
+        z = x.tolist()
+        data = " ".join(map(str, z))
+        cmd = "{}{}{} {}".format(self.packageloc, os.sep, self.funcloc, data)
+        stream = os.popen(cmd)
+        output = stream.read()
+        # Check if error occured
+        try:
+            output = float(output)
+        except ValueError:
+            raise Exception("Error ('{}') for input '{}'".format(output, data))
+        return output
+
+    def _evaluate(self, x):
+        y = np.zeros(len(x))
+        for i, xi in enumerate(x):
+            y[i] = self._query(xi)
+        return y
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
 
 
 class NoDerivativeError(NotImplementedError):
@@ -1428,3 +1473,31 @@ class Schwefel(TestFunction):
 
     def _derivative(self, x):
         raise NoDerivativeError()
+
+
+class HiddenFunction1(HiddenFunction):
+    def __init__(self):
+        self.ranges = self.construct_ranges(2, -30.0, 30.0)
+        super(HiddenFunction1, self).__init__()
+        self.funcloc = 'hidden_functions{}test_func_1.bin'.format(os.sep)
+
+
+class HiddenFunction2(HiddenFunction):
+    def __init__(self):
+        self.ranges = self.construct_ranges(4, -7.0, 7.0)
+        super(HiddenFunction2, self).__init__()
+        self.funcloc = 'hidden_functions{}test_func_2.bin'.format(os.sep)
+
+
+class HiddenFunction3(HiddenFunction):
+    def __init__(self):
+        self.ranges = self.construct_ranges(6, 0.0, 1.0)
+        super(HiddenFunction3, self).__init__()
+        self.funcloc = 'hidden_functions{}test_func_3.bin'.format(os.sep)
+
+
+class HiddenFunction4(HiddenFunction):
+    def __init__(self):
+        self.ranges = self.construct_ranges(16, -500.0, 500.0)
+        super(HiddenFunction4, self).__init__()
+        self.funcloc = 'hidden_functions{}test_func_4.bin'.format(os.sep)
