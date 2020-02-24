@@ -529,8 +529,8 @@ class HiddenFunction(TestFunction, ABC):
         # Check if compiled_against is in this list
         if compiled_against not in versions:
             raise Exception("The hidden functions were not compiled against"
-                "{}. Use one of the following: {}".format(
-                compiled_against, versions))
+                            "{}. Use one of the following: {}".format(
+                                compiled_against, versions))
         return compiled_against
 
     def _query(self, x):
@@ -542,8 +542,10 @@ class HiddenFunction(TestFunction, ABC):
         z = x.tolist()
         data = " ".join(map(str, z))
         cmd = "{}{}hidden_functions{}{}{}{} {}".format(self.packageloc, os.sep,
-                                     os.sep, self.compiled_against, os.sep,
-                                     self.funcname, data)
+                                                       os.sep,
+                                                       self.compiled_against,
+                                                       os.sep, self.funcname,
+                                                       data)
         stream = os.popen(cmd)
         output = stream.read()
         # Check if error occured
