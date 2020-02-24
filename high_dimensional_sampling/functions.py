@@ -28,7 +28,6 @@ class TestFunction(ABC):
     Raises:
         Exception: Testfunction should define ranges.
     """
-
     def __init__(self, name=None):
         if not hasattr(self, 'ranges'):
             self.ranges = []
@@ -82,7 +81,7 @@ class TestFunction(ABC):
         self.counter.append([len(x), get_time() - t_start, bool(derivative)])
         # Return value
         if self.inverted:
-            return -1*value
+            return -1 * value
         return value
 
     def reset(self):
@@ -391,7 +390,6 @@ class SimpleFunctionWrapper:
         Exception: SimpleFunctionWrapper can only wrap instances of the
             TestFunction class
     """
-
     def __init__(self, function):
         if not isinstance(function, TestFunction):
             raise Exception("SimpleFunctionWrapper can only wrap instances of"
@@ -496,7 +494,6 @@ class SimpleFunctionWrapper:
 
 
 class SimpleFunctionWrapperWithScan(SimpleFunctionWrapper):
-
     def __call__(self, scan=None, *args, **kwargs):
         """
         Same as `SimpleFunctionWrapper`.__call__, but with an extra dummy input
@@ -511,15 +508,29 @@ class HiddenFunction(TestFunction, ABC):
     Base class for functions that get their evaluated value from a precompiled
     binary.
     """
-    def __init__(self):
+    def __init__(self, compiled_against="18.04", *args, **kwargs):
         self.packageloc = None
         self.funcloc = None
-        super(HiddenFunction, self).__init__()
+        self.compiled_against = self._check_compile_version(compiled_against)
+        super(HiddenFunction, self).__init__(*args, **kwargs)
 
     def _get_package_location(self):
         """ Get location in which the package was installed """
         this_dir, _ = os.path.split(__file__)
         return this_dir
+
+    def _check_compile_version(self, compiled_against):
+        # Get package location if not already known
+        if self.packageloc is None:
+            self.packageloc = self._get_package_location()
+        # Get included compile versions
+        versions = os.listdir(self.packageloc)
+        # Check if compiled_against is in this list
+        if compiled_against not in versions:
+            raise Exception("""The hidden functions were not compiled against 
+                {}. Use one of the following: {}""".format(
+                compiled_against, versions))
+        return compiled_against
 
     def _query(self, x):
         """ Query individual point to the binary """
@@ -529,7 +540,9 @@ class HiddenFunction(TestFunction, ABC):
         # Feed datapoint to binary
         z = x.tolist()
         data = " ".join(map(str, z))
-        cmd = "{}{}{} {}".format(self.packageloc, os.sep, self.funcloc, data)
+        cmd = "{}{}{}{}{} {}".format(self.packageloc, os.sep,
+                                     self.compiled_against, os.sep,
+                                     self.funcloc, data)
         stream = os.popen(cmd)
         output = stream.read()
         # Check if error occured
@@ -566,7 +579,6 @@ class FunctionFeeder:
     which will then feed the functions in the container one by one to the
     code in the loop.
     """
-
     def __init__(self):
         self.reset()
 
@@ -778,7 +790,6 @@ class Rastrigin(TestFunction):
     Args:
         dimensionality: Number of input dimensions the function should take.
     """
-
     def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -5.12, 5.12)
         self.a = 10
@@ -803,7 +814,6 @@ class Rosenbrock(TestFunction):
     This function has a dynamic dimensionality and is its application range is
     unbounded. There is no derivative defined.
     """
-
     def __init__(self, dimensionality=2, **kwargs):
         if dimensionality < 2:
             raise Exception("""Dimensionality of Rosenbrock function has to
@@ -831,7 +841,6 @@ class Beale(TestFunction):
     This is a 2-dimensional function with an application range of -4.5 to 4.5
     for both dimensions. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-4.5, 4.5], [-4.5, 4.5]]
         super(Beale, self).__init__(**kwargs)
@@ -854,7 +863,6 @@ class Booth(TestFunction):
     This is a 2-dimensional function bounded by -10 and 10 for both input
     dimensions. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
         super(Booth, self).__init__(**kwargs)
@@ -877,7 +885,6 @@ class BukinNmbr6(TestFunction):
     and -5 for the first input variable and -3 and 3 for the second input
     variable. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-15, -5], [-3, 3]]
         print(self)
@@ -900,7 +907,6 @@ class Matyas(TestFunction):
     This is a 2-dimensional function with an application range bounded by -10
     and 10 for both input variables. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
         super(Matyas, self).__init__(**kwargs)
@@ -922,7 +928,6 @@ class LeviNmbr13(TestFunction):
     This is a 2-dimensional function with an application range boundedd by -10
     and 10 for both input variables. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
         super(LeviNmbr13, self).__init__(**kwargs)
@@ -947,7 +952,6 @@ class Himmelblau(TestFunction):
     This is a 2-dimensional function with an application range bounded by -5
     and 5 for both input variables. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
         super(Himmelblau, self).__init__(**kwargs)
@@ -969,7 +973,6 @@ class ThreeHumpCamel(TestFunction):
     This is a 2-dimensional function with an application range bounded by -5
     and 5 for both input variables. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
         super(ThreeHumpCamel, self).__init__(**kwargs)
@@ -999,7 +1002,6 @@ class Sphere(TestFunction):
     initialisation of and instance of this class. For each of these dimensions
     the application range is unbounded.
     """
-
     def __init__(self, dimensionality=3, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
         super(Sphere, self).__init__(**kwargs)
@@ -1019,7 +1021,6 @@ class Ackley(TestFunction):
     This is a 2-dimensional function with an application range bounded by -5
     and 5 for each of these dimensions. No derivative has been defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
         super(Ackley, self).__init__(**kwargs)
@@ -1053,7 +1054,6 @@ class Easom(TestFunction):
             range [-1 * absolute_range, absolute_range]. Is set to 100 by
             default, as is customary for this function.
     """
-
     def __init__(self, absolute_range=100, **kwargs):
         self.ranges = [[-absolute_range, absolute_range],
                        [-absolute_range, absolute_range]]
@@ -1077,7 +1077,6 @@ class Cosine(TestFunction):
 
     The ranges have been set to [-4*pi, 4*pi].
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[-4 * np.pi, 4 * np.pi]]
         super(Cosine, self).__init__(**kwargs)
@@ -1112,7 +1111,6 @@ class Block(TestFunction):
             spanned by block_size. Default: 0.
 
     """
-
     def __init__(self,
                  dimensionality=3,
                  block_size=1,
@@ -1160,7 +1158,6 @@ class Bessel(TestFunction):
         fast: Boolean indicating which set of Bessel function implementations
             to use. See above for more information.
     """
-
     def __init__(self, fast=False, **kwargs):
         self.ranges = [[-100, 100]]
         self.fast = bool(fast)
@@ -1198,7 +1195,6 @@ class ModifiedBessel(TestFunction):
         fast: Boolean indicating which set of Bessel function implementations
             to use. See above for more information.
     """
-
     def __init__(self, fast=False, **kwargs):
         self.ranges = [[0, 10]]
         self.fast = bool(fast)
@@ -1225,7 +1221,6 @@ class Eggbox(TestFunction):
     This is a 2-dimensional function bounded 0 and 10*pi in each dimension. No
     derivative is defined.
     """
-
     def __init__(self, **kwargs):
         self.ranges = [[0, 10 * np.pi], [0, 10 * np.pi]]
         super(Eggbox, self).__init__(**kwargs)
@@ -1252,7 +1247,6 @@ class MultivariateNormal(TestFunction):
             matrix to use. By default is is set to the 2-dimensional unit
             matrix, making the function 2-dimensional.
     """
-
     def __init__(self, covariance=None, **kwargs):
         if covariance is None:
             covariance = np.identity(2)
@@ -1297,7 +1291,6 @@ class GaussianShells(TestFunction):
         w_2: Standard deviation of the second gaussian shell. By default this
             value is 0.1.
     """
-
     def __init__(self,
                  c_1=[2.5, 0],
                  r_1=2.0,
@@ -1341,7 +1334,6 @@ class Linear(TestFunction):
         dimensionality: Number of dimensions for input of the function. By
             default this argument is set to 2.
     """
-
     def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -10, 10)
         super(Linear, self).__init__(**kwargs)
@@ -1366,7 +1358,6 @@ class Reciprocal(TestFunction):
         dimensionality: Number of dimensions for input of the function. By
             default this argument is set to 2.
     """
-
     def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, 0.001, 1)
         super(Reciprocal, self).__init__(**kwargs)
@@ -1399,7 +1390,6 @@ class BreitWigner(TestFunction):
             it corresponds to the decay width of the particle of the resonance.
             Set to 15 by default.
     """
-
     def __init__(self, m=50, width=15, **kwargs):
         self.m = m
         self.width = width
@@ -1431,7 +1421,6 @@ class GoldsteinPrice(TestFunction):
     The application range of this function is -2 to 2 for both of the two input
     dimensions.
     """
-
     def __init__(self):
         self.ranges = [[-2, 2], [-2, 2]]
         super(GoldsteinPrice, self).__init__()
@@ -1461,7 +1450,6 @@ class Schwefel(TestFunction):
         dimensionality: Number of dimensions for input of the function. By
             default this argument is set to 5.
     """
-
     def __init__(self, dimensionality=5):
         self.ranges = self.construct_ranges(dimensionality, -500, 500)
         super(Schwefel, self).__init__()
@@ -1476,28 +1464,28 @@ class Schwefel(TestFunction):
 
 
 class HiddenFunction1(HiddenFunction):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(2, -30.0, 30.0)
-        super(HiddenFunction1, self).__init__()
+        super(HiddenFunction1, self).__init__(*args, **kwargs)
         self.funcloc = 'hidden_functions{}test_func_1.bin'.format(os.sep)
 
 
 class HiddenFunction2(HiddenFunction):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(4, -7.0, 7.0)
-        super(HiddenFunction2, self).__init__()
+        super(HiddenFunction2, self).__init__(*args, **kwargs)
         self.funcloc = 'hidden_functions{}test_func_2.bin'.format(os.sep)
 
 
 class HiddenFunction3(HiddenFunction):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(6, 0.0, 1.0)
-        super(HiddenFunction3, self).__init__()
+        super(HiddenFunction3, self).__init__(*args, **kwargs)
         self.funcloc = 'hidden_functions{}test_func_3.bin'.format(os.sep)
 
 
 class HiddenFunction4(HiddenFunction):
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(16, -500.0, 500.0)
-        super(HiddenFunction4, self).__init__()
+        super(HiddenFunction4, self).__init__(*args, **kwargs)
         self.funcloc = 'hidden_functions{}test_func_4.bin'.format(os.sep)
