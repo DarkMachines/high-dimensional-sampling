@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import shutil
 from high_dimensional_sampling import functions as func
