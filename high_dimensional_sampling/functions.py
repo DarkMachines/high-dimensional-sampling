@@ -550,6 +550,8 @@ class HiddenFunction(TestFunction, ABC):
         try:
             output = float(output)
         except ValueError:
+            if output == '':
+                output = 'Check entire traceback for error information'
             raise Exception("Error ('{}') for input '{}'".format(output, data))
         return output
 
