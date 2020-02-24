@@ -140,7 +140,7 @@ class PyScannerBit(hds.Procedure):
             print(format(farg), results_ps.get_best_fit(farg))
 
         # No way to get sampled function values from PS, so recalculate
-        y = function(x)
+        y = -function(x)
 
         return (x, y)
 
