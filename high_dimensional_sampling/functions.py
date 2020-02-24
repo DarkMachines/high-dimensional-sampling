@@ -528,8 +528,8 @@ class HiddenFunction(TestFunction, ABC):
             self.packageloc, os.sep))
         # Check if compiled_against is in this list
         if compiled_against not in versions:
-            raise Exception("""The hidden functions were not compiled against
-                {}. Use one of the following: {}""".format(
+            raise Exception("The hidden functions were not compiled against"
+                "{}. Use one of the following: {}".format(
                 compiled_against, versions))
         return compiled_against
 
