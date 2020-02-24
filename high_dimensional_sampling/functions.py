@@ -524,7 +524,8 @@ class HiddenFunction(TestFunction, ABC):
         if self.packageloc is None:
             self.packageloc = self._get_package_location()
         # Get included compile versions
-        versions = os.listdir(self.packageloc)
+        versions = os.listdir("{}{}hidden_functions".format(
+            self.packageloc, os.sep))
         # Check if compiled_against is in this list
         if compiled_against not in versions:
             raise Exception("""The hidden functions were not compiled against
