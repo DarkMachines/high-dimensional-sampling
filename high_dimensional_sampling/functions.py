@@ -510,7 +510,7 @@ class HiddenFunction(TestFunction, ABC):
     """
     def __init__(self, compiled_against="18.04", *args, **kwargs):
         self.packageloc = None
-        self.funcloc = None
+        self.funcname = None
         self.compiled_against = self._check_compile_version(compiled_against)
         super(HiddenFunction, self).__init__(*args, **kwargs)
 
@@ -541,9 +541,9 @@ class HiddenFunction(TestFunction, ABC):
         # Feed datapoint to binary
         z = x.tolist()
         data = " ".join(map(str, z))
-        cmd = "{}{}{}{}{} {}".format(self.packageloc, os.sep,
-                                     self.compiled_against, os.sep,
-                                     self.funcloc, data)
+        cmd = "{}{}hidden_functions{}{}{}{} {}".format(self.packageloc, os.sep,
+                                     os.sep, self.compiled_against, os.sep,
+                                     self.funcname, data)
         stream = os.popen(cmd)
         output = stream.read()
         # Check if error occured
@@ -1468,25 +1468,25 @@ class HiddenFunction1(HiddenFunction):
     def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(2, -30.0, 30.0)
         super(HiddenFunction1, self).__init__(*args, **kwargs)
-        self.funcloc = 'hidden_functions{}test_func_1.bin'.format(os.sep)
+        self.funcname = 'test_func_1.bin'
 
 
 class HiddenFunction2(HiddenFunction):
     def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(4, -7.0, 7.0)
         super(HiddenFunction2, self).__init__(*args, **kwargs)
-        self.funcloc = 'hidden_functions{}test_func_2.bin'.format(os.sep)
+        self.funcname = 'test_func_2.bin'
 
 
 class HiddenFunction3(HiddenFunction):
     def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(6, 0.0, 1.0)
         super(HiddenFunction3, self).__init__(*args, **kwargs)
-        self.funcloc = 'hidden_functions{}test_func_3.bin'.format(os.sep)
+        self.funcname = 'test_func_3.bin'
 
 
 class HiddenFunction4(HiddenFunction):
     def __init__(self, *args, **kwargs):
         self.ranges = self.construct_ranges(16, -500.0, 500.0)
         super(HiddenFunction4, self).__init__(*args, **kwargs)
-        self.funcloc = 'hidden_functions{}test_func_4.bin'.format(os.sep)
+        self.funcname = 'test_func_4.bin'
