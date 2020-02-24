@@ -30,7 +30,7 @@ def test_hiddenfunctions_general():
 
 def test_hiddenfunctions_all():
     function = func.HiddenFunction1()
-    x = np.raxndom.rand(10, 2)
+    x = np.random.rand(10, 2)
     assert function(x).shape[0] == len(x)
     function = func.HiddenFunction2()
     x = np.random.rand(7, 4)
