@@ -41,6 +41,10 @@ by using the --user argument. For instance:
 pip3 install --user .
 ```
 
+## How to use the package
+
+Documentation on how to use the package can be found on the [Project Wiki](https://github.com/DarkMachines/high-dimensional-sampling/wiki).
+
 ## Examples
 
 Examples can be found in the [examples](examples) folder.
