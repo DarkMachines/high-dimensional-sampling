@@ -26,26 +26,19 @@ class PyScannerBit(hds.Procedure):
                  polychord_tol=1.0,
                  polychord_nlive=20,
                  diver_convthresh=1e-2,
-                 diver_np=300,
+                 diver_NP=300,
                  twalk_sqrtr=1.05,
                  random_point_number=10000,
                  toy_mcmc_point_number=10,
                  badass_points=1000,
                  badass_jumps=10,
-                 pso_np=400):
-        self.store_parameters = ['scanner',
-                                 'multinest_tol',
-                                 'multinest_nlive',
-                                 'polychord_tol',
-                                 'polychord_nlive',
-                                 'diver_convthresh',
-                                 'diver_NP',
-                                 'twalk_sqrtr',
-                                 'random_point_number',
-                                 'toy_mcmc_point_number',
-                                 'badass_points',
-                                 'badass_jumps',
-                                 'pso_NP']
+                 pso_NP=400):
+        self.store_parameters = [
+            'scanner', 'multinest_tol', 'multinest_nlive', 'polychord_tol',
+            'polychord_nlive', 'diver_convthresh', 'diver_NP', 'twalk_sqrtr',
+            'random_point_number', 'toy_mcmc_point_number', 'badass_points',
+            'badass_jumps', 'pso_NP'
+        ]
 
         # Check if import was succesfull
         # Raise Error if this fails (not all necessary packages are available)
@@ -64,30 +57,39 @@ class PyScannerBit(hds.Procedure):
         self.polychord_tol = polychord_tol
         self.polychord_nlive = polychord_nlive
         self.diver_convthresh = diver_convthresh
-        self.diver_np = diver_np
+        self.diver_NP = diver_NP
         self.twalk_sqrtr = twalk_sqrtr
         self.random_point_number = random_point_number
         self.toy_mcmc_point_number = toy_mcmc_point_number
         self.badass_points = badass_points
         self.badass_jumps = badass_jumps
-        self.pso_np = pso_np
+        self.pso_NP = pso_NP
         self.reset()
 
     def __call__(self, function):
         scanner_options = {}
-        scanner_options["multinest"] = {"tol": self.multinest_tol,
-                                        "nlive": self.multinest_nlive}
-        scanner_options["polychord"] = {"tol": self.polychord_tol,
-                                        "nlive": self.polychord_nlive}
-        scanner_options["diver"] = {"convthresh": self.diver_convthresh,
-                                    "NP": self.diver_np}
+        scanner_options["multinest"] = {
+            "tol": self.multinest_tol,
+            "nlive": self.multinest_nlive
+        }
+        scanner_options["polychord"] = {
+            "tol": self.polychord_tol,
+            "nlive": self.polychord_nlive
+        }
+        scanner_options["diver"] = {
+            "convthresh": self.diver_convthresh,
+            "NP": self.diver_NP
+        }
         scanner_options["twalk"] = {"sqrtR": self.twalk_sqrtr}
         scanner_options["random"] = {"point_number": self.random_point_number}
-        scanner_options["toy_mcmc"] = {"point_number":
-                                       self.toy_mcmc_point_number}
-        scanner_options["badass"] = {"points": self.badass_points,
-                                     "jumps": self.badass_jumps}
-        scanner_options["pso"] = {"NP": self.pso_np}
+        scanner_options["toy_mcmc"] = {
+            "point_number": self.toy_mcmc_point_number
+        }
+        scanner_options["badass"] = {
+            "points": self.badass_points,
+            "jumps": self.badass_jumps
+        }
+        scanner_options["pso"] = {"NP": self.pso_NP}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
         # and the maxima 0.001 down, in order to make use the sampling is not
@@ -114,14 +116,14 @@ class PyScannerBit(hds.Procedure):
         def prior(vec, map):
             iii = 0
             for argument in fargs:
-                map[argument] = (ranges[iii][0]
-                                 + (ranges[iii][1]-ranges[iii][0])*vec[iii])
+                map[argument] = (ranges[iii][0] +
+                                 (ranges[iii][1] - ranges[iii][0]) * vec[iii])
                 iii = iii + 1
 
         myscan = sb.Scan(simple,
                          bounds=ranges,
                          prior_func=prior,
-                         prior_types=["flat"]*dimensions,
+                         prior_types=["flat"] * dimensions,
                          scanner=self.scanner,
                          scanner_options=scanner_options[self.scanner],
                          fargs=fargs)
