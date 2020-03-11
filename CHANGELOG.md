@@ -5,6 +5,12 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 ## Unreleased
 
+## Added
+
+### Changed
+
+* Some print commands that were left from a debugging era are now removed.
+
 ### Fixed
 
 * When using the `invert` method on a wrapped function, the original function

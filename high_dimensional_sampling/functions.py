@@ -893,7 +893,6 @@ class BukinNmbr6(TestFunction):
     """
     def __init__(self, **kwargs):
         self.ranges = [[-15, -5], [-3, 3]]
-        print(self)
         super(BukinNmbr6, self).__init__(**kwargs)
 
     def _evaluate(self, x):
