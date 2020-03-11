@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import os
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
@@ -394,7 +395,7 @@ class SimpleFunctionWrapper:
         if not isinstance(function, TestFunction):
             raise Exception("SimpleFunctionWrapper can only wrap instances of"
                             "the TestFunction class.")
-        self.function = function
+        self.function = deepcopy(function)
 
     def __call__(self, *args, **kwargs):
         """
@@ -490,7 +491,7 @@ class SimpleFunctionWrapper:
         """ Invert evaluations of the TestFunction (i.e. multiply them with
         -1). See documentation for TestFunction.invert() for more information.
         """
-        return self.function.invert()
+        return self.function.invert(inverted)
 
 
 class SimpleFunctionWrapperWithScan(SimpleFunctionWrapper):

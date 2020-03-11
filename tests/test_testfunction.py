@@ -245,7 +245,7 @@ def test_simplefunctionwrapper_call():
     z_evaluated = wrapped(x[:, 0], x[:, 1], x[:, 2])
     wrapped.invert()
     assert np.array_equal(z_evaluated, -1*wrapped(x[:, 0], x[:, 1], x[:, 2]))
-    tmp.invert(False)
+    wrapped.invert(False)
     assert np.array_equal(z_evaluated, wrapped(x[:, 0], x[:, 1], x[:, 2]))
     # Test what happens when just numbers are provided
     z = wrapped._create_input_array([1, 2, 3])
@@ -286,4 +286,20 @@ def test_return_wrapper():
     tmp = TmpFunction()
     tmp_wrapped = tmp.get_simple_interface()
     assert isinstance(tmp_wrapped, func.SimpleFunctionWrapper)
-    assert tmp == tmp_wrapped.function
+    assert isinstance(tmp, type(tmp_wrapped.function))
+
+
+def test_invertion():
+    tmp = TmpFunction()
+    tmp_wrapped = tmp.get_simple_interface()
+    x = np.random.rand(1, 2)
+
+    y_normal = tmp(x)
+    y_wrapped_normal = tmp_wrapped(x[:, 0], x[:, 1])
+    tmp_wrapped.invert()
+    y_normal_inverted = tmp(x)
+    y_wrapped_inverted = tmp_wrapped(x[:, 0], x[:, 1])
+
+    assert np.array_equal(y_wrapped_normal, y_normal)
+    assert np.array_equal(y_normal, -y_wrapped_inverted)
+    assert np.array_equal(y_normal, y_normal_inverted)
