@@ -3,9 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+## Unreleased
+
+### Fixed
+
+* When using the `invert` method on a wrapped function, the original function
+  was also inverted. This was solved by having the `get_simple_interface()`
+  and `get_simple_interface_with_scan` methods use copies of the original
+  function.
+
 ## Version 0.2.0 (Monday February 17th, 2020)
 
 ### Added
+
 * A submodule `results` that implements functionality to visualise or format
   the results of one or more experiments into neat little plots and tables.
   Accompanying this new submodule is a new example script.
@@ -32,6 +42,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Several optimisation procedures were added.
 
 ### Changed
+
 * The examples now use relative path indications for storage of their results,
   so that the examples can be used out of the box without errors.
 * The package indicator in setup.py now is more general, allowing for easier
@@ -44,6 +55,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   in the FunctionFeeder.
 
 ### Fixed
+
 * An error was raised when GaussianShells was logged, as this function stores
   its parameters internally as numpy arrays. These don't translate well to
   .yaml files. This has been solved by forcing the storage of function 
@@ -53,9 +65,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   work with dataframes now, as was intended.
   
 ---
+
 ## Version 0.1.1 (Tuesday August 20th, 2019)
 
 ### Added
+
 * A `get_ranges` method in the TestFunction class. It returns the ranges of the
   test function, taking a leeway parameter epsilon provided to the method into
   account: all minima will be raised by epsilon, all maxima will be reduced by
@@ -73,15 +87,18 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   the logged time includes also the overhead introduced by the HDS package
   itself.
 * The following test functions are added:
-    * BreitWigner
-    * Reciprocal
+
+  * BreitWigner
+  * Reciprocal
 
 ### Changed
+
 * Increased the readability of the error message given when a test function is
   queried for its value outside of the box defined by its ranges parameter.
 * The `utils.get_time` method now returns time in seconds
 
 ### Fixed
+
 * Ackley, Easom and Sphere test functions returned data in an incorrect shape.
   This has been corrected.
 * The GaussianShells test function mapped multi-point input to a single output
