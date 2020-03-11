@@ -9,10 +9,14 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 ### Changed
 
-* Some print commands that were left from a debugging era are now removed.
+* As `pygmo` cannot be installed through the pip installer, it has been
+  removed from installation requirements in the `setup.py` file. This will only
+  yield error messages when the `pygmo` package is actually requested by the
+  implemented pygmo Procedure.
 
 ### Fixed
 
+* Some print commands that were left from a debugging era are now removed.
 * When using the `invert` method on a wrapped function, the original function
   was also inverted. This was solved by having the `get_simple_interface()`
   and `get_simple_interface_with_scan` methods use copies of the original
