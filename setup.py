@@ -21,7 +21,7 @@ setup(
     long_description=readme + '\n\n',
     author="Joeri Hermans, Bob Stienen",
     author_email='joeri.hermans@doct.uliege.be, b.stienen@science.ru.nl',
-    url='https://github.com/darkMmchines/high_dimensional_sampling',
+    url='https://github.com/darkmachines/high_dimensional_sampling',
     #packages=[
     #    'high_dimensional_sampling',
     #],
@@ -44,7 +44,7 @@ setup(
     test_suite='tests',
     install_requires=[
         'pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'gpyopt', 'cma',
-        'turbo @ git+ssh://git@github.com/uber-research/TuRBO.git'],
+        'turbo @ git+ssh://git@github.com/uber-research/TuRBO'],
          # FIXME: add your package's dependencies to this list
     setup_requires=[
     #    # dependency for `python setup.py test`
