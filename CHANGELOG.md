@@ -10,6 +10,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * [TuRBO](https://github.com/uber-research/TuRBO) is now implemented as a
   Procedure in the `optimisation` module. The code, and an example use, can be
   found in the `examples` folder as well.
+* Additional tests on the shape of input data for test functions and on the
+  shape of output data from procedures. This change was made to accomodate the
+  usage of the TuRBO package.
 
 ### Changed
 
