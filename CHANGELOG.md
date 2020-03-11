@@ -7,6 +7,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 ## Added
 
+* Additional tests on the shape of input data for test functions and on the
+  shape of output data from procedures. This change was made to accomodate the
+  usage of the TuRBO package.
+
 ### Changed
 
 * As `pygmo` cannot be installed through the pip installer, it has been
