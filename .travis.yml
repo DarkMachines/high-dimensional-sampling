@@ -25,6 +25,7 @@ install:
     - pip install pyyaml matplotlib
     - pip install gpyopt
     - python setup.py install
+    - pip install git+https://github.com/uber-research/TuRBO.git
 
 before_script:
     # Test for pep-compliance
