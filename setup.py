@@ -44,7 +44,7 @@ setup(
     test_suite='tests',
     install_requires=[
         'pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'gpyopt', 'cma',
-        'turbo @ git+ssh://git@github.com/uber-research/TuRBO'],
+        'turbo @ git+https://github.com/uber-research/TuRBO.git'],
          # FIXME: add your package's dependencies to this list
     setup_requires=[
     #    # dependency for `python setup.py test`
