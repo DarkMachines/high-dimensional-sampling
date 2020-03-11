@@ -7,6 +7,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 ## Added
 
+* [TuRBO](https://github.com/uber-research/TuRBO) is now implemented as a
+  Procedure in the `optimisation` module. The code, and an example use, can be
+  found in the `examples` folder as well.
+
 ### Changed
 
 * As `pygmo` cannot be installed through the pip installer, it has been

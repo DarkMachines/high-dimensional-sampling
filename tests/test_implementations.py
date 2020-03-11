@@ -25,6 +25,7 @@ def test_optimisation_implementations(tmp_path):
         optimisation.GPyOpt,
         optimisation.CMAOptimisation,
         optimisation.Ampgo,
+        optimisation.TuRBO
         # optimisation.Pygmo,  # excluded because of a mandatory install
         # optimisation.PyScannerBit  # excluded because of a mandatory install
     ]
