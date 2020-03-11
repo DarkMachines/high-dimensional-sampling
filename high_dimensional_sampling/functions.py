@@ -245,12 +245,12 @@ class TestFunction(ABC):
                 lists and pandas dataframes are allowed.""".format(
                     type(x).__name__))
         return array
-    
+
     def reshape_flat_array(self, x):
         """
         Reshapes a flat array to a 2-dimensional array. The shape of this new
-        array depends on the dimensionality of the TestFunction. 
-        
+        array depends on the dimensionality of the TestFunction.
+
         If the input array has shape `(a,)`, the output of this function will
         have shape `(1, a)` if `a` equals the dimensionality of the
         TestFunction. In any other case the output will have a shape of
@@ -271,7 +271,7 @@ class TestFunction(ABC):
             else:
                 return (False, copy(x).rehshape(-1, 1))
         return (False, x)
-        
+
     def construct_ranges(self, dimensionality, minimum, maximum):
         """
         Constructs the application range of the test function for a dynamic
