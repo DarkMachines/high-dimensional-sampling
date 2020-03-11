@@ -16,6 +16,12 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 ### Fixed
 
+* Some print commands that were left from a debugging era are now removed.
+* When using the `invert` method on a wrapped function, the original function
+  was also inverted. This was solved by having the `get_simple_interface()`
+  and `get_simple_interface_with_scan` methods use copies of the original
+  function.
+
 ## Version 0.2.0 (Monday February 17th, 2020)
 
 ### Added
