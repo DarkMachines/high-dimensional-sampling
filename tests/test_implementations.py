@@ -18,20 +18,19 @@ def test_posterior_implementations(tmp_path):
 
 
 def test_optimisation_implementations(tmp_path):
-    # These are the classes to test
-    classes = [
-        optimisation.RandomOptimisation,
-        optimisation.ParticleFilter,
-        optimisation.GPyOpt,
-        optimisation.CMAOptimisation,
-        optimisation.Ampgo,
-        optimisation.TuRBO
+    # These are the implementations to test
+    implementations = [
+        optimisation.RandomOptimisation(),
+        optimisation.ParticleFilter(),
+        optimisation.GPyOpt(),
+        optimisation.CMAOptimisation(),
+        optimisation.Ampgo(),
+        optimisation.TuRBO(max_evals=11, n_training_steps=30)
         # optimisation.Pygmo,  # excluded because of a mandatory install
         # optimisation.PyScannerBit  # excluded because of a mandatory install
     ]
 
-    for procedure_class in classes:
-        procedure = procedure_class()
+    for procedure in implementations:
         experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
         experiment.run(func.Himmelblau(), finish_line=250)
         shutil.rmtree(str(tmp_path))
