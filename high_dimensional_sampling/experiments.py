@@ -521,7 +521,6 @@ class Logger:
                     info['procedure']['properties'][prop] = info['procedure'][
                         'properties'][prop].tolist()
             # Convert information to yaml and write to file
-            print(info)
             yaml.dump(info, handle, default_flow_style=False)
 
     def log_results(self, metrics):
