@@ -1469,28 +1469,28 @@ class Schwefel(TestFunction):
 
 
 class HiddenFunction1(HiddenFunction):
-    def __init__(self, *args, **kwargs):
-        self.ranges = self.construct_ranges(2, -30.0, 30.0)
+    def __init__(self, dimensionality=2, *args, **kwargs):
+        self.ranges = self.construct_ranges(dimensionality, -30.0, 30.0)
         super(HiddenFunction1, self).__init__(*args, **kwargs)
         self.funcname = 'test_func_1.bin'
 
 
 class HiddenFunction2(HiddenFunction):
-    def __init__(self, *args, **kwargs):
-        self.ranges = self.construct_ranges(4, -7.0, 7.0)
+    def __init__(self, dimensionality=4, *args, **kwargs):
+        self.ranges = self.construct_ranges(dimensionality, -7.0, 7.0)
         super(HiddenFunction2, self).__init__(*args, **kwargs)
         self.funcname = 'test_func_2.bin'
 
 
 class HiddenFunction3(HiddenFunction):
-    def __init__(self, *args, **kwargs):
-        self.ranges = self.construct_ranges(6, 0.0, 1.0)
+    def __init__(self, dimensionality=6, *args, **kwargs):
+        self.ranges = self.construct_ranges(dimensionality, 0.0, 1.0)
         super(HiddenFunction3, self).__init__(*args, **kwargs)
         self.funcname = 'test_func_3.bin'
 
 
 class HiddenFunction4(HiddenFunction):
-    def __init__(self, *args, **kwargs):
-        self.ranges = self.construct_ranges(16, -500.0, 500.0)
+    def __init__(self, dimensionality=16, *args, **kwargs):
+        self.ranges = self.construct_ranges(dimensionality, -500.0, 500.0)
         super(HiddenFunction4, self).__init__(*args, **kwargs)
         self.funcname = 'test_func_4.bin'
