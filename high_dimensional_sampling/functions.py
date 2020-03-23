@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import os
-from copy import deepcopy
+from copy import copy, deepcopy
 
 import numpy as np
 import pandas as pd
@@ -68,6 +68,7 @@ class TestFunction(ABC):
         # Convert input information to numpy array
         x = self.to_numpy_array(x)
         # Check if dimensionality and ranges of the input are correct
+        did_reshape, x = self.reshape_flat_array(x)
         self.check_dimensionality(x.shape)
         self.check_ranges(x, epsilon)
         # Start time for function call
@@ -82,7 +83,9 @@ class TestFunction(ABC):
         self.counter.append([len(x), get_time() - t_start, bool(derivative)])
         # Return value
         if self.inverted:
-            return -1 * value
+            value = -1 * value
+        if did_reshape:
+            value = value[0, 0]
         return value
 
     def reset(self):
@@ -231,15 +234,43 @@ class TestFunction(ABC):
                 arrays, list and pandas dataframes are allowed.
         """
         if isinstance(x, np.ndarray):
-            return x
-        if isinstance(x, list):
-            return np.array(x)
-        if isinstance(x, pd.DataFrame):
-            return x.values
-        raise Exception(
-            """"Testfunctions don't accept {} as input: only numpy arrays,
-            lists and pandas dataframes are allowed.""".format(
-                type(x).__name__))
+            array = x
+        elif isinstance(x, list):
+            array = np.array(x)
+        elif isinstance(x, pd.DataFrame):
+            array = x.values
+        else:
+            raise Exception(
+                """"Testfunctions don't accept {} as input: only numpy arrays,
+                lists and pandas dataframes are allowed.""".format(
+                    type(x).__name__))
+        return array
+
+    def reshape_flat_array(self, x):
+        """
+        Reshapes a flat array to a 2-dimensional array. The shape of this new
+        array depends on the dimensionality of the TestFunction.
+
+        If the input array has shape `(a,)`, the output of this function will
+        have shape `(1, a)` if `a` equals the dimensionality of the
+        TestFunction. In any other case the output will have a shape of
+        `(a, 1)`. Not flattened arrays will be returned without changing them.
+
+        Args:
+            x: Data of type numpy.ndarray.
+
+        Returns:
+            did_change_array: boolean indicating if the array was changed. This
+                will only be `True` if `a` equals the dimensionality of the
+                Test Function (see above for explanation).
+            array: Reshaped array.
+        """
+        if len(x.shape) == 1:
+            if x.shape[0] == self.get_dimensionality():
+                return (True, copy(x).reshape(1, -1))
+            else:
+                return (False, copy(x).rehshape(-1, 1))
+        return (False, x)
 
     def construct_ranges(self, dimensionality, minimum, maximum):
         """
