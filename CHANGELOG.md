@@ -1,11 +1,40 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-This project adheres to `Semantic Versioning <http://semver.org/>`_.
+This project adheres to [Semantic Versioning](http://semver.org/).
+
+## Unreleased
+
+## Added
+
+* [TuRBO](https://github.com/uber-research/TuRBO) is now implemented as a
+  Procedure in the `optimisation` module. The code, and an example use, can be
+  found in the `examples` folder as well.
+* Additional tests on the shape of input data for test functions and on the
+  shape of output data from procedures. This change was made to accomodate the
+  usage of the TuRBO package.
+* The dimensionality of hidden `TestFunction`s can now be changed with the
+  `dimensionality` argument at initialisation of the class.
+
+### Changed
+
+* As `pygmo` cannot be installed through the pip installer, it has been
+  removed from installation requirements in the `setup.py` file. This will only
+  yield error messages when the `pygmo` package is actually requested by the
+  implemented pygmo Procedure.
+
+### Fixed
+
+* Some print commands that were left from a debugging era are now removed.
+* When using the `invert` method on a wrapped function, the original function
+  was also inverted. This was solved by having the `get_simple_interface()`
+  and `get_simple_interface_with_scan` methods use copies of the original
+  function.
 
 ## Version 0.2.0 (Monday February 17th, 2020)
 
 ### Added
+
 * A submodule `results` that implements functionality to visualise or format
   the results of one or more experiments into neat little plots and tables.
   Accompanying this new submodule is a new example script.
@@ -32,6 +61,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Several optimisation procedures were added.
 
 ### Changed
+
 * The examples now use relative path indications for storage of their results,
   so that the examples can be used out of the box without errors.
 * The package indicator in setup.py now is more general, allowing for easier
@@ -44,6 +74,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   in the FunctionFeeder.
 
 ### Fixed
+
 * An error was raised when GaussianShells was logged, as this function stores
   its parameters internally as numpy arrays. These don't translate well to
   .yaml files. This has been solved by forcing the storage of function 
@@ -53,9 +84,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   work with dataframes now, as was intended.
   
 ---
+
 ## Version 0.1.1 (Tuesday August 20th, 2019)
 
 ### Added
+
 * A `get_ranges` method in the TestFunction class. It returns the ranges of the
   test function, taking a leeway parameter epsilon provided to the method into
   account: all minima will be raised by epsilon, all maxima will be reduced by
@@ -73,15 +106,18 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
   the logged time includes also the overhead introduced by the HDS package
   itself.
 * The following test functions are added:
-    * BreitWigner
-    * Reciprocal
+
+  * BreitWigner
+  * Reciprocal
 
 ### Changed
+
 * Increased the readability of the error message given when a test function is
   queried for its value outside of the box defined by its ranges parameter.
 * The `utils.get_time` method now returns time in seconds
 
 ### Fixed
+
 * Ackley, Easom and Sphere test functions returned data in an incorrect shape.
   This has been corrected.
 * The GaussianShells test function mapped multi-point input to a single output

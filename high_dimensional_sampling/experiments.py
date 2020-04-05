@@ -96,6 +96,14 @@ class Experiment(ABC):
             t_start = get_time()
             x, y = self.procedure(self.function)
             dt = get_time() - t_start
+            # Reshape output arrays to match expectation
+            if len(x.shape) == 1:
+                if x.shape[0] == self.function.get_dimensionality():
+                    x = x.reshape((1, -1))
+                else:
+                    x = x.reshape((-1, 1))
+            if len(y.shape) == 1:
+                y = y.reshape((len(x), 1))
             self._event_new_samples(x, y)
             # Log procedure call
             n = len(x)
@@ -521,7 +529,6 @@ class Logger:
                     info['procedure']['properties'][prop] = info['procedure'][
                         'properties'][prop].tolist()
             # Convert information to yaml and write to file
-            print(info)
             yaml.dump(info, handle, default_flow_style=False)
 
     def log_results(self, metrics):
