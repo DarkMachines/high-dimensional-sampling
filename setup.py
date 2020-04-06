@@ -57,6 +57,7 @@ setup(
         'pytest',
         'pytest-cov',
         'pycodestyle',
+        'numpy==1.15.4',
         'gpyopt',
         'cma',
         'turbo @ git+https://github.com/uber-research/TuRBO.git',
