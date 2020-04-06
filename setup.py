@@ -43,8 +43,7 @@ setup(
     ],
     test_suite='tests',
     install_requires=[
-        'pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'gpyopt', 'cma',
-        'turbo @ git+https://github.com/uber-research/TuRBO.git', 'openopt'],
+        'pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn'],
          # FIXME: add your package's dependencies to this list
     setup_requires=[
     #    # dependency for `python setup.py test`
@@ -57,7 +56,11 @@ setup(
     tests_require=[
         'pytest',
         'pytest-cov',
-        'pycodestyle'
+        'pycodestyle',
+        'gpyopt',
+        'cma',
+        'turbo @ git+https://github.com/uber-research/TuRBO.git',
+        'openopt'
     ],
     extras_require={
         'dev':  ['prospector[with_pyroma]', 'yapf', 'isort'],
