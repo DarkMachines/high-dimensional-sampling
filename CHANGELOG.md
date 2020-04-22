@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-This project adheres to `Semantic Versioning <http://semver.org/>`_.
+This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
@@ -13,6 +13,8 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Additional tests on the shape of input data for test functions and on the
   shape of output data from procedures. This change was made to accomodate the
   usage of the TuRBO package.
+* The dimensionality of hidden `TestFunction`s can now be changed with the
+  `dimensionality` argument at initialisation of the class.
 
 ### Changed
 
