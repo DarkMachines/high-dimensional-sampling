@@ -43,8 +43,11 @@ setup(
     ],
     test_suite='tests',
     install_requires=[
-        'pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn', 'gpyopt', 'cma',
-        'turbo @ git+https://github.com/uber-research/TuRBO.git'],
+        'pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn',
+        'gpyopt',
+        'cma',
+        'turbo @ git+https://github.com/uber-research/TuRBO.git',
+        'openopt'],
          # FIXME: add your package's dependencies to this list
     setup_requires=[
     #    # dependency for `python setup.py test`

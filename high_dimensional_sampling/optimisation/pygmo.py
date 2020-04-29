@@ -3,7 +3,7 @@ import high_dimensional_sampling as hds
 try:
     import pygmo as pg  # noqa: F401
     from pygmo import *  # noqa: F403, F401
-except Exception:
+except ImportError:
     pass
 import numpy as np
 
@@ -105,7 +105,9 @@ class Pygmo(hds.Procedure):
         try:
             pg
         except NameError:
-            raise ImportError("The `pygmo` package is not installed.")
+            raise ImportError(
+                "The `pygmo` package is not installed. See the wiki on our "
+                "GitHub project for installation instructions.")
 
         self.store_parameters = [
             'scanner', 'gen', 'variant', 'allowed_variants', 'variant_adptv',
@@ -474,8 +476,7 @@ class Pygmo(hds.Procedure):
         else:
             print(
                 'The ' + self.scanner + ' algorithm is not implemented. The '
-                'list of algorithms available is',
-                algorithms)
+                'list of algorithms available is', algorithms)
             sys.exit()
 
         # add verbosing flag

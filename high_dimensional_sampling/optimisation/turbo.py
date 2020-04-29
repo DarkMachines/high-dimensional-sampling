@@ -1,6 +1,9 @@
 import high_dimensional_sampling as hds
 import numpy as np
-from turbo import TurboM
+try:
+    from turbo import TurboM
+except ImportError:
+    pass
 import sys
 
 
@@ -11,6 +14,14 @@ class TuRBO(hds.Procedure):
                  max_cholesky_size=2000,
                  n_training_steps=50,
                  batch_size=10):
+
+        try:
+            TurboM
+        except NameError:
+            raise ImportError(
+                "The `turbo` package is not installed. See the wiki on our "
+                "GitHub project for installation instructions.")
+
         self.max_evals = max_evals
         self.trust_regions = trust_regions
         self.max_cholesky_size = max_cholesky_size

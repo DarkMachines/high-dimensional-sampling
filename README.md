@@ -16,14 +16,14 @@ python that is run when calling python3
 python3 --version
 ```
 
-If this version is >=3.5, the package can be installed by running the following
+If this version is >=3.6, the package can be installed by running the following
 command from the project folder:
 
 ```
 pip3 install .
 ```
 
-If you are running an older version of python than version 3.5 by default,
+If you are running an older version of python than version 3.6 by default,
 check if a newer version of python is installed on your machine. If not,
 install this new version. Otherwise, run the pip3 install command from the
 python command itself. For instance, for python version 3.7, you need to run
@@ -40,6 +40,11 @@ by using the --user argument. For instance:
 ```
 pip3 install --user .
 ```
+
+This installs the HDS package, but not all possible dependencies for the
+implemented sampling procedures. Depending on which procedures you plan to
+use, you need to install these as well. Instructions on which dependencies 
+these are, see the [Project Wiki](https://github.com/DarkMachines/high-dimensional-sampling/wiki/Procedures-and-installation-instructions).
 
 ## How to use the package
 

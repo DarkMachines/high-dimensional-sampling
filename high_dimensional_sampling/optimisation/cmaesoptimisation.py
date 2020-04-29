@@ -7,7 +7,11 @@ It is implicitly assumed that the parameters to be optimized in the function
 have been scaled properly to be of the order of 1. """
 import high_dimensional_sampling as hds
 import numpy as np
-import cma
+
+try:
+    import cma
+except ImportError:
+    pass
 
 
 class CMAOptimisation(hds.Procedure):
@@ -16,6 +20,13 @@ class CMAOptimisation(hds.Procedure):
         Initializes the algorithm.  The options dictionary is passed to the
         CMAOptions object
         """
+        try:
+            cma
+        except NameError:
+            raise ImportError(
+                "The `cma` package is not installed. See the wiki on our "
+                "GitHub project for installation instructions.")
+
         self.store_parameters = []
         self.opts = cma.CMAOptions()
         self.opts.init(options)
