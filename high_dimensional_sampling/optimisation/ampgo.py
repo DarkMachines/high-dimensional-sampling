@@ -424,7 +424,7 @@ class Ampgo(hds.Procedure):
         return yf
 
     def get_initial_position(self, ranges, n_sample_initial):
-        x = [uniform(l, u) for l, u in ranges]
+        x = [uniform(left, right) for left, right in ranges]
         return x
 
     def get_point(self, ranges, stdev=0.01, n_sample=1):
