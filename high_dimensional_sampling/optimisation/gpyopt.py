@@ -5,7 +5,10 @@
 import high_dimensional_sampling as hds
 import numpy as np
 
-import GPyOpt as gp
+try:
+    import GPyOpt as gp
+except ImportError:
+    pass
 
 
 class GPyOpt(hds.Procedure):
@@ -18,6 +21,14 @@ class GPyOpt(hds.Procedure):
                  max_iter=1000,
                  max_time=300,
                  eps=1e-6):
+
+        try:
+            gp
+        except NameError:
+            raise ImportError(
+                "The `GPyOpt` package is not installed. See the wiki on our "
+                "GitHub project for installation instructions.")
+
         self.store_parameters = ['initial_design_numdata',
                                  'aquisition_type',
                                  'exact_feval',

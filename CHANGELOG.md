@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-This project adheres to `Semantic Versioning <http://semver.org/>`_.
+This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
@@ -16,6 +16,8 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Argument `verbose` to Experiment initialisation method. This method controls
   the output of intermediate results (#samples for the #procedure_calls). See
   documentation of __init__ of the Experiment class for more information.
+* The dimensionality of hidden `TestFunction`s can now be changed with the
+  `dimensionality` argument at initialisation of the class.
 
 ### Changed
 
