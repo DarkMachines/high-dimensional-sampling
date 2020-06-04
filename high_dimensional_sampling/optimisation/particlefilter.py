@@ -321,8 +321,11 @@ def weighing_stochastic_uniform(algorithm, n, samples, values):
 
 def weighing_stochastic_linear(algorithm, n, samples, values):
     z = values - np.amin(values)
-    z = 1 - (z / np.amax(z))
-    probabilities = z / np.sum(z)
+    if len(np.unique(z)) != 1:
+        z = 1 - (z / np.amax(z))
+        probabilities = z / np.sum(z)
+    else:
+        probabilities = np.ones(len(z))/len(z)
     indices = np.random.choice(len(samples), n, p=probabilities.flatten())
     return (samples[indices], values[indices])
 
