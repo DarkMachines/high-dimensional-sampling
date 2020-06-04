@@ -13,6 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Additional tests on the shape of input data for test functions and on the
   shape of output data from procedures. This change was made to accomodate the
   usage of the TuRBO package.
+* Argument `verbose` to Experiment initialisation method. This method controls
+  the output of intermediate results (#samples for the #procedure_calls). See
+  documentation of __init__ of the Experiment class for more information.
 * The dimensionality of hidden `TestFunction`s can now be changed with the
   `dimensionality` argument at initialisation of the class.
 
@@ -30,6 +33,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   was also inverted. This was solved by having the `get_simple_interface()`
   and `get_simple_interface_with_scan` methods use copies of the original
   function.
+* The weighing_stochastic_linear function in the particle filter optimisation
+  method could occasionally raise errors related to `nan` probabilities. This
+  is now fixed.
+* The gaussian constructors needed for the particle filter could return negative
+  results. As the output represents standard deviations, this is unexpected
+  behaviour. The absolute value of the standard deviation is now returned
+  instead.
 
 ## Version 0.2.0 (Monday February 17th, 2020)
 

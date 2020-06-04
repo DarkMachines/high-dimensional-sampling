@@ -51,7 +51,7 @@ class ParticleFilter(hds.Procedure):
             width_decay: Decay parameter for the width. Used by the width
                 scheduler. Default: 0.95.
             gaussian_constructor: Function that returns the stdevs of the
-                gaussians to use. Default: `self.gaussian_constructor_linear`.
+                gaussians to use. Default: `gaussian_constructor_linear`.
             inf_replace: Number to replace infinities in ranges with.
                 Default: 1e9.
         """
@@ -264,14 +264,14 @@ def gaussian_constructor_linear(algorithm, samples, values):
     width = algorithm.determine_gaussian_width()
     ranges = algorithm.ranges[:, 1] - algorithm.ranges[:, 0]
     ranges[ranges == 0] = 1.0
-    return width * ranges * np.ones(samples.shape)
+    return np.abs(width * ranges * np.ones(samples.shape))
 
 
 def gaussian_constructor_log(algorithm, samples, values):
     width = algorithm.determine_gaussian_width()
     ranges = algorithm.ranges[:, 1] - algorithm.ranges[:, 0]
     ranges[ranges == 0] = 1.0
-    return width * ranges * samples
+    return np.abs(width * ranges * samples)
 
 
 """ =========================================== Width parameter methods === """
@@ -321,8 +321,11 @@ def weighing_stochastic_uniform(algorithm, n, samples, values):
 
 def weighing_stochastic_linear(algorithm, n, samples, values):
     z = values - np.amin(values)
-    z = 1 - (z / np.amax(z))
-    probabilities = z / np.sum(z)
+    if len(np.unique(z)) != 1:
+        z = 1 - (z / np.amax(z))
+        probabilities = z / np.sum(z)
+    else:
+        probabilities = np.ones(len(z))/len(z)
     indices = np.random.choice(len(samples), n, p=probabilities.flatten())
     return (samples[indices], values[indices])
 
