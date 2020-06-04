@@ -24,14 +24,21 @@ class Experiment(ABC):
         procedure: An instance of a Procedure derived class that needs to be
             tested in this experiment.
         path: Path to which the experiment should write its logs.
+        verbose: Boolean or integer indicating if intermediate output should to
+            stdout should be provided, indicating how many samples were taken
+            and in which procedure call the experiment is. If a boolean, each
+            procedure call will get its current sample count outputted. If an
+            integer, output will only be given if the number of procedure calls
+            is a multiple of said integer.
     """
-    def __init__(self, procedure, path):
+    def __init__(self, procedure, path, verbose=True):
         if not isinstance(procedure, Procedure):
             raise Exception("""Experiments should be provided an instance of a
                 class derived from the procedures.Procedure class.""")
         self.path = path
         self.procedure = procedure
         self.logger = None
+        self.verbose = int(verbose)
 
     def _perform_experiment(self, function, log_data=True):
         """
@@ -108,6 +115,10 @@ class Experiment(ABC):
             # Log procedure call
             n = len(x)
             n_sampled += n
+            if self.verbose != 0:
+                if self.logger.procedure_calls % self.verbose == 0:
+                    print("{} samples taken in {} procedure calls".format(
+                        n_sampled, self.logger.procedure_calls))
             self.logger.log_procedure_calls(dt, n_sampled, n)
             # Log sampled data
             if log_data:
@@ -121,6 +132,10 @@ class Experiment(ABC):
             # condition to control this.
             is_finished = (self.procedure.is_finished()
                            or self._stop_experiment(x, y))
+        if self.verbose:
+            print(
+                "Experiment finished with {} procedure calls and {} samples.".
+                format(self.logger.procedure_calls, n_sampled))
         self._event_end_experiment()
         # Log result metrics
         t_experiment_end = get_time()
