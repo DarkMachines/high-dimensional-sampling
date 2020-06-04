@@ -264,14 +264,14 @@ def gaussian_constructor_linear(algorithm, samples, values):
     width = algorithm.determine_gaussian_width()
     ranges = algorithm.ranges[:, 1] - algorithm.ranges[:, 0]
     ranges[ranges == 0] = 1.0
-    return width * ranges * np.ones(samples.shape)
+    return np.abs(width * ranges * np.ones(samples.shape))
 
 
 def gaussian_constructor_log(algorithm, samples, values):
     width = algorithm.determine_gaussian_width()
     ranges = algorithm.ranges[:, 1] - algorithm.ranges[:, 0]
     ranges[ranges == 0] = 1.0
-    return width * ranges * samples
+    return np.abs(width * ranges * samples)
 
 
 """ =========================================== Width parameter methods === """

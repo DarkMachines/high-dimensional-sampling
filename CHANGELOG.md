@@ -34,6 +34,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * The weighing_stochastic_linear function in the particle filter optimisation
   method could occasionally raise errors related to `nan` probabilities. This
   is now fixed.
+* The gaussian constructors needed for the particle filter could return negative
+  results. As the output represents standard deviations, this is unexpected
+  behaviour. The absolute value of the standard deviation is now returned
+  instead.
 
 ## Version 0.2.0 (Monday February 17th, 2020)
 
