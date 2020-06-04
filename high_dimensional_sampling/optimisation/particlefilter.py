@@ -51,7 +51,7 @@ class ParticleFilter(hds.Procedure):
             width_decay: Decay parameter for the width. Used by the width
                 scheduler. Default: 0.95.
             gaussian_constructor: Function that returns the stdevs of the
-                gaussians to use. Default: `self.gaussian_constructor_linear`.
+                gaussians to use. Default: `gaussian_constructor_linear`.
             inf_replace: Number to replace infinities in ranges with.
                 Default: 1e9.
         """
