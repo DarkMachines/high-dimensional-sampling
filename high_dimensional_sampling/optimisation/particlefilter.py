@@ -15,12 +15,14 @@ class ParticleFilter(hds.Procedure):
                  ranges=None,
                  hard_ranges=False,
                  iteration_size=1000,
-                 weighing_function=None,
+                 survival_rate=0.2,
+                 selector_function=None,
                  width=2,
                  width_scheduler=None,
                  width_decay=0.95,
                  gaussian_constructor=None,
-                 inf_replace=1e9):
+                 inf_replace=1e9,
+                 callback=None):
         """Implementation of the Particle Filter algorithm
 
         The documentation in the code can be found at the project wiki on
@@ -43,8 +45,13 @@ class ParticleFilter(hds.Procedure):
                 False.
             iteration_size: Number of samples to add in each iteration.
                 Default: 1000.
-            weighing_function: Function to sample points from previous samples.
-                Default: `self.weighing_stochastic_linear`.
+            survival_rate: Defines how many points of the previous iteration
+                will be copied over to the current iteration. This fraction
+                will be taken as the best points sampled from the previous
+                iteration (i.e., 'the survival_rate% best points will be kept).
+                Has to be a `float`. Default is 0.2.
+            selector_function: Function to sample points from previous samples.
+                Default: `self.selector_deterministic_linear`.
             width: Start width parameter for the gaussians. Default: 2.
             width_scheduler: Function that schedules the changes in width over
                 the iterations. Default: `self.width_schedule_exponential`.
@@ -54,6 +61,20 @@ class ParticleFilter(hds.Procedure):
                 gaussians to use. Default: `gaussian_constructor_linear`.
             inf_replace: Number to replace infinities in ranges with.
                 Default: 1e9.
+            callback: Handle to a function that will be called at each
+                iteration (except the first one). This function needs to have
+                the following signature: (
+                    reference to the ParticleFilter object,
+                    indices of selected samples from previous iteration,
+                    samples from previous iteration
+                    function values from previous iteration,
+                    standard deviations for selected points (see indices) from
+                        gaussian constructor,
+                    used width to create standard deviations,
+                    newly sampled points x,
+                    newly samples points y
+                )
+                If defined as `None` (default) no callback will be called.
         """
         # Iteration counter
         self.iteration = 0
@@ -65,10 +86,13 @@ class ParticleFilter(hds.Procedure):
         # Distributions of initial seed sampling
         self.seed_distributions = seed_distributions
 
-        # Number of samples in each iteration
+        # Number of samples to add in each iteration
         self.iteration_size = int(iteration_size)
+        # % of the best samples from the previous iteration to copy over to the
+        # current iteration
+        self.survival_rate = float(survival_rate)
         # Function to sample points from previous samples
-        self.weighing_function = weighing_function
+        self.selector_function = selector_function
         # Start width parameter for the gaussians
         self.initial_width = float(width)
         self.width = float(width)
@@ -96,6 +120,8 @@ class ParticleFilter(hds.Procedure):
             'inf_replace', 'seed_size', 'seed_distributions', 'iteration_size',
             'initial_width', 'width', 'width_decay', 'ranges', 'hard_ranges'
         ]
+        # Callback called at the end of each sample_iteration
+        self.callback = callback
 
     def __call__(self, function):
         self.check_testfunction(function)
@@ -105,6 +131,9 @@ class ParticleFilter(hds.Procedure):
         else:
             # Sample new iteration with gaussian kernel
             x, y = self.sample_iteration(function)
+        # Save points from previous iteration
+        x, y = self.append_surviver_points(x, y, self.previous_samples,
+                                           self.survival_rate)
         self.iteration += 1
         self.previous_samples = (x, y)
         return (x, y)
@@ -144,21 +173,26 @@ class ParticleFilter(hds.Procedure):
 
     def sample_iteration(self, function):
         # Select points to use as seed for gaussian
-        selected, values = self.weighing_function(self, self.iteration_size,
-                                                  self.previous_samples[0],
-                                                  self.previous_samples[1])
+        ind, samples, values = self.selector_function(self,
+                                                      self.iteration_size,
+                                                      self.previous_samples[0],
+                                                      self.previous_samples[1])
         # Determine sigmas for gaussians
-        stdevs = self.gaussian_constructor(self, selected, values)
+        stdevs = self.gaussian_constructor(self, samples[ind], values[ind])
         # Sample from gaussians
-        x = np.zeros((self.iteration_size, selected.shape[1]))
+        x = np.zeros((self.iteration_size, samples.shape[1]))
         for i, r in enumerate(self.ranges):
             if self.hard_ranges:
-                x[:, i] = self._sample_iteration_hard(selected[:, i],
-                                                      stdevs[:, i], r[0], r[1])
+                x[:, i] = self._sample_iteration_hard(samples[ind, i],
+                                                      stdevs[:, i],
+                                                      r[0], r[1])
             else:
-                x[:, i] = self._sample_iteration_soft(selected[:, i],
+                x[:, i] = self._sample_iteration_soft(samples[ind, i],
                                                       stdevs[:, i])
         y = function(x)
+        if hasattr(self.callback, '__call__'):
+            self.callback(self, ind, samples, values, stdevs,
+                          self.determine_gaussian_width(), x, y)
         return (x, y)
 
     def _sample_iteration_soft(self, means, stdevs):
@@ -172,6 +206,22 @@ class ParticleFilter(hds.Procedure):
                                        loc=mean,
                                        scale=stdev)
         return x
+
+    def append_surviver_points(self, x, y, previous_samples, survival_rate):
+        if previous_samples is None:
+            return (x, y)
+        # Order previous samples
+        x_old, y_old = previous_samples
+        ind = np.argsort(y_old).flatten()
+        x_old, y_old = x_old[ind], y_old[ind]
+        # Select survivers
+        n_survive = int(len(x_old) * survival_rate)
+        x_survived, y_survived = x_old[:n_survive], y_old[:n_survive]
+        # Append
+        x = np.append(x, x_survived, axis=0)
+        y = np.append(y, y_survived)
+        # Return
+        return (x, y)
 
     def determine_gaussian_width(self):
         if isinstance(self.width_scheduler, float):
@@ -243,8 +293,8 @@ class ParticleFilter(hds.Procedure):
         if not hasattr(self.width_scheduler, '__call__'):
             self.width_scheduler = width_schedule_exponential
         # Configure default weiging function
-        if not hasattr(self.weighing_function, '__call__'):
-            self.weighing_function = weighing_stochastic_linear
+        if not hasattr(self.selector_function, '__call__'):
+            self.selector_function = selector_stochastic_linear
         # Configure the default gaussian stdev constructor
         if not hasattr(self.gaussian_constructor, '__call__'):
             self.gaussian_constructor = gaussian_constructor_linear
@@ -288,53 +338,64 @@ def width_schedule_exponential_10stepped(algorithm, alpha):
     return algorithm.width
 
 
-""" =========================================== Sample weighing methods === """
+""" =========================================== Sample selector methods === """
 
 
-def weighing_deterministic_linear(algorithm, n, samples, values):
-    z = values - np.amin(values)
-    z = z / np.amax(z)
-    z = 1 - z
-
-    sortind = np.argsort(z)[::-1]
-    z = z[sortind]
-    samples = samples[sortind]
-    values = values[sortind]
-
-    indices = []
-    for _ in range(n):
-        index = np.argmax(z)
-        indices.append(index)
-        v = np.sort(np.unique(z))
-        z[index] = v[-2]
-
-    plt.plot(indices)
-    plt.show()
-
-    return (samples[indices], values[indices])
-
-
-def weighing_stochastic_uniform(algorithm, n, samples, values):
-    indices = np.random.choice(len(samples), n)
-    return (samples[indices], values[indices])
-
-
-def weighing_stochastic_linear(algorithm, n, samples, values):
+def selector_deterministic_linear(algorithm, n, samples, values):
+    # Calculate probabilities for samples
     z = values - np.amin(values)
     if len(np.unique(z)) != 1:
         z = 1 - (z / np.amax(z))
         probabilities = z / np.sum(z)
     else:
-        probabilities = np.ones(len(z))/len(z)
+        probabilities = np.ones(len(z)) / len(z)
+
+    # Sort samples based on probability, from low to high
+    sortind = np.argsort(probabilities)[::-1]
+    z = z[sortind]
+    samples = samples[sortind]
+    values = values[sortind]
+    probabilities = probabilities[sortind]
+
+    # Determine samples per point
+    samples_per_ind = np.ceil(probabilities * n)
+
+    # Correct for rounding errors
+    at_least_one = 1.0 * (samples_per_ind > 0)
+    for i in range(len(at_least_one)):
+        potentially_sampled = np.sum(samples_per_ind) - np.sum(at_least_one)
+        if potentially_sampled < n:
+            at_least_one[i] = 0
+    samples_per_ind = samples_per_ind - at_least_one
+
+    # Create indices and return values
+    indices = []
+    for i in range(len(samples_per_ind)):
+        indices.extend([i] * int(samples_per_ind[i]))
+    return (indices, samples, values)
+
+
+def selector_stochastic_uniform(algorithm, n, samples, values):
+    indices = np.random.choice(len(samples), n)
+    return (indices, samples, values)
+
+
+def selector_stochastic_linear(algorithm, n, samples, values):
+    z = values - np.amin(values)
+    if len(np.unique(z)) != 1:
+        z = 1 - (z / np.amax(z))
+        probabilities = z / np.sum(z)
+    else:
+        probabilities = np.ones(len(z)) / len(z)
     indices = np.random.choice(len(samples), n, p=probabilities.flatten())
-    return (samples[indices], values[indices])
+    return (indices, samples, values)
 
 
-def weighing_stochastic_softmax(algorithm, n, samples, values):
+def selector_stochastic_softmax(algorithm, n, samples, values):
     z = values - np.amin(values)
     probabilities = np.exp(-z) / np.sum(np.exp(-z))
     indices = np.random.choice(len(samples), n, p=probabilities)
-    return (samples[indices], values[indices])
+    return (indices, samples, values)
 
 
 class ExampleFunction(func.TestFunction):
