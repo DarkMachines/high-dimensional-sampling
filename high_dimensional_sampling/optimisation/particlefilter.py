@@ -20,7 +20,8 @@ class ParticleFilter(hds.Procedure):
                  width_scheduler=None,
                  width_decay=0.95,
                  gaussian_constructor=None,
-                 inf_replace=1e9):
+                 inf_replace=1e9,
+                 callback=None):
         """Implementation of the Particle Filter algorithm
 
         The documentation in the code can be found at the project wiki on
@@ -54,6 +55,19 @@ class ParticleFilter(hds.Procedure):
                 gaussians to use. Default: `gaussian_constructor_linear`.
             inf_replace: Number to replace infinities in ranges with.
                 Default: 1e9.
+            callback: Handle to a function that will be called at each iteration
+                (except the first one). This function needs to have the
+                following signature: (
+                    reference to the ParticleFilter object,
+                    indices of selected samples from previous iteration,
+                    samples from previous iteration
+                    function values from previous iteration,
+                    standard deviations for selected points (see indices) from 
+                        gaussian constructor,
+                    used width to create standard deviations,
+                    newly sampled points x,
+                    newly samples points y
+                )
         """
         # Iteration counter
         self.iteration = 0
@@ -96,6 +110,8 @@ class ParticleFilter(hds.Procedure):
             'inf_replace', 'seed_size', 'seed_distributions', 'iteration_size',
             'initial_width', 'width', 'width_decay', 'ranges', 'hard_ranges'
         ]
+        # Callback called at the end of each sample_iteration
+        self.callback = callback
 
     def __call__(self, function):
         self.check_testfunction(function)
@@ -147,20 +163,22 @@ class ParticleFilter(hds.Procedure):
         ind, samples, values = self.selector_function(self, self.iteration_size,
                                                       self.previous_samples[0],
                                                       self.previous_samples[1])
-        selected = samples[ind]
-        values = values[ind]
         # Determine sigmas for gaussians
-        stdevs = self.gaussian_constructor(self, selected, values)
+        stdevs = self.gaussian_constructor(self, samples[ind], values[ind])
         # Sample from gaussians
-        x = np.zeros((self.iteration_size, selected.shape[1]))
+        x = np.zeros((self.iteration_size, samples.shape[1]))
         for i, r in enumerate(self.ranges):
             if self.hard_ranges:
-                x[:, i] = self._sample_iteration_hard(selected[:, i],
+                x[:, i] = self._sample_iteration_hard(samples[:, i],
                                                       stdevs[:, i], r[0], r[1])
             else:
-                x[:, i] = self._sample_iteration_soft(selected[:, i],
+                x[:, i] = self._sample_iteration_soft(samples[:, i],
                                                       stdevs[:, i])
         y = function(x)
+        if hasattr(self.callback, '__call__'):
+            self.callback(self, ind, samples, values,
+                          stdevs, algorithm.determine_gaussian_width(),
+                          x, y)
         return (x, y)
 
     def _sample_iteration_soft(self, means, stdevs):

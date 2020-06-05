@@ -18,6 +18,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   documentation of __init__ of the Experiment class for more information.
 * The dimensionality of hidden `TestFunction`s can now be changed with the
   `dimensionality` argument at initialisation of the class.
+* The ParticleFilter now implements a callback method that allows for the
+  inclusion of a callback function in each sampling iteration (except for
+  the first one). See the documentation on the wiki and in the docstring for
+  more information.
 
 ### Changed
 
@@ -30,7 +34,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   changed.
 * To accomodate the implementation of callbacks in the particle filter, the
   selector methods don't select data directly, but instead output `(indices,
-  samples, values)`, where `indices` are the indices of the samples and values selected.
+  samples, values)`, where `indices` are the indices of the samples and values
+  selected.
 
 ### Fixed
 
