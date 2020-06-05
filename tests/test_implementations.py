@@ -53,7 +53,7 @@ def test_optimisation_ampgo(tmp_path):
 
 
 def test_optimisation_turbo(tmp_path):
-    procedure = optimisation.TuRBO(max_evals=5, n_training_steps=5)
+    procedure = optimisation.TuRBO(max_evals=5, n_training_steps=30)
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
