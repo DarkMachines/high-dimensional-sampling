@@ -292,25 +292,36 @@ def width_schedule_exponential_10stepped(algorithm, alpha):
 
 
 def weighing_deterministic_linear(algorithm, n, samples, values):
+    # Calculate probabilities for samples
     z = values - np.amin(values)
-    z = z / np.amax(z)
-    z = 1 - z
+    if len(np.unique(z)) != 1:
+        z = 1 - (z / np.amax(z))
+        probabilities = z / np.sum(z)
+    else:
+        probabilities = np.ones(len(z))/len(z)
 
-    sortind = np.argsort(z)[::-1]
+    # Sort samples based on probability, from low to high
+    sortind = np.argsort(probabilities)[::-1]
     z = z[sortind]
     samples = samples[sortind]
     values = values[sortind]
+    probabilities = probabilities[sortind]
+    
+    # Determine samples per point
+    samples_per_ind = np.ceil(probabilities*n)
 
+    # Correct for rounding errors
+    at_least_one = 1.0*(samples_per_ind > 0)
+    for i in range(len(at_least_one)):
+        potentially_sampled = np.sum(samples_per_ind) - np.sum(at_least_one)
+        if potentially_sampled < n:
+            at_least_one[i] = 0
+    samples_per_ind = samples_per_ind - at_least_one
+
+    # Create indices and return values
     indices = []
-    for _ in range(n):
-        index = np.argmax(z)
-        indices.append(index)
-        v = np.sort(np.unique(z))
-        z[index] = v[-2]
-
-    plt.plot(indices)
-    plt.show()
-
+    for i in range(len(samples_per_ind)):
+        indices.extend([i]*int(samples_per_ind[i]))
     return (samples[indices], values[indices])
 
 

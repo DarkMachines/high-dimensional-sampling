@@ -25,6 +25,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   removed from installation requirements in the `setup.py` file. This will only
   yield error messages when the `pygmo` package is actually requested by the
   implemented pygmo Procedure.
+* The `weighing_deterministic_linear` function in the particle filter's linear
+  function was based on sample order, not on function value. This has been
+  changed.
 
 ### Fixed
 
