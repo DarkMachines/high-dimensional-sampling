@@ -15,7 +15,7 @@ class ParticleFilter(hds.Procedure):
                  ranges=None,
                  hard_ranges=False,
                  iteration_size=1000,
-                 weighing_function=None,
+                 selector_function=None,
                  width=2,
                  width_scheduler=None,
                  width_decay=0.95,
@@ -43,8 +43,8 @@ class ParticleFilter(hds.Procedure):
                 False.
             iteration_size: Number of samples to add in each iteration.
                 Default: 1000.
-            weighing_function: Function to sample points from previous samples.
-                Default: `self.weighing_stochastic_linear`.
+            selector_function: Function to sample points from previous samples.
+                Default: `self.selector_deterministic_linear`.
             width: Start width parameter for the gaussians. Default: 2.
             width_scheduler: Function that schedules the changes in width over
                 the iterations. Default: `self.width_schedule_exponential`.
@@ -68,7 +68,7 @@ class ParticleFilter(hds.Procedure):
         # Number of samples in each iteration
         self.iteration_size = int(iteration_size)
         # Function to sample points from previous samples
-        self.weighing_function = weighing_function
+        self.selector_function = selector_function
         # Start width parameter for the gaussians
         self.initial_width = float(width)
         self.width = float(width)
@@ -144,7 +144,7 @@ class ParticleFilter(hds.Procedure):
 
     def sample_iteration(self, function):
         # Select points to use as seed for gaussian
-        selected, values = self.weighing_function(self, self.iteration_size,
+        selected, values = self.selector_function(self, self.iteration_size,
                                                   self.previous_samples[0],
                                                   self.previous_samples[1])
         # Determine sigmas for gaussians
@@ -243,8 +243,8 @@ class ParticleFilter(hds.Procedure):
         if not hasattr(self.width_scheduler, '__call__'):
             self.width_scheduler = width_schedule_exponential
         # Configure default weiging function
-        if not hasattr(self.weighing_function, '__call__'):
-            self.weighing_function = weighing_stochastic_linear
+        if not hasattr(self.selector_function, '__call__'):
+            self.selector_function = selector_stochastic_linear
         # Configure the default gaussian stdev constructor
         if not hasattr(self.gaussian_constructor, '__call__'):
             self.gaussian_constructor = gaussian_constructor_linear
@@ -288,10 +288,10 @@ def width_schedule_exponential_10stepped(algorithm, alpha):
     return algorithm.width
 
 
-""" =========================================== Sample weighing methods === """
+""" =========================================== Sample selector methods === """
 
 
-def weighing_deterministic_linear(algorithm, n, samples, values):
+def selector_deterministic_linear(algorithm, n, samples, values):
     # Calculate probabilities for samples
     z = values - np.amin(values)
     if len(np.unique(z)) != 1:
@@ -325,12 +325,12 @@ def weighing_deterministic_linear(algorithm, n, samples, values):
     return (samples[indices], values[indices])
 
 
-def weighing_stochastic_uniform(algorithm, n, samples, values):
+def selector_stochastic_uniform(algorithm, n, samples, values):
     indices = np.random.choice(len(samples), n)
     return (samples[indices], values[indices])
 
 
-def weighing_stochastic_linear(algorithm, n, samples, values):
+def selector_stochastic_linear(algorithm, n, samples, values):
     z = values - np.amin(values)
     if len(np.unique(z)) != 1:
         z = 1 - (z / np.amax(z))
@@ -341,7 +341,7 @@ def weighing_stochastic_linear(algorithm, n, samples, values):
     return (samples[indices], values[indices])
 
 
-def weighing_stochastic_softmax(algorithm, n, samples, values):
+def selector_stochastic_softmax(algorithm, n, samples, values):
     z = values - np.amin(values)
     probabilities = np.exp(-z) / np.sum(np.exp(-z))
     indices = np.random.choice(len(samples), n, p=probabilities)
