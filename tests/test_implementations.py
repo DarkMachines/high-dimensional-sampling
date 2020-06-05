@@ -18,42 +18,42 @@ def test_posterior_implementations(tmp_path):
 
 
 def test_optimisation_randomoptimisation(tmp_path):
-    procedure = optimisation.RandomOptimisation(),
+    procedure = optimisation.RandomOptimisation()
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
 
 
 def test_optimisation_particlefilter(tmp_path):
-    procedure = optimisation.ParticleFilter(),
+    procedure = optimisation.ParticleFilter()
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
 
 
 def test_optimisation_gpyopt(tmp_path):
-    procedure = optimisation.GPyOpt(),
+    procedure = optimisation.GPyOpt()
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
 
 
 def test_optimisation_cmae(tmp_path):
-    procedure = optimisation.CMAOptimisation(),
+    procedure = optimisation.CMAOptimisation()
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
 
 
 def test_optimisation_ampgo(tmp_path):
-    procedure = optimisation.Ampgo(),
+    procedure = optimisation.Ampgo()
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
 
 
 def test_optimisation_turbo(tmp_path):
-    procedure = optimisation.TuRBO(max_evals=5, n_training_steps=5),
+    procedure = optimisation.TuRBO(max_evals=5, n_training_steps=5)
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
