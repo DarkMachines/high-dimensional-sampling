@@ -46,10 +46,10 @@ class ParticleFilter(hds.Procedure):
             iteration_size: Number of samples to add in each iteration.
                 Default: 1000.
             survival_rate: Defines how many points of the previous iteration
-                will be copied over to the current iteration. This fraction will
-                be taken as the best points sampled from the previous iteration
-                (i.e., 'the survival_rate% best points will be kept). Has to be
-                a `float`. Default is 0.2.
+                will be copied over to the current iteration. This fraction
+                will be taken as the best points sampled from the previous
+                iteration (i.e., 'the survival_rate% best points will be kept).
+                Has to be a `float`. Default is 0.2.
             selector_function: Function to sample points from previous samples.
                 Default: `self.selector_deterministic_linear`.
             width: Start width parameter for the gaussians. Default: 2.
@@ -61,14 +61,14 @@ class ParticleFilter(hds.Procedure):
                 gaussians to use. Default: `gaussian_constructor_linear`.
             inf_replace: Number to replace infinities in ranges with.
                 Default: 1e9.
-            callback: Handle to a function that will be called at each iteration
-                (except the first one). This function needs to have the
-                following signature: (
+            callback: Handle to a function that will be called at each
+                iteration (except the first one). This function needs to have
+                the following signature: (
                     reference to the ParticleFilter object,
                     indices of selected samples from previous iteration,
                     samples from previous iteration
                     function values from previous iteration,
-                    standard deviations for selected points (see indices) from 
+                    standard deviations for selected points (see indices) from
                         gaussian constructor,
                     used width to create standard deviations,
                     newly sampled points x,
@@ -132,7 +132,8 @@ class ParticleFilter(hds.Procedure):
             # Sample new iteration with gaussian kernel
             x, y = self.sample_iteration(function)
         # Save points from previous iteration
-        self.append_surviver_points(x, y, self.previous_samples, self.survival_rate)
+        self.append_surviver_points(x, y, self.previous_samples,
+                                    self.survival_rate)
         self.iteration += 1
         self.previous_samples = (x, y)
         return (x, y)
@@ -172,7 +173,8 @@ class ParticleFilter(hds.Procedure):
 
     def sample_iteration(self, function):
         # Select points to use as seed for gaussian
-        ind, samples, values = self.selector_function(self, self.iteration_size,
+        ind, samples, values = self.selector_function(self,
+                                                      self.iteration_size,
                                                       self.previous_samples[0],
                                                       self.previous_samples[1])
         # Determine sigmas for gaussians
@@ -184,13 +186,12 @@ class ParticleFilter(hds.Procedure):
                 x[:, i] = self._sample_iteration_hard(samples[:, i],
                                                       stdevs[:, i], r[0], r[1])
             else:
-                x[:, i] = self._sample_iteration_soft(samples[:, i],
-                                                      stdevs[:, i])
+                x[:, i] = self._sample_iteration_soft(samples[:, i], stdevs[:,
+                                                                            i])
         y = function(x)
         if hasattr(self.callback, '__call__'):
-            self.callback(self, ind, samples, values,
-                          stdevs, algorithm.determine_gaussian_width(),
-                          x, y)
+            self.callback(self, ind, samples, values, stdevs,
+                          algorithm.determine_gaussian_width(), x, y)
         return (x, y)
 
     def _sample_iteration_soft(self, means, stdevs):
@@ -204,20 +205,20 @@ class ParticleFilter(hds.Procedure):
                                        loc=mean,
                                        scale=stdev)
         return x
-    
+
     def append_surviver_points(self, x, y, previous_samples, survival_rate):
         # Order previous samples
         x_old, y_old = previous_samples
         ind = np.argsort(y_old)
         x_old, y_old = x_old[ind], y_old[ind]
         # Select survivers
-        n_survive = int(len(x_old)*survival_rate)
+        n_survive = int(len(x_old) * survival_rate)
         x_survived, y_survived = x_old[:n_survive], y_old[:n_survive]
         # Append
         x = np.append(x, x_survived, axis=0)
         y = np.append(y, y_survived)
         # Return
-        return (x,y)
+        return (x, y)
 
     def determine_gaussian_width(self):
         if isinstance(self.width_scheduler, float):
@@ -344,7 +345,7 @@ def selector_deterministic_linear(algorithm, n, samples, values):
         z = 1 - (z / np.amax(z))
         probabilities = z / np.sum(z)
     else:
-        probabilities = np.ones(len(z))/len(z)
+        probabilities = np.ones(len(z)) / len(z)
 
     # Sort samples based on probability, from low to high
     sortind = np.argsort(probabilities)[::-1]
@@ -352,12 +353,12 @@ def selector_deterministic_linear(algorithm, n, samples, values):
     samples = samples[sortind]
     values = values[sortind]
     probabilities = probabilities[sortind]
-    
+
     # Determine samples per point
-    samples_per_ind = np.ceil(probabilities*n)
+    samples_per_ind = np.ceil(probabilities * n)
 
     # Correct for rounding errors
-    at_least_one = 1.0*(samples_per_ind > 0)
+    at_least_one = 1.0 * (samples_per_ind > 0)
     for i in range(len(at_least_one)):
         potentially_sampled = np.sum(samples_per_ind) - np.sum(at_least_one)
         if potentially_sampled < n:
@@ -367,7 +368,7 @@ def selector_deterministic_linear(algorithm, n, samples, values):
     # Create indices and return values
     indices = []
     for i in range(len(samples_per_ind)):
-        indices.extend([i]*int(samples_per_ind[i]))
+        indices.extend([i] * int(samples_per_ind[i]))
     return (indices, samples, values)
 
 
@@ -382,7 +383,7 @@ def selector_stochastic_linear(algorithm, n, samples, values):
         z = 1 - (z / np.amax(z))
         probabilities = z / np.sum(z)
     else:
-        probabilities = np.ones(len(z))/len(z)
+        probabilities = np.ones(len(z)) / len(z)
     indices = np.random.choice(len(samples), n, p=probabilities.flatten())
     return (indices, samples, values)
 
