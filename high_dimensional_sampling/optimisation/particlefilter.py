@@ -15,6 +15,7 @@ class ParticleFilter(hds.Procedure):
                  ranges=None,
                  hard_ranges=False,
                  iteration_size=1000,
+                 survival_rate=0.2,
                  selector_function=None,
                  width=2,
                  width_scheduler=None,
@@ -44,6 +45,11 @@ class ParticleFilter(hds.Procedure):
                 False.
             iteration_size: Number of samples to add in each iteration.
                 Default: 1000.
+            survival_rate: Defines how many points of the previous iteration
+                will be copied over to the current iteration. This fraction will
+                be taken as the best points sampled from the previous iteration
+                (i.e., 'the survival_rate% best points will be kept). Has to be
+                a `float`. Default is 0.2.
             selector_function: Function to sample points from previous samples.
                 Default: `self.selector_deterministic_linear`.
             width: Start width parameter for the gaussians. Default: 2.
@@ -68,6 +74,7 @@ class ParticleFilter(hds.Procedure):
                     newly sampled points x,
                     newly samples points y
                 )
+                If defined as `None` (default) no callback will be called.
         """
         # Iteration counter
         self.iteration = 0
@@ -79,8 +86,11 @@ class ParticleFilter(hds.Procedure):
         # Distributions of initial seed sampling
         self.seed_distributions = seed_distributions
 
-        # Number of samples in each iteration
+        # Number of samples to add in each iteration
         self.iteration_size = int(iteration_size)
+        # % of the best samples from the previous iteration to copy over to the
+        # current iteration
+        self.survival_rate = float(survival_rate)
         # Function to sample points from previous samples
         self.selector_function = selector_function
         # Start width parameter for the gaussians
@@ -121,6 +131,8 @@ class ParticleFilter(hds.Procedure):
         else:
             # Sample new iteration with gaussian kernel
             x, y = self.sample_iteration(function)
+        # Save points from previous iteration
+        self.append_surviver_points(x, y, self.previous_samples, self.survival_rate)
         self.iteration += 1
         self.previous_samples = (x, y)
         return (x, y)
@@ -192,6 +204,20 @@ class ParticleFilter(hds.Procedure):
                                        loc=mean,
                                        scale=stdev)
         return x
+    
+    def append_surviver_points(self, x, y, previous_samples, survival_rate):
+        # Order previous samples
+        x_old, y_old = previous_samples
+        ind = np.argsort(y_old)
+        x_old, y_old = x_old[ind], y_old[ind]
+        # Select survivers
+        n_survive = int(len(x_old)*survival_rate)
+        x_survived, y_survived = x_old[:n_survive], y_old[:n_survive]
+        # Append
+        x = np.append(x, x_survived, axis=0)
+        y = np.append(y, y_survived)
+        # Return
+        return (x,y)
 
     def determine_gaussian_width(self):
         if isinstance(self.width_scheduler, float):

@@ -51,6 +51,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   results. As the output represents standard deviations, this is unexpected
   behaviour. The absolute value of the standard deviation is now returned
   instead.
+* The particle filter did not implement a way to keep the best points of the
+  previous iteration for the current one. This is now implemented through the
+  `survival_rate` argument (default=0.2).
 
 ## Version 0.2.0 (Monday February 17th, 2020)
 
