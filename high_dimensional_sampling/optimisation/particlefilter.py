@@ -144,9 +144,11 @@ class ParticleFilter(hds.Procedure):
 
     def sample_iteration(self, function):
         # Select points to use as seed for gaussian
-        selected, values = self.selector_function(self, self.iteration_size,
-                                                  self.previous_samples[0],
-                                                  self.previous_samples[1])
+        ind, samples, values = self.selector_function(self, self.iteration_size,
+                                                      self.previous_samples[0],
+                                                      self.previous_samples[1])
+        selected = samples[ind]
+        values = values[ind]
         # Determine sigmas for gaussians
         stdevs = self.gaussian_constructor(self, selected, values)
         # Sample from gaussians
@@ -322,12 +324,12 @@ def selector_deterministic_linear(algorithm, n, samples, values):
     indices = []
     for i in range(len(samples_per_ind)):
         indices.extend([i]*int(samples_per_ind[i]))
-    return (samples[indices], values[indices])
+    return (indices, samples, values)
 
 
 def selector_stochastic_uniform(algorithm, n, samples, values):
     indices = np.random.choice(len(samples), n)
-    return (samples[indices], values[indices])
+    return (indices, samples, values)
 
 
 def selector_stochastic_linear(algorithm, n, samples, values):
@@ -338,14 +340,14 @@ def selector_stochastic_linear(algorithm, n, samples, values):
     else:
         probabilities = np.ones(len(z))/len(z)
     indices = np.random.choice(len(samples), n, p=probabilities.flatten())
-    return (samples[indices], values[indices])
+    return (indices, samples, values)
 
 
 def selector_stochastic_softmax(algorithm, n, samples, values):
     z = values - np.amin(values)
     probabilities = np.exp(-z) / np.sum(np.exp(-z))
     indices = np.random.choice(len(samples), n, p=probabilities)
-    return (samples[indices], values[indices])
+    return (indices, samples, values)
 
 
 class ExampleFunction(func.TestFunction):

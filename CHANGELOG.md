@@ -28,6 +28,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * The `weighing_deterministic_linear` function in the particle filter's linear
   function was based on sample order, not on function value. This has been
   changed.
+* To accomodate the implementation of callbacks in the particle filter, the
+  selector methods don't select data directly, but instead output `(indices,
+  samples, values)`, where `indices` are the indices of the samples and values selected.
 
 ### Fixed
 
