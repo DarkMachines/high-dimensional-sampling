@@ -18,6 +18,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   documentation of __init__ of the Experiment class for more information.
 * The dimensionality of hidden `TestFunction`s can now be changed with the
   `dimensionality` argument at initialisation of the class.
+* The ParticleFilter now implements a callback method that allows for the
+  inclusion of a callback function in each sampling iteration (except for
+  the first one). See the documentation on the wiki and in the docstring for
+  more information.
 
 ### Changed
 
@@ -25,6 +29,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   removed from installation requirements in the `setup.py` file. This will only
   yield error messages when the `pygmo` package is actually requested by the
   implemented pygmo Procedure.
+* The `weighing_deterministic_linear` function in the particle filter's linear
+  function was based on sample order, not on function value. This has been
+  changed.
+* To accomodate the implementation of callbacks in the particle filter, the
+  selector methods don't select data directly, but instead output `(indices,
+  samples, values)`, where `indices` are the indices of the samples and values
+  selected.
 
 ### Fixed
 
@@ -40,6 +51,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   results. As the output represents standard deviations, this is unexpected
   behaviour. The absolute value of the standard deviation is now returned
   instead.
+* The particle filter did not implement a way to keep the best points of the
+  previous iteration for the current one. This is now implemented through the
+  `survival_rate` argument (default=0.2).
 
 ## Version 0.2.0 (Monday February 17th, 2020)
 
