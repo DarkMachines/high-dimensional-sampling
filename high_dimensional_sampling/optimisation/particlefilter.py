@@ -132,8 +132,8 @@ class ParticleFilter(hds.Procedure):
             # Sample new iteration with gaussian kernel
             x, y = self.sample_iteration(function)
         # Save points from previous iteration
-        self.append_surviver_points(x, y, self.previous_samples,
-                                    self.survival_rate)
+        x, y = self.append_surviver_points(x, y, self.previous_samples,
+                                           self.survival_rate) 
         self.iteration += 1
         self.previous_samples = (x, y)
         return (x, y)
@@ -183,15 +183,16 @@ class ParticleFilter(hds.Procedure):
         x = np.zeros((self.iteration_size, samples.shape[1]))
         for i, r in enumerate(self.ranges):
             if self.hard_ranges:
-                x[:, i] = self._sample_iteration_hard(samples[:, i],
-                                                      stdevs[:, i], r[0], r[1])
+                x[:, i] = self._sample_iteration_hard(samples[ind, i],
+                                                      stdevs[:, i],
+                                                      r[0], r[1])
             else:
-                x[:, i] = self._sample_iteration_soft(samples[:, i], stdevs[:,
-                                                                            i])
+                x[:, i] = self._sample_iteration_soft(samples[ind, i],
+                                                      stdevs[:, i])
         y = function(x)
         if hasattr(self.callback, '__call__'):
             self.callback(self, ind, samples, values, stdevs,
-                          algorithm.determine_gaussian_width(), x, y)
+                          self.determine_gaussian_width(), x, y)
         return (x, y)
 
     def _sample_iteration_soft(self, means, stdevs):
@@ -207,9 +208,11 @@ class ParticleFilter(hds.Procedure):
         return x
 
     def append_surviver_points(self, x, y, previous_samples, survival_rate):
+        if previous_samples is None:
+            return (x, y)
         # Order previous samples
         x_old, y_old = previous_samples
-        ind = np.argsort(y_old)
+        ind = np.argsort(y_old).flatten()
         x_old, y_old = x_old[ind], y_old[ind]
         # Select survivers
         n_survive = int(len(x_old) * survival_rate)
