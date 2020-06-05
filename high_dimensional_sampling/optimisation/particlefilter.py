@@ -133,7 +133,7 @@ class ParticleFilter(hds.Procedure):
             x, y = self.sample_iteration(function)
         # Save points from previous iteration
         x, y = self.append_surviver_points(x, y, self.previous_samples,
-                                           self.survival_rate) 
+                                           self.survival_rate)
         self.iteration += 1
         self.previous_samples = (x, y)
         return (x, y)
