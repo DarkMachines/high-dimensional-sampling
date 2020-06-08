@@ -258,7 +258,7 @@ class OptimisationExperiment(Experiment):
         super(OptimisationExperiment, self).__init__(*args, **kwargs)
         self.threshold_x = np.inf
         self.tollerance_y = 0
-    
+
     def detect_multiple_minima(self, threshold_x=np.inf, tollerance_y=0):
         """
         Allow the detection of multiple minima by setting thresholds for the
@@ -268,7 +268,7 @@ class OptimisationExperiment(Experiment):
         multiple minima can be detected by the OptimisationExperiment. The
         `threshold_x` parameter defines the minimum required euclidean distance
         between the different found candidate minima, so a higher threshold
-        makes it harder to find secundary minima (default is `numpy.inf`). 
+        makes it harder to find secundary minima (default is `numpy.inf`).
         `tollerance_y` sets how much the function value of the test function
         may vary with respect to the absolute minimum found so far in order
         to be considered a candidate minimum (default is `0`).
@@ -283,12 +283,12 @@ class OptimisationExperiment(Experiment):
             threshold_x: Float indicating the minimum distance between the
                 different minima to be found. Distance is measured using the
                 euclidean distance norm.
-            tollerance_y: Allowed difference between secundary minima and 
+            tollerance_y: Allowed difference between secundary minima and
                 the best found minimum.
         """
         self.threshold_x = threshold_x
         self.tollerance_y = tollerance_y
-    
+
     def _find_minima(self, x, y, previous_x, previous_y):
         # Find best minimum so far
         if previous_x is None:
@@ -298,7 +298,8 @@ class OptimisationExperiment(Experiment):
             y_candi = np.vstack((y, np.array(previous_y)))
         minimum = np.amin(y)
         # Select based on y_threshold
-        indices = np.argwhere(y_candi.flatten() <= minimum + self.tollerance_y).flatten() 
+        indices = np.argwhere(
+            y_candi.flatten() <= minimum + self.tollerance_y).flatten()
         x_candi, y_candi = x_candi[indices], y_candi[indices]
         # Sort candidates based on y value
         indices = np.argsort(y_candi, axis=0).flatten()
@@ -317,7 +318,7 @@ class OptimisationExperiment(Experiment):
 
     def _is_minimum_new(self, x, x_prime):
         for z in x_prime:
-            if np.linalg.norm(x-z) < self.threshold_x:
+            if np.linalg.norm(x - z) < self.threshold_x:
                 return False
         return True
 
@@ -348,8 +349,8 @@ class OptimisationExperiment(Experiment):
             y: Function values for the samples datapoints of shape
                 (nDatapoints, ?)
         """
-        self.best_x, self.best_y = self._find_minima(x, y,
-                                                     self.best_x, self.best_y)
+        self.best_x, self.best_y = self._find_minima(x, y, self.best_x,
+                                                     self.best_y)
 
     def make_metrics(self):
         """
