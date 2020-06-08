@@ -254,11 +254,53 @@ class OptimisationExperiment(Experiment):
     Implements automatic logging of best obtained result to the experiment.yaml
     file.
     """
+    def __init__(self, *args, **kwargs):
+        super(OptimisationExperiment, self).__init__(*args, **kwargs)
+        self.threshold_x = np.inf
+        self.threshold_y = 0
+    
+    def set_minima_thresholds(self, threshold_x, threshold_y):
+        self.threshold_x = threshold_x
+        self.threshold_y = threshold_y
+    
+    def _find_minima(self, x, y, previous_x, previous_y):
+        # Find best minimum so far
+        if previous_x is None:
+            x_candi, y_candi = x, y
+        else:
+            x_candi = np.vstack((x, np.array(previous_x)))
+            y_candi = np.vstack((y, np.array(previous_y)))
+        minimum = np.amin(y)
+        # Select based on y_threshold
+        indices = np.argwhere(y_candi.flatten() <= minimum + self.threshold_y).flatten() 
+        x_candi, y_candi = x_candi[indices], y_candi[indices]
+        # Sort candidates based on y value
+        indices = np.argsort(y_candi, axis=0).flatten()
+        indices = indices
+        x_candi, y_candi = x_candi[indices], y_candi[indices]
+        # Select based on x_threshold
+        indices = []
+        for i in range(len(x_candi)):
+            if len(indices) == 0:
+                indices.append(i)
+            elif self._is_minimum_new(x_candi[i], x_candi[np.array(indices)]):
+                indices.append(i)
+        indices = np.array(indices).flatten()
+        # Return selection
+        return x_candi[indices], y_candi[indices]
+
+    def _is_minimum_new(self, x, x_prime):
+        for z in x_prime:
+            if np.linalg.norm(x-z) < self.threshold_x:
+                return False
+        return True
+
     def _event_start_experiment(self):
         """
         Event that is run when a new experiment is started.
         """
-        self.best_point = None
+        self.best_x = None
+        self.best_y = None
 
     def _event_end_experiment(self):
         """
@@ -280,11 +322,8 @@ class OptimisationExperiment(Experiment):
             y: Function values for the samples datapoints of shape
                 (nDatapoints, ?)
         """
-        for i in range(len(x)):
-            if self.best_point is None:
-                self.best_point = (x[i], y[i])
-            elif y[i] < self.best_point[1]:
-                self.best_point = (x[i], y[i])
+        self.best_x, self.best_y = self._find_minima(x, y,
+                                                     self.best_x, self.best_y)
 
     def make_metrics(self):
         """
@@ -294,11 +333,14 @@ class OptimisationExperiment(Experiment):
         Returns:
             Dictionary containing the metrics by name.
         """
-        if self.best_point is None:
-            return {}
+        if len(self.best_x) == 1:
+            return {
+                'best_point': self.best_x[0].tolist(),
+                'best_value': self.best_y[0].tolist()
+            }
         return {
-            'best_point': self.best_point[0].tolist(),
-            'best_value': self.best_point[1].tolist()
+            'best_point': self.best_x.tolist(),
+            'best_value': self.best_y.tolist()
         }
 
 
