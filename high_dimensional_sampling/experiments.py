@@ -257,11 +257,37 @@ class OptimisationExperiment(Experiment):
     def __init__(self, *args, **kwargs):
         super(OptimisationExperiment, self).__init__(*args, **kwargs)
         self.threshold_x = np.inf
-        self.threshold_y = 0
+        self.tollerance_y = 0
     
-    def set_minima_thresholds(self, threshold_x, threshold_y):
+    def detect_multiple_minima(self, threshold_x=np.inf, tollerance_y=0):
+        """
+        Allow the detection of multiple minima by setting thresholds for the
+        identification of a minimum as a unique minimum.
+
+        By calling this function with anything by the default parameters,
+        multiple minima can be detected by the OptimisationExperiment. The
+        `threshold_x` parameter defines the minimum required euclidean distance
+        between the different found candidate minima, so a higher threshold
+        makes it harder to find secundary minima (default is `numpy.inf`). 
+        `tollerance_y` sets how much the function value of the test function
+        may vary with respect to the absolute minimum found so far in order
+        to be considered a candidate minimum (default is `0`).
+
+        If a point is both more than `threshold_x` away from the best found
+        minimum (and other, already found secundary minima) and its function
+        value is within `tollerance_y` of the best found minimum, it is
+        considered a secundary minimum and will be reported as such in the
+        `experiment.yaml` file.
+
+        Args:
+            threshold_x: Float indicating the minimum distance between the
+                different minima to be found. Distance is measured using the
+                euclidean distance norm.
+            tollerance_y: Allowed difference between secundary minima and 
+                the best found minimum.
+        """
         self.threshold_x = threshold_x
-        self.threshold_y = threshold_y
+        self.tollerance_y = tollerance_y
     
     def _find_minima(self, x, y, previous_x, previous_y):
         # Find best minimum so far
@@ -272,7 +298,7 @@ class OptimisationExperiment(Experiment):
             y_candi = np.vstack((y, np.array(previous_y)))
         minimum = np.amin(y)
         # Select based on y_threshold
-        indices = np.argwhere(y_candi.flatten() <= minimum + self.threshold_y).flatten() 
+        indices = np.argwhere(y_candi.flatten() <= minimum + self.tollerance_y).flatten() 
         x_candi, y_candi = x_candi[indices], y_candi[indices]
         # Sort candidates based on y value
         indices = np.argsort(y_candi, axis=0).flatten()
