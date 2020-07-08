@@ -527,3 +527,18 @@ def test_testfunction_schwefel():
     assert y.shape == (10000, 1)
     with pytest.raises(func.NoDerivativeError):
         function(x, True)
+
+
+def test_testfunction_mssm7():
+    function = func.MSSM7()
+    # Validate the default configuration
+    assert function.get_dimensionality() == 12
+    # Validate function properties
+    assert function.is_bounded() is False
+    assert function.is_differentiable() is False
+    # Validate output shape
+    x = np.random.rand(10, function.get_dimensionality())
+    y = function(x)
+    assert y.shape == (10, 1)
+    with pytest.raises(func.NoDerivativeError):
+        function(x, True)
