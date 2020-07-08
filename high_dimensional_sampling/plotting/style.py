@@ -34,7 +34,8 @@ def use_hds_plot_style(full_colour=True):
            prop_cycle=prop_cycle,
            facecolor='#f3f3f3',
            edgecolor='#f3f3f3',
-           grid=True)
+           grid=True,
+           axisbelow=True)
     plt.rc('figure', dpi=200, figsize=(4, 3), autolayout=True)
     plt.rc('font', family=['Times', 'Times New Roman', 'serif'])
     plt.rc('grid', color='white', linewidth=1)
