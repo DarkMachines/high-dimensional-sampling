@@ -1,5 +1,5 @@
 from .randomoptimisation import RandomOptimisation  # noqa: F401
-from .particlefilter import ParticleFilter  # noqa: F401
+from .gaussianparticlefilter import GaussianParticleFilter  # noqa: F401
 from .gpyopt import GPyOpt  # noqa: F401
 from .cmaesoptimisation import CMAOptimisation  # noqa: F401
 from .ampgo import Ampgo  # noqa: F401

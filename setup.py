@@ -47,6 +47,7 @@ setup(
         'gpyopt',
         'cma',
         'turbo @ git+https://github.com/uber-research/TuRBO.git',
+        'particlefilter @ git+https://github.com/bstienen/particlefilter.git',
         'openopt',
         'tensorflow'],
          # FIXME: add your package's dependencies to this list
