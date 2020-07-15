@@ -1,4 +1,3 @@
-import sys
 import high_dimensional_sampling as hds
 from high_dimensional_sampling import functions as func
 import particlefilter as pf
@@ -23,7 +22,7 @@ class GaussianParticleFilter(hds.Procedure):
                  kc_cut_to_iteration_size=False,
                  max_resample_attempts=100,
                  inf_replace=1e12):
-        
+
         # Store properties
         self.iteration = 0
         self.seed_size = seed_size
@@ -43,44 +42,30 @@ class GaussianParticleFilter(hds.Procedure):
             boundaries=boundaries,
             initial_width=initial_width,
             width_controller=pf.get_width_controller(
-                self.wc_decay_rate,
-                self.wc_apply_every_n_iterations
-            ),
+                self.wc_decay_rate, self.wc_apply_every_n_iterations),
             stdev_controller=pf.get_stdev_controller(
-                self.sc_min_stdev,
-                self.sc_max_stdev,
-                self.sc_scales_with_boundary,
-                self.sc_logarithmic,
-                inf_replace
-            ),
+                self.sc_min_stdev, self.sc_max_stdev,
+                self.sc_scales_with_boundary, self.sc_logarithmic,
+                inf_replace),
             kill_controller=pf.get_kill_controller(
-                self.kc_survival_rate,
-                self.kc_cut_to_iteration_size
-            ),
+                self.kc_survival_rate, self.kc_cut_to_iteration_size),
             max_resample_attempts=max_resample_attempts,
             inf_replace=inf_replace)
 
         self.store_parameters = [
-            'seed_size',
-            'iteration_size',
-            'initial_width',
-            'wc_decay_rate',
-            'wc_apply_every_n_iterations',
-            'sc_min_stdev',
-            'sc_max_stdev',
-            'sc_scales_with_boundary',
-            'sc_logarithmic',
-            'kc_survival_rate',
-            'kc_cut_to_iteration_size',
-            'boundaries',
-            'inf_replace'
+            'seed_size', 'iteration_size', 'initial_width', 'wc_decay_rate',
+            'wc_apply_every_n_iterations', 'sc_min_stdev', 'sc_max_stdev',
+            'sc_scales_with_boundary', 'sc_logarithmic', 'kc_survival_rate',
+            'kc_cut_to_iteration_size', 'boundaries', 'inf_replace'
         ]
+
     def __len__(self):
         return len(self)
-    
+
     def __getattribute__(self, name):
-        if name in ['iteration_size', 'initial_width', 'inf_replace',
-            'boundaries']:
+        if name in [
+                'iteration_size', 'initial_width', 'inf_replace', 'boundaries'
+        ]:
             v = getattr(self.pf, name)
             if isinstance(v, np.ndarray):
                 v = v.tolist()
@@ -91,16 +76,15 @@ class GaussianParticleFilter(hds.Procedure):
 
     def add_callback(self, name, function=None):
         self.pf.add_callback(name, function)
-    
+
     def set_seed(self, x, y):
         self.pf.set_seed(x, y)
 
     def __call__(self, function):
         # Insert function in particle filter
-        func = lambda x: function(x)
-        func = self.pf.validate_function(func)
+        func = self.pf.validate_function(lambda x: function(x))
         self.pf.function = func
-        # Replace boundaries 
+        # Replace boundaries
         if not np.array_equal(self.pf.boundaries, function.ranges):
             self.pf.boundaries = np.array(function.ranges)
         # Sample!
@@ -118,7 +102,7 @@ class GaussianParticleFilter(hds.Procedure):
         print("\n\n")
         self.iteration += 1
         return (x, y)
-    
+
     def check_testfunction(self, function):
         return True
 
@@ -161,4 +145,3 @@ if __name__ == "__main__":
     plt.hist(xn[:, 0], bins, density=1, histtype='step', label='iteration 24')
     plt.legend()
     plt.show()
-

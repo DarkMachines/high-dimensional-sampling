@@ -40,6 +40,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   selector methods don't select data directly, but instead output `(indices,
   samples, values)`, where `indices` are the indices of the samples and values
   selected.
+* Changed particle filter implementation to the one in
+  https://github.com/bstienen/particlefilter.
 
 ### Fixed
 
