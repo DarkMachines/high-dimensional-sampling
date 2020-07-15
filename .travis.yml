@@ -24,9 +24,9 @@ install:
     - pip install flake8 coveralls
     - pip install pyyaml matplotlib
     - pip install gpyopt
-    - python setup.py install
     - pip install git+https://github.com/uber-research/TuRBO.git
     - pip install git+https://github.com/bstienen/particlefilter.git
+    - python setup.py install
 
 before_script:
     # Test for pep-compliance
