@@ -42,6 +42,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   selected.
 * Changed particle filter implementation to the one in
   https://github.com/bstienen/particlefilter.
+* Plotting style now puts the grid at the lowest z-order, such that e.g.
+  scatter markers are fully visible.
 
 ### Fixed
 
