@@ -125,8 +125,8 @@ class PyScannerBit(hds.Procedure):
             for argument in fargs:
                 ranges_array = np.array(ranges)
                 map[argument] = (ranges_array[iii][0]
-                                 + (ranges_array[iii][1]-
-                                    ranges_array[iii][0])*vec[iii])
+                                 + (ranges_array[iii][1] -
+                                    ranges_array[iii][0]) * vec[iii])
                 iii = iii + 1
 
         myscan = sb.Scan(simple,
