@@ -1656,7 +1656,7 @@ class MSSM7(MLFunction):
         for i in range(len(self.x_mean)):
             ranges.append([x_min[i], x_max[i]])
         self.ranges = ranges
-        # self.ranges = self.construct_ranges(len(self.x_mean), 
+        # self.ranges = self.construct_ranges(len(self.x_mean),
         #    self.x_mean-5.*self.x_stdev, self.x_mean+5.*self.x_stdev)
         # self.ranges = self.construct_ranges(len(self.x_mean),
         #   -10000000, 10000000)
