@@ -20,7 +20,7 @@ except NameError:
 
 class PyScannerBit(hds.Procedure):
     def __init__(self,
-                 output_path = '',
+                 output_path='',
                  scanner="badass",
                  multinest_tol=0.5,
                  multinest_nlive=100,
@@ -62,8 +62,8 @@ class PyScannerBit(hds.Procedure):
         except NameError:
             raise ImportError("The `mpi4py` package is not installed.")
 
-        print('output_path is',output_path)
-        
+        print('output_path is', output_path)
+
         self.output_path = output_path
         self.scanner = scanner
         self.multinest_tol = multinest_tol
@@ -96,7 +96,7 @@ class PyScannerBit(hds.Procedure):
         scanner_options["badass"] = {"points": self.badass_points,
                                      "jumps": self.badass_jumps}
         scanner_options["pso"] = {"NP": self.pso_np}
-        scanner_options['pso'] = {"convthresh" : self.pso_convthresh}
+        scanner_options['pso'] = {"convthresh": self.pso_convthresh}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
         # and the maxima 0.001 down, in order to make use the sampling is not
@@ -123,10 +123,10 @@ class PyScannerBit(hds.Procedure):
         def prior(vec, map):
             iii = 0
             for argument in fargs:
-                ranges_array=np.array(ranges)
+                ranges_array = np.array(ranges)
                 map[argument] = (ranges_array[iii][0]
-                                 + (ranges_array[iii][1]-ranges_array[iii][0])*vec[iii])
-           
+                                 + (ranges_array[iii][1]-
+                                    ranges_array[iii][0])*vec[iii])
                 iii = iii + 1
 
         myscan = sb.Scan(simple,
@@ -135,7 +135,7 @@ class PyScannerBit(hds.Procedure):
                          prior_types=["flat"]*dimensions,
                          scanner=self.scanner,
                          scanner_options=scanner_options[self.scanner],
-                         output_path = self.output_path,
+                         output_path=self.output_path,
                          fargs=fargs)
         print("Running scan with {}".format(self.scanner))
         myscan.scan()
