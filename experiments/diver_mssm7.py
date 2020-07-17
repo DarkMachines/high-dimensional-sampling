@@ -27,7 +27,6 @@ np_values = [2000]
 # Create function feeder
 feeder = hds.functions.FunctionFeeder()
 mssm7 = func.MSSM7()
-mssm7.invert()
 feeder.add_function(mssm7)
 # feeder.add_function(func.HiddenFunction1(int(2)))
 
