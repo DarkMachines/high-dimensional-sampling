@@ -536,9 +536,5 @@ def test_testfunction_mssm7():
     # Validate function properties
     assert function.is_bounded() is True
     assert function.is_differentiable() is False
-    # Validate output shape
-    x = np.random.rand(10, function.get_dimensionality())
-    y = function(x)
-    assert y.shape == (10, 1)
     with pytest.raises(func.NoDerivativeError):
         function(x, True)
