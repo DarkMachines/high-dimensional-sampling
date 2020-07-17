@@ -534,7 +534,7 @@ def test_testfunction_mssm7():
     # Validate the default configuration
     assert function.get_dimensionality() == 12
     # Validate function properties
-    assert function.is_bounded() is False
+    assert function.is_bounded() is True
     assert function.is_differentiable() is False
     # Validate output shape
     x = np.random.rand(10, function.get_dimensionality())
