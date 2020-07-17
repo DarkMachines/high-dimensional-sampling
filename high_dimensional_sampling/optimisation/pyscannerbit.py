@@ -20,6 +20,7 @@ except NameError:
 
 class PyScannerBit(hds.Procedure):
     def __init__(self,
+                 output_path='',
                  scanner="badass",
                  multinest_tol=0.5,
                  multinest_nlive=100,
@@ -32,8 +33,10 @@ class PyScannerBit(hds.Procedure):
                  toy_mcmc_point_number=10,
                  badass_points=1000,
                  badass_jumps=10,
-                 pso_np=400):
-        self.store_parameters = ['scanner',
+                 pso_np=400,
+                 pso_convthresh=1e-2):
+        self.store_parameters = ['output_path',
+                                 'scanner',
                                  'multinest_tol',
                                  'multinest_nlive',
                                  'polychord_tol',
@@ -45,7 +48,8 @@ class PyScannerBit(hds.Procedure):
                                  'toy_mcmc_point_number',
                                  'badass_points',
                                  'badass_jumps',
-                                 'pso_np']
+                                 'pso_np',
+                                 'pso_convthresh']
 
         # Check if import was succesfull
         # Raise Error if this fails (not all necessary packages are available)
@@ -58,6 +62,9 @@ class PyScannerBit(hds.Procedure):
         except NameError:
             raise ImportError("The `mpi4py` package is not installed.")
 
+        print('output_path is', output_path)
+
+        self.output_path = output_path
         self.scanner = scanner
         self.multinest_tol = multinest_tol
         self.multinest_nlive = multinest_nlive
@@ -71,6 +78,7 @@ class PyScannerBit(hds.Procedure):
         self.badass_points = badass_points
         self.badass_jumps = badass_jumps
         self.pso_np = pso_np
+        self.pso_convthresh = pso_convthresh
         self.reset()
 
     def __call__(self, function):
@@ -88,11 +96,12 @@ class PyScannerBit(hds.Procedure):
         scanner_options["badass"] = {"points": self.badass_points,
                                      "jumps": self.badass_jumps}
         scanner_options["pso"] = {"NP": self.pso_np}
+        scanner_options['pso'] = {"convthresh": self.pso_convthresh}
 
         # Get ranges of the test function. The 0.001 moves the minima 0.001 up
         # and the maxima 0.001 down, in order to make use the sampling is not
         # by accident moving outside of the test function range.
-        ranges = function.get_ranges(0.01)
+        ranges = function.get_ranges(0.0000000001)
         ranges = np.array(ranges).tolist()
 
         dimensions = function.get_dimensionality()
@@ -116,6 +125,7 @@ class PyScannerBit(hds.Procedure):
             for argument in fargs:
                 map[argument] = (ranges[iii][0]
                                  + (ranges[iii][1]-ranges[iii][0])*vec[iii])
+
                 iii = iii + 1
 
         myscan = sb.Scan(simple,
@@ -124,6 +134,7 @@ class PyScannerBit(hds.Procedure):
                          prior_types=["flat"]*dimensions,
                          scanner=self.scanner,
                          scanner_options=scanner_options[self.scanner],
+                         output_path=self.output_path,
                          fargs=fargs)
         print("Running scan with {}".format(self.scanner))
         myscan.scan()
