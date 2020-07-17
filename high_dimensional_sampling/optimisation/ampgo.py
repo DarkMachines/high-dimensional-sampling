@@ -1,7 +1,3 @@
-"""
-Example of an optimisation experiment. Implemented procedure is explained at
-https://en.wikipedia.org/wiki/Random_optimization
-"""
 import high_dimensional_sampling as hds
 import numpy as np
 
@@ -27,6 +23,13 @@ OPENOPT_LOCAL_SOLVERS = [
 
 class Ampgo(hds.Procedure):
     def __init__(self, n_initial=10, n_sample=10):
+        try:
+            NLP
+        except NameError:
+            raise ImportError(
+                "The `openopt` package is not installed. See the wiki on our "
+                "GitHub project for installation instructions.")
+
         self.store_parameters = ['n_initial', 'n_sample']
         self.n_initial = n_initial
         self.n_sample = n_sample
@@ -424,7 +427,7 @@ class Ampgo(hds.Procedure):
         return yf
 
     def get_initial_position(self, ranges, n_sample_initial):
-        x = [uniform(l, u) for l, u in ranges]
+        x = [uniform(left, right) for left, right in ranges]
         return x
 
     def get_point(self, ranges, stdev=0.01, n_sample=1):

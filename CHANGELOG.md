@@ -13,8 +13,19 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Additional tests on the shape of input data for test functions and on the
   shape of output data from procedures. This change was made to accomodate the
   usage of the TuRBO package.
+* Argument `verbose` to Experiment initialisation method. This method controls
+  the output of intermediate results (#samples for the #procedure_calls). See
+  documentation of __init__ of the Experiment class for more information.
 * The dimensionality of hidden `TestFunction`s can now be changed with the
   `dimensionality` argument at initialisation of the class.
+* The ParticleFilter now implements a callback method that allows for the
+  inclusion of a callback function in each sampling iteration (except for
+  the first one). See the documentation on the wiki and in the docstring for
+  more information.
+* A `MSSM7` function has been added to the `functions` module. This function
+  calls a trained neural network to evaluate the likelihood in a 12-dimensional
+  space (which includes 5 nuisance parameters). The algorithm was trained on 
+  data from the Gambit collaboration.
 
 ### Changed
 
@@ -22,6 +33,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   removed from installation requirements in the `setup.py` file. This will only
   yield error messages when the `pygmo` package is actually requested by the
   implemented pygmo Procedure.
+* The `weighing_deterministic_linear` function in the particle filter's linear
+  function was based on sample order, not on function value. This has been
+  changed.
+* To accomodate the implementation of callbacks in the particle filter, the
+  selector methods don't select data directly, but instead output `(indices,
+  samples, values)`, where `indices` are the indices of the samples and values
+  selected.
+* Changed particle filter implementation to the one in
+  https://github.com/bstienen/particlefilter.
+* Plotting style now puts the grid at the lowest z-order, such that e.g.
+  scatter markers are fully visible.
 
 ### Fixed
 
@@ -30,6 +52,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   was also inverted. This was solved by having the `get_simple_interface()`
   and `get_simple_interface_with_scan` methods use copies of the original
   function.
+* The weighing_stochastic_linear function in the particle filter optimisation
+  method could occasionally raise errors related to `nan` probabilities. This
+  is now fixed.
+* The gaussian constructors needed for the particle filter could return negative
+  results. As the output represents standard deviations, this is unexpected
+  behaviour. The absolute value of the standard deviation is now returned
+  instead.
+* The particle filter did not implement a way to keep the best points of the
+  previous iteration for the current one. This is now implemented through the
+  `survival_rate` argument (default=0.2).
 
 ## Version 0.2.0 (Monday February 17th, 2020)
 

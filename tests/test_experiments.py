@@ -164,7 +164,8 @@ def test_experiment_optimisation():
     experiment = exp.OptimisationExperiment(procedure, path)
     # Test start_experiment event
     experiment._event_start_experiment()
-    assert experiment.best_point is None
+    assert experiment.best_x is None
+    assert experiment.best_y is None
     # Test that end experiment event does return nothing
     # TODO: how to test a function that does nothing?
     assert experiment._event_end_experiment() is None
@@ -172,16 +173,13 @@ def test_experiment_optimisation():
     y = x[:, 1]
     m = np.argmin(y)
     experiment._event_new_samples(x, y)
-    best = experiment.best_point
-    assert np.array_equal(best[0], x[m]) is True
-    assert np.array_equal(best[1], y[m]) is True
+    assert np.array_equal(experiment.best_x[0], x[m]) is True
+    assert np.array_equal(experiment.best_y[0], y[m]) is True
     # Test make metrics function
     metrics = experiment.make_metrics()
+    assert isinstance(experiment.make_metrics(), dict)
     assert metrics['best_point'] == x[m].tolist()
     assert metrics['best_value'] == y[m].tolist()
-    experiment.best_point = None
-    assert isinstance(experiment.make_metrics(), dict)
-    assert len(experiment.make_metrics()) == 0
 
 
 def test_experiment_posteriorsampling():

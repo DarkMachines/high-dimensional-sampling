@@ -24,14 +24,21 @@ class Experiment(ABC):
         procedure: An instance of a Procedure derived class that needs to be
             tested in this experiment.
         path: Path to which the experiment should write its logs.
+        verbose: Boolean or integer indicating if intermediate output should to
+            stdout should be provided, indicating how many samples were taken
+            and in which procedure call the experiment is. If a boolean, each
+            procedure call will get its current sample count outputted. If an
+            integer, output will only be given if the number of procedure calls
+            is a multiple of said integer.
     """
-    def __init__(self, procedure, path):
+    def __init__(self, procedure, path, verbose=True):
         if not isinstance(procedure, Procedure):
             raise Exception("""Experiments should be provided an instance of a
                 class derived from the procedures.Procedure class.""")
         self.path = path
         self.procedure = procedure
         self.logger = None
+        self.verbose = int(verbose)
 
     def _perform_experiment(self, function, log_data=True):
         """
@@ -108,6 +115,10 @@ class Experiment(ABC):
             # Log procedure call
             n = len(x)
             n_sampled += n
+            if self.verbose != 0:
+                if self.logger.procedure_calls % self.verbose == 0:
+                    print("{} samples taken in {} procedure calls".format(
+                        n_sampled, self.logger.procedure_calls))
             self.logger.log_procedure_calls(dt, n_sampled, n)
             # Log sampled data
             if log_data:
@@ -121,6 +132,10 @@ class Experiment(ABC):
             # condition to control this.
             is_finished = (self.procedure.is_finished()
                            or self._stop_experiment(x, y))
+        if self.verbose:
+            print(
+                "Experiment finished with {} procedure calls and {} samples.".
+                format(self.logger.procedure_calls, n_sampled))
         self._event_end_experiment()
         # Log result metrics
         t_experiment_end = get_time()
@@ -239,11 +254,80 @@ class OptimisationExperiment(Experiment):
     Implements automatic logging of best obtained result to the experiment.yaml
     file.
     """
+    def __init__(self, *args, **kwargs):
+        super(OptimisationExperiment, self).__init__(*args, **kwargs)
+        self.threshold_x = np.inf
+        self.tollerance_y = 0
+
+    def detect_multiple_minima(self, threshold_x=np.inf, tollerance_y=0):
+        """
+        Allow the detection of multiple minima by setting thresholds for the
+        identification of a minimum as a unique minimum.
+
+        By calling this function with anything by the default parameters,
+        multiple minima can be detected by the OptimisationExperiment. The
+        `threshold_x` parameter defines the minimum required euclidean distance
+        between the different found candidate minima, so a higher threshold
+        makes it harder to find secundary minima (default is `numpy.inf`).
+        `tollerance_y` sets how much the function value of the test function
+        may vary with respect to the absolute minimum found so far in order
+        to be considered a candidate minimum (default is `0`).
+
+        If a point is both more than `threshold_x` away from the best found
+        minimum (and other, already found secundary minima) and its function
+        value is within `tollerance_y` of the best found minimum, it is
+        considered a secundary minimum and will be reported as such in the
+        `experiment.yaml` file.
+
+        Args:
+            threshold_x: Float indicating the minimum distance between the
+                different minima to be found. Distance is measured using the
+                euclidean distance norm.
+            tollerance_y: Allowed difference between secundary minima and
+                the best found minimum.
+        """
+        self.threshold_x = threshold_x
+        self.tollerance_y = tollerance_y
+
+    def _find_minima(self, x, y, previous_x, previous_y):
+        # Find best minimum so far
+        if previous_x is None:
+            x_candi, y_candi = x, y
+        else:
+            x_candi = np.vstack((x, np.array(previous_x)))
+            y_candi = np.vstack((y, np.array(previous_y)))
+        minimum = np.amin(y)
+        # Select based on y_threshold
+        indices = np.argwhere(
+            y_candi.flatten() <= minimum + self.tollerance_y).flatten()
+        x_candi, y_candi = x_candi[indices], y_candi[indices]
+        # Sort candidates based on y value
+        indices = np.argsort(y_candi, axis=0).flatten()
+        indices = indices
+        x_candi, y_candi = x_candi[indices], y_candi[indices]
+        # Select based on x_threshold
+        indices = []
+        for i in range(len(x_candi)):
+            if len(indices) == 0:
+                indices.append(i)
+            elif self._is_minimum_new(x_candi[i], x_candi[np.array(indices)]):
+                indices.append(i)
+        indices = np.array(indices).flatten()
+        # Return selection
+        return x_candi[indices], y_candi[indices]
+
+    def _is_minimum_new(self, x, x_prime):
+        for z in x_prime:
+            if np.linalg.norm(x - z) < self.threshold_x:
+                return False
+        return True
+
     def _event_start_experiment(self):
         """
         Event that is run when a new experiment is started.
         """
-        self.best_point = None
+        self.best_x = None
+        self.best_y = None
 
     def _event_end_experiment(self):
         """
@@ -265,11 +349,8 @@ class OptimisationExperiment(Experiment):
             y: Function values for the samples datapoints of shape
                 (nDatapoints, ?)
         """
-        for i in range(len(x)):
-            if self.best_point is None:
-                self.best_point = (x[i], y[i])
-            elif y[i] < self.best_point[1]:
-                self.best_point = (x[i], y[i])
+        self.best_x, self.best_y = self._find_minima(x, y, self.best_x,
+                                                     self.best_y)
 
     def make_metrics(self):
         """
@@ -279,11 +360,14 @@ class OptimisationExperiment(Experiment):
         Returns:
             Dictionary containing the metrics by name.
         """
-        if self.best_point is None:
-            return {}
+        if len(self.best_x) == 1:
+            return {
+                'best_point': self.best_x[0].tolist(),
+                'best_value': self.best_y[0].tolist()
+            }
         return {
-            'best_point': self.best_point[0].tolist(),
-            'best_value': self.best_point[1].tolist()
+            'best_point': self.best_x.tolist(),
+            'best_value': self.best_y.tolist()
         }
 
 
