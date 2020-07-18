@@ -1645,5 +1645,15 @@ class MSSM7(MLFunction):
         ], np.float64)
         self.y_mean = -262.5887645450105
         self.y_stdev = 7.461633956842537
-        self.ranges = self.construct_ranges(len(self.x_mean), -np.inf, np.inf)
+        # Now set ranges on the parameters
+        x_min = self.x_mean-5.*self.x_stdev
+        x_max = self.x_mean+5.*self.x_stdev
+        x_min = x_min.tolist()
+        x_max = x_max.tolist()
+
+        ranges = []
+
+        for i in range(len(self.x_mean)):
+            ranges.append([x_min[i], x_max[i]])
+        self.ranges = ranges
         super(MSSM7, self).__init__(*args, **kwargs)
