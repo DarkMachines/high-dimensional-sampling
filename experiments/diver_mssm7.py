@@ -15,7 +15,9 @@ from high_dimensional_sampling import optimisation
 PROCEDURE_REQUIRES_BOUNDED_FUNCTIONS = False
 
 """ Procedure configuration """
+
 # The MAXIMUM_NUMBER_OF_SAMPLES configuration defines how many samples are to
+
 # be sampled. If after any iteration the number of samples exceeds this number,
 # the optimisation procedure is stopped.
 MAXIMUM_NUMBER_OF_SAMPLES = 10000
@@ -27,6 +29,7 @@ np_values = [2000]
 # Create function feeder
 feeder = hds.functions.FunctionFeeder()
 mssm7 = func.MSSM7()
+
 feeder.add_function(mssm7)
 # feeder.add_function(func.HiddenFunction1(int(2)))
 
@@ -36,6 +39,7 @@ for numpoints in np_values:
 
         RESULTS_FOLDER = "/home/user/high-dimensional-sampling/" \
             "mssm7_functest_diver_"+str(convthresh)+"_"+str(numpoints)
+
 
         procedure = optimisation.PyScannerBit(scanner="diver",
                                               multinest_tol=0.5,
@@ -52,6 +56,7 @@ for numpoints in np_values:
                                               pso_np=400,
                                               output_path=RESULTS_FOLDER)
 
+
         experiment = hds.OptimisationExperiment(procedure, RESULTS_FOLDER)
 
         # Perform experiment with function
@@ -59,3 +64,4 @@ for numpoints in np_values:
             # if MPI.COMM_WORLD.Get_rank() == 0:
             experiment.run(function,
                            finish_line=int(MAXIMUM_NUMBER_OF_SAMPLES))
+
