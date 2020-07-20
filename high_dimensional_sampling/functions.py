@@ -38,7 +38,6 @@ class TestFunction(ABC):
         if not hasattr(self, 'ranges'):
             self.ranges = []
             raise Exception("TestFunction should define ranges.")
-        self.ranges = np.array(self.ranges)
         self.inverted = False
         self.counter = []
         if name is None:
