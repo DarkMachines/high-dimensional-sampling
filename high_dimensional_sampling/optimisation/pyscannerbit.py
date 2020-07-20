@@ -123,10 +123,8 @@ class PyScannerBit(hds.Procedure):
         def prior(vec, map):
             iii = 0
             for argument in fargs:
-                ranges_array = np.array(ranges)
-                map[argument] = (ranges_array[iii][0]
-                                 + (ranges_array[iii][1] -
-                                    ranges_array[iii][0]) * vec[iii])
+                map[argument] = (ranges[iii][0]
+                                 + (ranges[iii][1]-ranges[iii][0])*vec[iii])
                 iii = iii + 1
 
         myscan = sb.Scan(simple,
