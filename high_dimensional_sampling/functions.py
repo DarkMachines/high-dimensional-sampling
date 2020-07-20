@@ -1653,7 +1653,6 @@ class MSSM7(MLFunction):
         x_min = x_min.tolist()
         x_max = x_max.tolist()
 
-
         ranges = []
 
         for i in range(len(self.x_mean)):
