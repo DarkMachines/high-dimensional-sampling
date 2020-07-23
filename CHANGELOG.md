@@ -22,6 +22,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   inclusion of a callback function in each sampling iteration (except for
   the first one). See the documentation on the wiki and in the docstring for
   more information.
+* A `MSSM7` function has been added to the `functions` module. This function
+  calls a trained neural network to evaluate the likelihood in a 12-dimensional
+  space (which includes 5 nuisance parameters). The algorithm was trained on 
+  data from the Gambit collaboration.
 
 ### Changed
 
@@ -36,6 +40,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   selector methods don't select data directly, but instead output `(indices,
   samples, values)`, where `indices` are the indices of the samples and values
   selected.
+* Changed particle filter implementation to the one in
+  https://github.com/bstienen/particlefilter.
+* Plotting style now puts the grid at the lowest z-order, such that e.g.
+  scatter markers are fully visible.
 
 ### Fixed
 
