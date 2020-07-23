@@ -43,7 +43,7 @@ setup(
     ],
     test_suite='tests',
     install_requires=[
-        'pyyaml', 'numpy', 'pandas', 'matplotlib', 'seaborn',
+        'pyyaml', 'numpy==1.18.0', 'pandas', 'matplotlib', 'seaborn',
         'gpyopt',
         'cma',
         'turbo @ git+https://github.com/uber-research/TuRBO.git',

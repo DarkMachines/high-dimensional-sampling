@@ -274,7 +274,7 @@ class TestFunction(ABC):
             if x.shape[0] == self.get_dimensionality():
                 return (True, copy(x).reshape(1, -1))
             else:
-                return (False, copy(x).rehshape(-1, 1))
+                return (False, copy(x).reshape(-1, 1))
         return (False, x)
 
     def construct_ranges(self, dimensionality, minimum, maximum):
