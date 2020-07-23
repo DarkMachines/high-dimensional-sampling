@@ -7,6 +7,11 @@ import pandas as pd
 from scipy import special, stats
 from .utils import get_time
 
+try:
+    from tensorflow.keras.models import load_model
+except ImportError:
+    pass
+
 
 class TestFunction(ABC):
     """
@@ -593,6 +598,68 @@ class HiddenFunction(TestFunction, ABC):
         y = np.zeros((len(x), 1))
         for i, xi in enumerate(x):
             y[i, 0] = self._query(xi)
+        return y
+
+    def _derivative(self, x):
+        raise NoDerivativeError()
+
+
+class MLFunction(TestFunction, ABC):
+    """ Base class for functions that use a machine learning algorithm to
+    provide function values """
+    def __init__(self, *args, **kwargs):
+        # Check if TF is installed
+        try:
+            load_model
+        except NameError:
+            raise ImportError(
+                "The `tensorflow` package is not installed. This is needed in "
+                "order to run `MLFunction`s. See the wiki on our GitHub "
+                "project for installation instructions.")
+        # Define object properties
+        self.packageloc = self._get_package_location()
+        self.model = None
+        # Check definitions in parent class
+        if not hasattr(self, 'modelname'):
+            self.modelname = []
+            raise Exception("MLFunction should define modelname.")
+        if not hasattr(self, 'x_mean') or not hasattr(self, 'x_stdev'):
+            self.x_mean, self.x_stdev = None, None
+            raise Exception("MLFunction should define x_mean and x_stdev.")
+        if not hasattr(self, 'y_mean') or not hasattr(self, 'y_stdev'):
+            self.y_mean, self.y_stdev = None, None
+            raise Exception("MLFunction should define y_mean and y_stdev.")
+        super(MLFunction, self).__init__(*args, **kwargs)
+
+    def _get_package_location(self):
+        """ Get location in which the package was installed """
+        this_dir, _ = os.path.split(__file__)
+        return this_dir
+
+    def _load_model(self):
+        """ Load ML model from package """
+        model_path = "{}/ml_functions/{}/{}".format(self.packageloc,
+                                                    self.modelname,
+                                                    "model.hdf5")
+        self.model = load_model(model_path)
+
+    def _normalise(self, x, mu, sigma):
+        return (x - mu) / sigma
+
+    def _unnormalise(self, x, mu, sigma):
+        return x * sigma + mu
+
+    def _evaluate(self, x):
+        # Load model is not already done
+        if self.model is None:
+            self._load_model()
+        # Correct shape of x is needed
+        if len(x.shape) == 1:
+            x = x.reshape(1, -1)
+        # Query to model
+        x = self._normalise(x, self.x_mean, self.x_stdev)
+        y = self.model.predict(x)
+        y = self._unnormalise(y, self.y_mean, self.y_stdev)
         return y
 
     def _derivative(self, x):
@@ -1561,3 +1628,34 @@ class HiddenFunction4(HiddenFunction):
         self.ranges = self.construct_ranges(dimensionality, -500.0, 500.0)
         super(HiddenFunction4, self).__init__(*args, **kwargs)
         self.funcname = 'test_func_4.bin'
+
+
+class MSSM7(MLFunction):
+    def __init__(self, *args, **kwargs):
+        self.modelname = 'mssm7'
+        self.x_mean = np.array([
+            -1.65550622e+02, 6.53242357e+07, -6.04267288e+06, 1.15227686e+07,
+            -8.96546390e+02, 1.20880748e+03, 3.65456629e+01, 1.73423279e+02,
+            1.18539912e-01, 4.00306869e-01, 4.31081695e+01, 5.80441328e+01
+        ], np.float64)
+        self.x_stdev = np.array([
+            3.13242671e+03, 2.64037878e+07, 4.32735828e+06, 2.22328069e+07,
+            2.33891832e+03, 6.20060930e+03, 1.40566829e+01, 3.83628710e-01,
+            2.51362291e-04, 4.59609868e-02, 3.09244370e+00, 3.24780776e+00
+        ], np.float64)
+        self.y_mean = -262.5887645450105
+        self.y_stdev = 7.461633956842537
+
+        # Now set ranges on the parameters
+        x_min = self.x_mean-5.*self.x_stdev
+        x_max = self.x_mean+5.*self.x_stdev
+        x_min = x_min.tolist()
+        x_max = x_max.tolist()
+
+        ranges = []
+
+        for i in range(len(self.x_mean)):
+            ranges.append([x_min[i], x_max[i]])
+        self.ranges = ranges
+
+        super(MSSM7, self).__init__(*args, **kwargs)
