@@ -6,22 +6,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class GaussianParticleFilter(hds.Procedure):
+class ParticleFilter(hds.Procedure):
     def __init__(self,
                  seed_size=100,
-                 iteration_size=100,
+                 iteration_size=100,                #
                  boundaries=None,
                  initial_width=2,
-                 wc_decay_rate=0.95,
-                 wc_apply_every_n_iterations=1,
+                 wc_decay_rate=0.95,                #
+                 wc_apply_every_n_iterations=1,     #
                  sc_min_stdev=0.0,
                  sc_max_stdev=np.inf,
-                 sc_scales_with_boundary=True,
-                 sc_logarithmic=False,
+                 sc_scales_with_boundary=True,      #
+                 sc_logarithmic=False,              #
                  kc_survival_rate=0.2,
                  kc_cut_to_iteration_size=False,
                  max_resample_attempts=100,
-                 inf_replace=1e12):
+                 inf_replace=1e12,
+                 min_width=0.0001):
 
         # Store properties
         self.iteration = 0
@@ -34,6 +35,7 @@ class GaussianParticleFilter(hds.Procedure):
         self.sc_logarithmic = sc_logarithmic
         self.kc_survival_rate = kc_survival_rate
         self.kc_cut_to_iteration_size = kc_cut_to_iteration_size
+        self.min_width = min_width
 
         # Create core object
         self.pf = pf.ParticleFilter(
@@ -60,7 +62,9 @@ class GaussianParticleFilter(hds.Procedure):
         ]
 
     def __len__(self):
-        return len(self)
+        if self.pf.population is None:
+            return 0
+        return len(self.pf.population)
 
     def __getattribute__(self, name):
         if name in [
@@ -88,8 +92,9 @@ class GaussianParticleFilter(hds.Procedure):
         if not np.array_equal(self.pf.boundaries, function.ranges):
             self.pf.boundaries = np.array(function.ranges)
         # Sample!
-        if self.pf.population is None or len(self.pf.population) == 0:
+        if len(self) == 0:
             # Sample seed uniformly
+            print("SAMPLE SAMPLES!")
             self.pf.sample_seed(self.seed_size)
         else:
             # Sample new iteration with gaussian kernel
@@ -107,10 +112,14 @@ class GaussianParticleFilter(hds.Procedure):
         return True
 
     def is_finished(self):
+        width_criterion = self.pf.width < self.min_width
+        if width_criterion:
+            return True
         return False
 
     def reset(self):
-        self.pf.reset()
+        #self.pf.reset()
+        pass
 
 
 class ExampleFunction(func.TestFunction):
@@ -128,10 +137,10 @@ class ExampleFunction(func.TestFunction):
 
 if __name__ == "__main__":
     # Define ingredients
-    algorithm = GaussianParticleFilter(seed_size=100,
-                                       iteration_size=100,
-                                       initial_width=0.2,
-                                       wc_decay_rate=0.8)
+    algorithm = ParticleFilter(seed_size=100,
+                               iteration_size=100,
+                               initial_width=0.2,
+                               wc_decay_rate=0.8)
     function = ExampleFunction()
     # Run algorithm on function
     algorithm.check_testfunction(function)
