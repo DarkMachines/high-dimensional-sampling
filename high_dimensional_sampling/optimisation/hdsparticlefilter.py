@@ -94,7 +94,6 @@ class ParticleFilter(hds.Procedure):
         # Sample!
         if len(self) == 0:
             # Sample seed uniformly
-            print("SAMPLE SAMPLES!")
             self.pf.sample_seed(self.seed_size)
         else:
             # Sample new iteration with gaussian kernel
