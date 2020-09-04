@@ -24,8 +24,8 @@ def test_optimisation_randomoptimisation(tmp_path):
     shutil.rmtree(str(tmp_path))
 
 
-def test_optimisation_gaussianparticlefilter(tmp_path):
-    procedure = optimisation.GaussianParticleFilter()
+def test_optimisation_particlefilter(tmp_path):
+    procedure = optimisation.ParticleFilter()
     experiment = exp.OptimisationExperiment(procedure, str(tmp_path))
     experiment.run(func.Himmelblau(), finish_line=250)
     shutil.rmtree(str(tmp_path))
