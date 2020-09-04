@@ -118,7 +118,7 @@ class ParticleFilter(hds.Procedure):
         return False
 
     def reset(self):
-        #self.pf.reset()
+        # self.pf.reset()
         pass
 
 
