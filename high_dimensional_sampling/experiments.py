@@ -8,7 +8,7 @@ import numpy as np
 from .utils import (get_time, get_datetime, create_unique_folder,
                     benchmark_matrix_inverse, benchmark_sha_hashing)
 from .procedures import Procedure
-from .functions import TestFunction
+from .functions import TestFunction, MLFunction
 
 
 class Experiment(ABC):
@@ -586,6 +586,8 @@ class Logger:
             }
             # Get properties of function
             func_props = copy.copy(vars(function))
+            if isinstance(function, MLFunction):
+                del(func_props['model'])
             for prop in func_props:
                 if prop == 'name':
                     continue
