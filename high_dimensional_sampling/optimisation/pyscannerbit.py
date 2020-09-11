@@ -34,7 +34,8 @@ class PyScannerBit(hds.Procedure):
                  badass_points=1000,
                  badass_jumps=10,
                  pso_np=400,
-                 pso_convthresh=1e-2):
+                 pso_convthresh=1e-2,
+                 invert_function=True):
         self.store_parameters = ['output_path',
                                  'scanner',
                                  'multinest_tol',
@@ -49,7 +50,8 @@ class PyScannerBit(hds.Procedure):
                                  'badass_points',
                                  'badass_jumps',
                                  'pso_np',
-                                 'pso_convthresh']
+                                 'pso_convthresh',
+                                 'invert_function']
 
         # Check if import was succesfull
         # Raise Error if this fails (not all necessary packages are available)
@@ -79,6 +81,7 @@ class PyScannerBit(hds.Procedure):
         self.badass_jumps = badass_jumps
         self.pso_np = pso_np
         self.pso_convthresh = pso_convthresh
+        self.invert_function = invert_function
         self.reset()
 
     def __call__(self, function):
@@ -107,7 +110,8 @@ class PyScannerBit(hds.Procedure):
         dimensions = function.get_dimensionality()
 
         simple = function.get_simple_interface_with_scan()
-        simple.invert(True)
+        if self.invert_function:
+            simple.invert(True)
 
         # Create list of function arguments
         fargs = []

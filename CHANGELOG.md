@@ -26,6 +26,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   calls a trained neural network to evaluate the likelihood in a 12-dimensional
   space (which includes 5 nuisance parameters). The algorithm was trained on 
   data from the Gambit collaboration.
+* The `PyScannerBit` optimiser previously always inverted the test function
+  before optimising it, as the optimiser all functions were to be minimised.
+  With the introduction of the `MSSM7` test function this assumption has 
+  become invalid, as `MSSM7` needs to be maximised. The `PyScannerBit`
+  optimiser therefore now implements the `invert_function` argument at
+  construction, which indicates whether or not the test function should be
+  inverted or not (default is `True`).
 
 ### Changed
 
