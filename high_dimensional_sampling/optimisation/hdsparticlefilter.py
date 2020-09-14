@@ -95,6 +95,7 @@ class ParticleFilter(hds.Procedure):
         self.pf.set_seed(x, y)
 
     def __call__(self, function):
+        self.sampled_x, self.sampled_y = np.array([]), np.array([])
         # Insert function in particle filter
         func = self.pf.validate_function(lambda x: function(x))
         self.pf.function = func
