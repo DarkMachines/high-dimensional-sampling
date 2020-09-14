@@ -7,22 +7,23 @@ import matplotlib.pyplot as plt
 
 
 class ParticleFilter(hds.Procedure):
-    def __init__(self,
-                 seed_size=100,
-                 iteration_size=100,                #
-                 boundaries=None,
-                 initial_width=2,
-                 wc_decay_rate=0.95,                #
-                 wc_apply_every_n_iterations=1,     #
-                 sc_min_stdev=0.0,
-                 sc_max_stdev=np.inf,
-                 sc_scales_with_boundary=True,      #
-                 sc_logarithmic=False,              #
-                 kc_survival_rate=0.2,
-                 kc_cut_to_iteration_size=False,
-                 max_resample_attempts=100,
-                 inf_replace=1e12,
-                 min_width=0.0001):
+    def __init__(
+            self,
+            seed_size=100,
+            iteration_size=100,  #
+            boundaries=None,
+            initial_width=2,
+            wc_decay_rate=0.95,  #
+            wc_apply_every_n_iterations=1,  #
+            sc_min_stdev=0.0,
+            sc_max_stdev=np.inf,
+            sc_scales_with_boundary=True,  #
+            sc_logarithmic=False,  #
+            kc_survival_rate=0.2,
+            kc_cut_to_iteration_size=False,
+            max_resample_attempts=100,
+            inf_replace=1e12,
+            min_width=0.0001):
 
         # Store properties
         self.iteration = 0
@@ -54,12 +55,21 @@ class ParticleFilter(hds.Procedure):
             max_resample_attempts=max_resample_attempts,
             inf_replace=inf_replace)
 
+        # Add functionality to get sampled data
+        self.add_callback(
+            'after_procreation', lambda iteration, width, func, pop: self.
+            _get_sampled_data(iteration))
+
         self.store_parameters = [
             'seed_size', 'iteration_size', 'initial_width', 'wc_decay_rate',
             'wc_apply_every_n_iterations', 'sc_min_stdev', 'sc_max_stdev',
             'sc_scales_with_boundary', 'sc_logarithmic', 'kc_survival_rate',
             'kc_cut_to_iteration_size', 'boundaries', 'inf_replace'
         ]
+
+    def _get_sampled_data(self, iteration):
+        self.sampled_x, self.sampled_y = self.pf.population.get_data_by_origin(
+            self.iteration)
 
     def __len__(self):
         if self.pf.population is None:
@@ -95,17 +105,17 @@ class ParticleFilter(hds.Procedure):
         if len(self) == 0:
             # Sample seed uniformly
             self.pf.sample_seed(self.seed_size)
+            self._get_sampled_data(self.pf.iteration)
         else:
             # Sample new iteration with gaussian kernel
             self.pf.run_iteration()
         # Return latest iteration samples
-        x, y = self.pf.population.get_data_by_origin(self.iteration)
         print("Iteration {}".format(self.iteration))
         for sp in self.store_parameters:
             print(sp, getattr(self, sp))
         print("\n\n")
         self.iteration += 1
-        return (x, y)
+        return (self.sampled_x, self.sampled_y)
 
     def check_testfunction(self, function):
         return True
