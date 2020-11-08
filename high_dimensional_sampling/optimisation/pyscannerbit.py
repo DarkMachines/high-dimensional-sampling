@@ -159,7 +159,7 @@ class PyScannerBit(hds.Procedure):
 
         # Uninvert function at the end
         if self.invert_function:
-            function.invert(True)
+            function.invert(False)
         
         return (x, y)
 
