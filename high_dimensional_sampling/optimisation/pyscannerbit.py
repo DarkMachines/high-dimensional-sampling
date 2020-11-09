@@ -110,10 +110,10 @@ class PyScannerBit(hds.Procedure):
         dimensions = function.get_dimensionality()
 
         simple = function.get_simple_interface_with_scan()
-        if self.invert_function: # Invert simple and function if necessary
+        if self.invert_function:  # Invert simple and function if necessary
             simple.invert(True)
             function.invert(True)
-            
+
         # Create list of function arguments
         fargs = []
 
@@ -160,7 +160,7 @@ class PyScannerBit(hds.Procedure):
         # Uninvert function at the end
         if self.invert_function:
             function.invert(False)
-        
+
         return (x, y)
 
     def reset(self):
