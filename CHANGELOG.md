@@ -33,6 +33,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   optimiser therefore now implements the `invert_function` argument at
   construction, which indicates whether or not the test function should be
   inverted or not (default is `True`).
+* Example code for pyscannerbit has been added to `examples` folder.
 
 ### Changed
 
@@ -69,6 +70,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * The particle filter did not implement a way to keep the best points of the
   previous iteration for the current one. This is now implemented through the
   `survival_rate` argument (default=0.2).
+* The `pygmo` interface contained an error, which caused an incorrection
+  function value to be reported in some instances. The coordinate of the best
+  found minimum *was* correctly reported, but the function value is now fixed
+  so that is actually correctsponds to the value at this coordinate.
 
 ## Version 0.2.0 (Monday February 17th, 2020)
 
