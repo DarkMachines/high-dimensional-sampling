@@ -8,7 +8,7 @@ import sys
 
 """ Configure experiment """
 # Location to store results
-RESULTS_FOLDER = "/scratch/bstienen/hds_particlefilter/results/{}d_wd{}_log{}_sr{}"
+RESULTS_FOLDER = "./results/{}d_wd{}_log{}_sr{}"
 
 input_dimensionality = int(sys.argv[1]) # 2, 3, 5, 7
 input_width_decay = float(sys.argv[2]) # 0.9, 0.95, 0.99
