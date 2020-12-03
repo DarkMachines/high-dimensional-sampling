@@ -7,6 +7,9 @@ import pandas as pd
 from scipy import special, stats
 from .utils import get_time
 
+# To run GPU trained model with CPU device
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 try:
     from tensorflow.keras.models import load_model
 except ImportError:
@@ -623,12 +626,23 @@ class MLFunction(TestFunction, ABC):
         if not hasattr(self, 'modelname'):
             self.modelname = []
             raise Exception("MLFunction should define modelname.")
-        if not hasattr(self, 'x_mean') or not hasattr(self, 'x_stdev'):
+
+        is_standardised = hasattr(self, 'x_mean') and hasattr(self, 'x_stdev')
+        if not is_standardised:
             self.x_mean, self.x_stdev = None, None
-            raise Exception("MLFunction should define x_mean and x_stdev.")
-        if not hasattr(self, 'y_mean') or not hasattr(self, 'y_stdev'):
+            raise Exception(
+                "MLFunctions should either define x_mean and x_stdev or "
+                "x_min and x_max."
+            )
+
+        is_standardised = hasattr(self, 'y_mean') and hasattr(self, 'y_stdev')
+        if not is_standardised:
             self.y_mean, self.y_stdev = None, None
-            raise Exception("MLFunction should define y_mean and y_stdev.")
+            raise Exception(
+                "MLFunctions should either define y_mean and y_stdev or "
+                "y_min and y_max."
+            )
+
         super(MLFunction, self).__init__(*args, **kwargs)
 
     def _get_package_location(self):
@@ -1646,15 +1660,20 @@ class MSSM7(MLFunction):
         self.y_mean = -262.5887645450105
         self.y_stdev = 7.461633956842537
 
-        # Now set ranges on the parameters
-        x_min = self.x_mean-5.*self.x_stdev
-        x_max = self.x_mean+5.*self.x_stdev
-        x_min = x_min.tolist()
-        x_max = x_max.tolist()
-
+        # Limit sampling between these hard borders, in order to ALWAYS remain
+        # within the training box.
         ranges = []
-
-        for i in range(len(self.x_mean)):
+        x_min = np.array([
+            -7.16775760e+03, 4.27547804e+05, -9.98192815e+07, -6.81824964e+07,
+            -9.99995488e+03, -9.99999903e+03, 3.00597043e+00, 1.71060011e+02,
+            1.16700013e-01, 2.00000156e-01, 1.90001455e+01, 3.10001673e+01
+        ], np.float64)
+        x_max = np.array([
+            7.18253463e+03, 9.99999857e+07, 4.56142832e+05, 9.99999734e+07,
+            9.99987623e+03, 9.99999881e+03, 6.99999394e+01, 1.75619963e+02,
+            1.20299997e-01, 7.99999435e-01, 6.69997800e+01, 8.49983345e+01
+        ], np.float64)
+        for i in range(len(x_min)):
             ranges.append([x_min[i], x_max[i]])
         self.ranges = ranges
 
