@@ -54,7 +54,7 @@ MAXIMUM_NUMBER_OF_SAMPLES = 1000
 """ Output """
 # Folder in which the results of the experiment will be stored. If the folder
 # does not exist, it will be created.
-RESULTS_FOLDER = "/Users/bstienen/Desktop/hds"
+RESULTS_FOLDER = "./hds"
 
 
 """ ===========================================================================
