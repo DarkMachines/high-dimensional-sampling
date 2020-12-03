@@ -493,8 +493,10 @@ class Pygmo(hds.Procedure):
         if self.verbose > 9:
             print('algo', algo)
 
+        # best_x = np.expand_dims(opt.champion_x, axis=0)
+        # best_fitness = np.expand_dims(opt.get_f()[opt.best_idx()], axis=0)
         best_x = np.expand_dims(opt.champion_x, axis=0)
-        best_fitness = np.expand_dims(opt.get_f()[opt.best_idx()], axis=0)
+        best_fitness = np.expand_dims(opt.champion_f, axis=0)
 
         if self.verbose > 0:
             print('best fit:', best_x, best_fitness)
