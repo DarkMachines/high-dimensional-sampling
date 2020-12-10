@@ -50,11 +50,11 @@ class CMAOptimisation(hds.Procedure):
             r[:, 0][np.isinf(r[:, 0])] = -3
             r[:, 1][np.isinf(r[:, 1])] = 3
             self.__set_scale__(r)
-            x0 = np.zeros_like(r[:,0])
+            x0 = np.zeros_like(r[:, 0])
             sigma = 1./3.
 
             # Set the bounds before initializing the optimizer
-            self.opts["bounds"] = [-1,1]
+            self.opts["bounds"] = [-1, 1]
             self.es = cma.CMAEvolutionStrategy(x0, sigma, self.opts)
 
         # Get new points
@@ -71,12 +71,12 @@ class CMAOptimisation(hds.Procedure):
         # All points are returned
         return (x, y)
 
-    def __set_scale__(self,ranges):
+    def __set_scale__(self, ranges):
         # Do linear transformation from range to [-1,1]
-        self.scale = (ranges[:,1]-ranges[:,0])*0.5
-        self.shift = (ranges[:,1]+ranges[:,0])/(ranges[:,1]-ranges[:,0])
+        self.scale = (ranges[:, 1]-ranges[:, 0])*0.5
+        self.shift = (ranges[:, 1]+ranges[:, 0])/(ranges[:, 1]-ranges[:, 0])
 
-    def __scale__(self,xprime):
+    def __scale__(self, xprime):
         return (xprime+self.shift)*self.scale
 
     def check_testfunction(self, function):
