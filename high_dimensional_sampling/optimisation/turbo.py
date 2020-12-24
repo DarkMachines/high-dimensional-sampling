@@ -44,13 +44,6 @@ class TuRBO(hds.Procedure):
                 elif self.bounds[i][j] == float('-inf'):
                     self.bounds[i][j] = self.min_int
 
-        if function.inverted:
-
-            def func(function):
-                return -function
-
-            function = func
-
         turbo_m = TurboM(
             f=function,  # Handle to objective function
             lb=np.array(self.bounds[:, 0]),  # Numpy array specifying
