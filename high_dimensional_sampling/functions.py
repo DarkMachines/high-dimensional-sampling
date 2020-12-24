@@ -1663,16 +1663,18 @@ class MSSM7(MLFunction):
         # Limit sampling between these hard borders, in order to ALWAYS remain
         # within the training box.
         ranges = []
-        x_min = np.array([
+
+        x_min = [
             -7.16775760e+03, 4.27547804e+05, -9.98192815e+07, -6.81824964e+07,
             -9.99995488e+03, -9.99999903e+03, 3.00597043e+00, 1.71060011e+02,
             1.16700013e-01, 2.00000156e-01, 1.90001455e+01, 3.10001673e+01
-        ], np.float64)
-        x_max = np.array([
+        ]
+        x_max = [
             7.18253463e+03, 9.99999857e+07, 4.56142832e+05, 9.99999734e+07,
             9.99987623e+03, 9.99999881e+03, 6.99999394e+01, 1.75619963e+02,
             1.20299997e-01, 7.99999435e-01, 6.69997800e+01, 8.49983345e+01
-        ], np.float64)
+        ]
+
         for i in range(len(x_min)):
             ranges.append([x_min[i], x_max[i]])
         self.ranges = ranges
