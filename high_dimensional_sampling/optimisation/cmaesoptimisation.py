@@ -49,17 +49,19 @@ class CMAOptimisation(hds.Procedure):
             r = np.array(ranges)
             r[:, 0][np.isinf(r[:, 0])] = -3
             r[:, 1][np.isinf(r[:, 1])] = 3
-            x0 = 0.5*(r[:, 1]+r[:, 0])
-            sigma0 = np.mean(r[:, 1]-r[:, 0])/3.
+            self.__set_scale__(r)
+            x0 = np.zeros_like(r[:, 0])
+            sigma = 1./3.
 
             # Set the bounds before initializing the optimizer
-            self.opts["bounds"] = [ranges[:, 0], ranges[:, 1]]
-            self.es = cma.CMAEvolutionStrategy(x0, sigma0, self.opts)
+            self.opts["bounds"] = [-1, 1]
+            self.es = cma.CMAEvolutionStrategy(x0, sigma, self.opts)
 
         # Get new points
-        x = self.es.ask()
+        xprime = np.array(self.es.ask())
+        x = self.__scale__(xprime)
         y = function(x)
-        self.es.tell(x, [val[0] for val in y])
+        self.es.tell(xprime, [val[0] for val in y])
 
         # Return only the best point of the population
         # THIS IS DISABLED
@@ -67,7 +69,15 @@ class CMAOptimisation(hds.Procedure):
         # return (x[i].reshape((1,len(x[0]))), y[i].reshape(-1,1))
 
         # All points are returned
-        return (np.array(x), y)
+        return (x, y)
+
+    def __set_scale__(self, ranges):
+        # Do linear transformation from range to [-1,1]
+        self.scale = (ranges[:, 1]-ranges[:, 0])*0.5
+        self.shift = (ranges[:, 1]+ranges[:, 0])/(ranges[:, 1]-ranges[:, 0])
+
+    def __scale__(self, xprime):
+        return (xprime+self.shift)*self.scale
 
     def check_testfunction(self, function):
         return True
