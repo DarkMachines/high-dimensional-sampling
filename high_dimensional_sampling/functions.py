@@ -1224,21 +1224,25 @@ class Block(TestFunction):
             dimension as [-block_size, block_size]. Default: 1.
         block_value: Value that the function takes *inside* the ranges spanned
             by block_size. Default: 1.
+        global_size: Defines the domain for which the block function should be
+        searched [-global_size, global_size]. Default: 10.
         global_value: Value that the function takes outside of the ranges
             spanned by block_size. Default: 0.
 
     """
     def __init__(self,
                  dimensionality=3,
-                 block_size=1,
-                 block_value=1,
-                 global_value=0,
+                 block_size=1.,
+                 block_value=1.,
+                 global_size=10.,
+                 global_value=0.,
                  **kwargs):
         self.dimensionality = dimensionality
         self.block_size = block_size
         self.block_value = block_value
         self.global_value = global_value
-        self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
+        self.ranges = self.construct_ranges(dimensionality,
+                                            -global_size, global_size)
         super(Block, self).__init__(**kwargs)
 
     def _evaluate(self, x):

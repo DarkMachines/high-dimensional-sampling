@@ -91,7 +91,7 @@ defined.
 - **_evaluate(self, x)**: method that evaluates the test function at coordinate
 `x`. Be aware that `x` is a numpy array of shape `(nDatapoints, nVariables)`
 and can contain multiple rows (i.e. data points). This method should return
-the function values of your test fucntion in the form of a numpy array of shape
+the function values of your test function in the form of a numpy array of shape
 `(nDatapoints, nOutputVariables)`.
 - **_derivative(self, x)**: same as `_evaluate`, but now for the derivative of
 the testfunction. If no derivative is implemented, this method should raise
