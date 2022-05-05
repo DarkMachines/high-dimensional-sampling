@@ -7,6 +7,9 @@ import pandas as pd
 from scipy import special, stats
 from .utils import get_time
 
+# for CMB_Likelihood
+from importlib import import_module
+
 # To run GPU trained model with CPU device
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -37,8 +40,9 @@ class TestFunction(ABC):
     Raises:
         Exception: Testfunction should define ranges.
     """
+
     def __init__(self, name=None):
-        if not hasattr(self, 'ranges'):
+        if not hasattr(self, "ranges"):
             self.ranges = []
             raise Exception("TestFunction should define ranges.")
         self.inverted = False
@@ -137,8 +141,10 @@ class TestFunction(ABC):
         dim_data = shape[1]
         if dim_data != dim:
             raise Exception(
-                "Provided data has dimensionality {}, but {} was expected".
-                format(dim_data, dim))
+                "Provided data has dimensionality {}, but {} was expected".format(
+                    dim_data, dim
+                )
+            )
 
     def get_ranges(self, epsilon=0.01):
         """
@@ -158,8 +164,7 @@ class TestFunction(ABC):
             this list is a list with two entries: the minimum and the maximum
             for this dimension.
         """
-        return np.array([[r[0] + epsilon, r[1] - epsilon]
-                         for r in self.ranges])
+        return np.array([[r[0] + epsilon, r[1] - epsilon] for r in self.ranges])
 
     def check_ranges(self, x, epsilon=0):
         """
@@ -183,7 +188,9 @@ class TestFunction(ABC):
         if np.any(d < 0.0) or np.any(d > 1.0):
             raise Exception(
                 "Data does not lie within expected ranges: {}.".format(
-                    self.ranges.tolist()))
+                    self.ranges.tolist()
+                )
+            )
 
     def count_calls(self, select="all"):
         """
@@ -220,8 +227,9 @@ class TestFunction(ABC):
                 n_calls += 1
                 n_points += x[0]
         else:
-            raise Exception("Cannot count function calls of"
-                            "unknown type '{}'".format(select))
+            raise Exception(
+                "Cannot count function calls of" "unknown type '{}'".format(select)
+            )
         return (round(n_calls), round(n_points))
 
     def to_numpy_array(self, x):
@@ -251,7 +259,9 @@ class TestFunction(ABC):
             raise Exception(
                 """"Testfunctions don't accept {} as input: only numpy arrays,
                 lists and pandas dataframes are allowed.""".format(
-                    type(x).__name__))
+                    type(x).__name__
+                )
+            )
         return array
 
     def reshape_flat_array(self, x):
@@ -430,10 +440,13 @@ class SimpleFunctionWrapper:
         Exception: SimpleFunctionWrapper can only wrap instances of the
             TestFunction class
     """
+
     def __init__(self, function):
         if not isinstance(function, TestFunction):
-            raise Exception("SimpleFunctionWrapper can only wrap instances of"
-                            "the TestFunction class.")
+            raise Exception(
+                "SimpleFunctionWrapper can only wrap instances of"
+                "the TestFunction class."
+            )
         self.function = deepcopy(function)
 
     def __call__(self, *args, **kwargs):
@@ -473,13 +486,15 @@ class SimpleFunctionWrapper:
         """
         # Check dimensionality of the input
         if len(args) != self.function.get_dimensionality():
-            raise Exception("Number of provided unnamed arguments should match"
-                            "the dimensionality of the wrapped TestFunction.")
+            raise Exception(
+                "Number of provided unnamed arguments should match"
+                "the dimensionality of the wrapped TestFunction."
+            )
         # Construct input array for the wrapped TestFunction
         x = self._create_input_array(args)
         # Evaluate function and change type/form before returning its result
         evaluation = self.function(x, **kwargs)
-        if evaluation.shape == (1, ):
+        if evaluation.shape == (1,):
             return float(evaluation[0])
         return evaluation
 
@@ -506,28 +521,28 @@ class SimpleFunctionWrapper:
         return x
 
     def get_dimensionality(self):
-        """ Get the dimensionality of the TestFunction. See documentation for
-        TestFunction.get_dimensionality() for more information. """
+        """Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.get_dimensionality() for more information."""
         return self.function.get_dimensionality()
 
     def is_bounded(self):
-        """ Get the dimensionality of the TestFunction. See documentation for
-        TestFunction.is_bounded() for more information. """
+        """Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.is_bounded() for more information."""
         return self.function.is_bounded()
 
     def is_differentiable(self):
-        """ Get the dimensionality of the TestFunction. See documentation for
-        TestFunction.is_differentiable() for more information. """
+        """Get the dimensionality of the TestFunction. See documentation for
+        TestFunction.is_differentiable() for more information."""
         return self.function.is_differentiable()
 
     def is_inverted(self):
-        """ Returns a boolean indicating if the TestFunction is inverted, i.e.
+        """Returns a boolean indicating if the TestFunction is inverted, i.e.
         if the bare result of TestFunction evaluations is multiplied with -1.
         """
         return self.function.inverted
 
     def invert(self, inverted=True):
-        """ Invert evaluations of the TestFunction (i.e. multiply them with
+        """Invert evaluations of the TestFunction (i.e. multiply them with
         -1). See documentation for TestFunction.invert() for more information.
         """
         return self.function.invert(inverted)
@@ -548,6 +563,7 @@ class HiddenFunction(TestFunction, ABC):
     Base class for functions that get their evaluated value from a precompiled
     binary.
     """
+
     def __init__(self, compiled_against="18.04", *args, **kwargs):
         self.packageloc = None
         self.funcname = None
@@ -564,13 +580,13 @@ class HiddenFunction(TestFunction, ABC):
         if self.packageloc is None:
             self.packageloc = self._get_package_location()
         # Get included compile versions
-        versions = os.listdir("{}{}hidden_functions".format(
-            self.packageloc, os.sep))
+        versions = os.listdir("{}{}hidden_functions".format(self.packageloc, os.sep))
         # Check if compiled_against is in this list
         if compiled_against not in versions:
-            raise Exception("The hidden functions were not compiled against"
-                            "{}. Use one of the following: {}".format(
-                                compiled_against, versions))
+            raise Exception(
+                "The hidden functions were not compiled against"
+                "{}. Use one of the following: {}".format(compiled_against, versions)
+            )
         return compiled_against
 
     def _query(self, x):
@@ -581,19 +597,23 @@ class HiddenFunction(TestFunction, ABC):
         # Feed datapoint to binary
         z = x.tolist()
         data = " ".join(map(str, z))
-        cmd = "{}{}hidden_functions{}{}{}{} {}".format(self.packageloc, os.sep,
-                                                       os.sep,
-                                                       self.compiled_against,
-                                                       os.sep, self.funcname,
-                                                       data)
+        cmd = "{}{}hidden_functions{}{}{}{} {}".format(
+            self.packageloc,
+            os.sep,
+            os.sep,
+            self.compiled_against,
+            os.sep,
+            self.funcname,
+            data,
+        )
         stream = os.popen(cmd)
         output = stream.read()
         # Check if error occured
         try:
             output = float(output)
         except ValueError:
-            if output == '':
-                output = 'Check entire traceback for error information'
+            if output == "":
+                output = "Check entire traceback for error information"
             raise Exception("Error ('{}') for input '{}'".format(output, data))
         return output
 
@@ -608,8 +628,9 @@ class HiddenFunction(TestFunction, ABC):
 
 
 class MLFunction(TestFunction, ABC):
-    """ Base class for functions that use a machine learning algorithm to
-    provide function values """
+    """Base class for functions that use a machine learning algorithm to
+    provide function values"""
+
     def __init__(self, *args, **kwargs):
         # Check if TF is installed
         try:
@@ -618,16 +639,17 @@ class MLFunction(TestFunction, ABC):
             raise ImportError(
                 "The `tensorflow` package is not installed. This is needed in "
                 "order to run `MLFunction`s. See the wiki on our GitHub "
-                "project for installation instructions.")
+                "project for installation instructions."
+            )
         # Define object properties
         self.packageloc = self._get_package_location()
         self.model = None
         # Check definitions in parent class
-        if not hasattr(self, 'modelname'):
+        if not hasattr(self, "modelname"):
             self.modelname = []
             raise Exception("MLFunction should define modelname.")
 
-        is_standardised = hasattr(self, 'x_mean') and hasattr(self, 'x_stdev')
+        is_standardised = hasattr(self, "x_mean") and hasattr(self, "x_stdev")
         if not is_standardised:
             self.x_mean, self.x_stdev = None, None
             raise Exception(
@@ -635,7 +657,7 @@ class MLFunction(TestFunction, ABC):
                 "x_min and x_max."
             )
 
-        is_standardised = hasattr(self, 'y_mean') and hasattr(self, 'y_stdev')
+        is_standardised = hasattr(self, "y_mean") and hasattr(self, "y_stdev")
         if not is_standardised:
             self.y_mean, self.y_stdev = None, None
             raise Exception(
@@ -652,9 +674,9 @@ class MLFunction(TestFunction, ABC):
 
     def _load_model(self):
         """ Load ML model from package """
-        model_path = "{}/ml_functions/{}/{}".format(self.packageloc,
-                                                    self.modelname,
-                                                    "model.hdf5")
+        model_path = "{}/ml_functions/{}/{}".format(
+            self.packageloc, self.modelname, "model.hdf5"
+        )
         self.model = load_model(model_path)
 
     def _normalise(self, x, mu, sigma):
@@ -685,6 +707,7 @@ class NoDerivativeError(NotImplementedError):
     Error indicating no derivative is known to queried testfunction. Inherits
     from NotImplementedError.
     """
+
     pass
 
 
@@ -697,6 +720,7 @@ class FunctionFeeder:
     which will then feed the functions in the container one by one to the
     code in the loop.
     """
+
     def __init__(self):
         self.reset()
 
@@ -764,36 +788,88 @@ class FunctionFeeder:
         """
         # Define functions for group
         function_names = {
-            'optimisation': [
-                'Rastrigin', 'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6',
-                'Matyas', 'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel',
-                'Sphere', 'Ackley', 'Easom', 'Linear', 'Reciprocal',
-                'Schwefel', 'GoldsteinPrice'
+            "optimisation": [
+                "Rastrigin",
+                "Rosenbrock",
+                "Beale",
+                "Booth",
+                "BukinNmbr6",
+                "Matyas",
+                "LeviNmbr13",
+                "Himmelblau",
+                "ThreeHumpCamel",
+                "Sphere",
+                "Ackley",
+                "Easom",
+                "Linear",
+                "Reciprocal",
+                "Schwefel",
+                "GoldsteinPrice",
             ],
-            'posterior': [
-                'Cosine', 'Block', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                'MultivariateNormal', 'GaussianShells', 'Linear', 'BreitWigner'
+            "posterior": [
+                "Cosine",
+                "Block",
+                "Bessel",
+                "ModifiedBessel",
+                "Eggbox",
+                "MultivariateNormal",
+                "GaussianShells",
+                "Linear",
+                "BreitWigner",
             ],
-            'with_derivative': [
-                'Rastrigin', 'Sphere', 'Cosine', 'Bessel', 'ModifiedBessel',
-                'Reciprocal', 'BreitWigner'
+            "with_derivative": [
+                "Rastrigin",
+                "Sphere",
+                "Cosine",
+                "Bessel",
+                "ModifiedBessel",
+                "Reciprocal",
+                "BreitWigner",
             ],
-            'no_derivative': [
-                'Rosenbrock', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
-                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
-                'Easom', 'Block', 'Eggbox', 'MultivariateNormal',
-                'GaussianShells', 'Linear', 'Schwefel', 'GoldsteinPrice'
+            "no_derivative": [
+                "Rosenbrock",
+                "Beale",
+                "Booth",
+                "BukinNmbr6",
+                "Matyas",
+                "LeviNmbr13",
+                "Himmelblau",
+                "ThreeHumpCamel",
+                "Ackley",
+                "Easom",
+                "Block",
+                "Eggbox",
+                "MultivariateNormal",
+                "GaussianShells",
+                "Linear",
+                "Schwefel",
+                "GoldsteinPrice",
             ],
-            'bounded': [
-                'Rastrigin', 'Beale', 'Booth', 'BukinNmbr6', 'Matyas',
-                'LeviNmbr13', 'Himmelblau', 'ThreeHumpCamel', 'Ackley',
-                'Easom', 'Bessel', 'ModifiedBessel', 'Eggbox',
-                'MultivariateNormal', 'GaussianShells', 'Linear', 'Reciprocal',
-                'BreitWigner', 'Schwefel', 'GoldsteinPrice'
+            "bounded": [
+                "Rastrigin",
+                "Beale",
+                "Booth",
+                "BukinNmbr6",
+                "Matyas",
+                "LeviNmbr13",
+                "Himmelblau",
+                "ThreeHumpCamel",
+                "Ackley",
+                "Easom",
+                "Bessel",
+                "ModifiedBessel",
+                "Eggbox",
+                "MultivariateNormal",
+                "GaussianShells",
+                "Linear",
+                "Reciprocal",
+                "BreitWigner",
+                "Schwefel",
+                "GoldsteinPrice",
             ],
-            'unbounded': ['Rosenbrock', 'Sphere', 'Block']
+            "unbounded": ["Rosenbrock", "Sphere", "Block"],
         }
-        function_names['optimization'] = function_names['optimisation']
+        function_names["optimization"] = function_names["optimisation"]
         # Check if provided function names are known
         if isinstance(group, str):
             if group not in function_names:
@@ -811,8 +887,7 @@ class FunctionFeeder:
         else:
             for groupname in group:
                 extending_with = [
-                    func for func in function_names[groupname]
-                    if func not in load
+                    func for func in function_names[groupname] if func not in load
                 ]
                 load.extend(extending_with)
         # Loop over function names and load each function
@@ -847,8 +922,10 @@ class FunctionFeeder:
             raise Exception("Function name '{}' unknown".format(functionname))
         f = globals()[functionname]()
         if not isinstance(f, TestFunction):
-            raise Exception("""Cannot load a function that is not derived from
-                               the TestFunction base class.""")
+            raise Exception(
+                """Cannot load a function that is not derived from
+                               the TestFunction base class."""
+            )
         # Configure testfunction
         if parameters is None:
             parameters = {}
@@ -872,8 +949,10 @@ class FunctionFeeder:
                 TestFunction base class.
         """
         if not isinstance(function, TestFunction):
-            raise Exception("""Cannot load a function that is not derived from
-                               the TestFunction base class.""")
+            raise Exception(
+                """Cannot load a function that is not derived from
+                               the TestFunction base class."""
+            )
         self.functions.append(function)
 
     def fix_duplicate_names(self):
@@ -885,14 +964,13 @@ class FunctionFeeder:
         corrections = {}
         # Get all duplicate names
         for func in self.functions:
-            if func.name in known_names and func.name not in corrections.keys(
-            ):
+            if func.name in known_names and func.name not in corrections.keys():
                 corrections[func.name] = 1
             known_names.append(func.name)
-        del (known_names)
+        del known_names
         # Correct duplicate names
         for i, func in enumerate(self.functions):
-            new_name = func.name + '_config' + str(corrections[func.name])
+            new_name = func.name + "_config" + str(corrections[func.name])
             corrections[func.name] += 1
             self.functions[i].name = new_name
 
@@ -908,6 +986,7 @@ class Rastrigin(TestFunction):
     Args:
         dimensionality: Number of input dimensions the function should take.
     """
+
     def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -5.12, 5.12)
         self.a = 10
@@ -924,6 +1003,88 @@ class Rastrigin(TestFunction):
         return 2 * x + 2 * np.pi * self.a * np.sin(2 * np.pi * x)
 
 
+class CMB_Likelihood(TestFunction):
+    """
+    Testfunction based on a Cosmic Microwave Background (CMB) power spectrum likelihood.
+    See https://github.com/a-e-cole/swyft-CMB/blob/main/notebooks/demo-TTTEEE.ipynb
+    or https://arxiv.org/abs/2111.08030 for more details.
+
+    Note that this likelihood depends on the external code CLASS. There is no derivative defined.
+    """
+
+    def __init__(self, **kwargs):
+        # import external code CLASS
+        self.CLASS = import_module("classy")
+        self.cosmo = self.CLASS.Class()
+        self.lmax = 2500
+        self.fsky = 0.6
+        self.ell = np.array([l for l in range(2, self.lmax + 1)])
+        self.ells = self.ell * (self.ell + 1) / (2 * np.pi)
+        here = os.path.abspath(os.path.dirname(__file__))
+        self.fpr2 = np.loadtxt(here + "/noise_fake_planck_realistic_two.dat")
+        self.Nltt = self.fpr2[self.ell - 2, 1]
+        self.Nlee = self.fpr2[self.ell - 2, 2]
+        self.pl = [0.0224, 0.12, 1.0411, 3.0753, 0.965, 0.054]
+        self.sigs = [0.00015, 0.0014, 0.00033, 0.0086, 0.0039, 0.0042]
+        self.ranges = [[p - 5 * s, p + 5 * s] for s, p in zip(self.sigs, self.pl)]
+
+        # set fiducial spectrum
+        self.fid = self._compute_spectrum(self.pl)
+
+        super(CMB_Likelihood, self).__init__(**kwargs)
+
+    def _compute_spectrum(self, params):
+        omega_b, omega_cdm, theta, lnAs, n_s, tau_reio = tuple(params)
+        A_s = np.exp(lnAs) / 1.0e10
+        params = {
+            "output": "tCl pCl lCl",
+            "l_max_scalars": self.lmax,
+            "lensing": "yes",
+            "omega_b": omega_b,
+            "omega_cdm": omega_cdm,
+            "100*theta_s": theta,
+            "A_s": A_s,
+            "n_s": n_s,
+            "tau_reio": tau_reio,
+        }
+        self.cosmo.set(params)
+        self.cosmo.compute(["lensing"])
+        # Extract observables.
+        out = self.cosmo.lensed_cl(self.lmax)
+        T = self.cosmo.T_cmb()
+        self.cosmo.struct_cleanup()
+        return dict(
+            TT=out["tt"][self.ell] * (T * 1.0e6) ** 2 + self.Nltt,
+            TE=out["te"][self.ell] * (T * 1.0e6) ** 2,
+            EE=out["ee"][self.ell] * (T * 1.0e6) ** 2 + self.Nlee,
+        )
+
+    def _lnL_from_spectra(self, spectra):
+        detTestL = spectra["TT"] * spectra["EE"] - spectra["TE"] ** 2
+        detFidL = self.fid["TT"] * self.fid["EE"] - self.fid["TE"] ** 2
+        mix = (
+            self.fid["TT"] * spectra["EE"]
+            + spectra["TT"] * self.fid["EE"]
+            - 2 * self.fid["TE"] * spectra["TE"]
+        )
+        res = np.sum(
+            self.fsky
+            * (2 * self.ell + 1)
+            * (mix / detTestL + np.log(detTestL / detFidL) - 2)
+        )
+        return -0.5 * res
+
+    def _evaluate(self, x):
+        spectra = []
+        for i in range(len(x)):
+            spectra.append(self._compute_spectrum(x[i]))
+        lnLs = np.array([self._lnL_from_spectra(s) for s in spectra])
+        return np.exp(lnLs)
+
+    def _derivative(self, x):
+        return NoDerivativeError()
+
+
 class Rosenbrock(TestFunction):
     """
     Testfunction as defined by
@@ -932,10 +1093,13 @@ class Rosenbrock(TestFunction):
     This function has a dynamic dimensionality and is its application range is
     unbounded. There is no derivative defined.
     """
+
     def __init__(self, dimensionality=2, **kwargs):
         if dimensionality < 2:
-            raise Exception("""Dimensionality of Rosenbrock function has to
-                            be >=2.""")
+            raise Exception(
+                """Dimensionality of Rosenbrock function has to
+                            be >=2."""
+            )
         self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
         super(Rosenbrock, self).__init__(**kwargs)
 
@@ -943,8 +1107,9 @@ class Rosenbrock(TestFunction):
         n = len(self.ranges)
         y = 0
         for i in range(n - 1):
-            y += (100 * np.power(x[:, i + 1] - np.power(x[:, i], 2), 2) +
-                  np.power(1 - x[:, i], 2))
+            y += 100 * np.power(x[:, i + 1] - np.power(x[:, i], 2), 2) + np.power(
+                1 - x[:, i], 2
+            )
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -959,14 +1124,17 @@ class Beale(TestFunction):
     This is a 2-dimensional function with an application range of -4.5 to 4.5
     for both dimensions. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-4.5, 4.5], [-4.5, 4.5]]
         super(Beale, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = (np.power(1.5 - x[:, 0] + x[:, 0] * x[:, 1], 2) +
-             np.power(2.25 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 2), 2) +
-             np.power(2.625 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 3), 2))
+        y = (
+            np.power(1.5 - x[:, 0] + x[:, 0] * x[:, 1], 2)
+            + np.power(2.25 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 2), 2)
+            + np.power(2.625 - x[:, 0] + x[:, 0] * np.power(x[:, 1], 3), 2)
+        )
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -981,13 +1149,15 @@ class Booth(TestFunction):
     This is a 2-dimensional function bounded by -10 and 10 for both input
     dimensions. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
         super(Booth, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         y = np.power(x[:, 0] + 2 * x[:, 1] - 7, 2) + np.power(
-            2 * x[:, 0] + x[:, 1] - 5, 2)
+            2 * x[:, 0] + x[:, 1] - 5, 2
+        )
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1003,13 +1173,15 @@ class BukinNmbr6(TestFunction):
     and -5 for the first input variable and -3 and 3 for the second input
     variable. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-15, -5], [-3, 3]]
         super(BukinNmbr6, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = 100 * np.sqrt(np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2))
-                          ) + 0.01 * np.abs(x[:, 0] + 10)
+        y = 100 * np.sqrt(
+            np.abs(x[:, 1] - 0.01 * np.power(x[:, 0], 2))
+        ) + 0.01 * np.abs(x[:, 0] + 10)
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1024,13 +1196,16 @@ class Matyas(TestFunction):
     This is a 2-dimensional function with an application range bounded by -10
     and 10 for both input variables. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
         super(Matyas, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = 0.26 * (np.power(x[:, 0], 2) +
-                    np.power(x[:, 1], 2)) - 0.48 * x[:, 0] * x[:, 1]
+        y = (
+            0.26 * (np.power(x[:, 0], 2) + np.power(x[:, 1], 2))
+            - 0.48 * x[:, 0] * x[:, 1]
+        )
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1045,16 +1220,17 @@ class LeviNmbr13(TestFunction):
     This is a 2-dimensional function with an application range boundedd by -10
     and 10 for both input variables. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-10, 10], [-10, 10]]
         super(LeviNmbr13, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = (np.power(np.sin(3 * np.pi * x[:, 0]), 2) +
-             np.power(x[:, 0] - 1, 2) *
-             (1 + np.power(np.sin(3 * np.pi * x[:, 1]), 2)) +
-             np.power(x[:, 1] - 1, 2) *
-             (1 + np.power(np.sin(2 * np.pi * x[:, 1]), 2)))
+        y = (
+            np.power(np.sin(3 * np.pi * x[:, 0]), 2)
+            + np.power(x[:, 0] - 1, 2) * (1 + np.power(np.sin(3 * np.pi * x[:, 1]), 2))
+            + np.power(x[:, 1] - 1, 2) * (1 + np.power(np.sin(2 * np.pi * x[:, 1]), 2))
+        )
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1069,14 +1245,16 @@ class Himmelblau(TestFunction):
     This is a 2-dimensional function with an application range bounded by -5
     and 5 for both input variables. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
         super(Himmelblau, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        return (np.power(np.power(x[:, 0], 2) + x[:, 1] - 11, 2) +
-                np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2)).reshape(
-                    -1, 1)
+        return (
+            np.power(np.power(x[:, 0], 2) + x[:, 1] - 11, 2)
+            + np.power(x[:, 0] + np.power(x[:, 1], 2) - 7, 2)
+        ).reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -1090,14 +1268,19 @@ class ThreeHumpCamel(TestFunction):
     This is a 2-dimensional function with an application range bounded by -5
     and 5 for both input variables. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
         super(ThreeHumpCamel, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        return (2.0 * np.power(x[:, 0], 2) - 1.05 * np.power(x[:, 0], 4) +
-                np.power(x[:, 0], 6) / 6.0 + x[:, 0] * x[:, 1] +
-                np.power(x[:, 1], 2)).reshape(-1, 1)
+        return (
+            2.0 * np.power(x[:, 0], 2)
+            - 1.05 * np.power(x[:, 0], 4)
+            + np.power(x[:, 0], 6) / 6.0
+            + x[:, 0] * x[:, 1]
+            + np.power(x[:, 1], 2)
+        ).reshape(-1, 1)
 
     def _derivative(self, x):
         raise NoDerivativeError()
@@ -1119,6 +1302,7 @@ class Sphere(TestFunction):
     initialisation of and instance of this class. For each of these dimensions
     the application range is unbounded.
     """
+
     def __init__(self, dimensionality=3, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -np.inf, np.inf)
         super(Sphere, self).__init__(**kwargs)
@@ -1127,7 +1311,7 @@ class Sphere(TestFunction):
         return np.sum(np.power(x, 2), axis=1).reshape(-1, 1)
 
     def _derivative(self, x):
-        return (2 * x)
+        return 2 * x
 
 
 class Ackley(TestFunction):
@@ -1138,14 +1322,15 @@ class Ackley(TestFunction):
     This is a 2-dimensional function with an application range bounded by -5
     and 5 for each of these dimensions. No derivative has been defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-5, 5], [-5, 5]]
         super(Ackley, self).__init__(**kwargs)
 
     def _evaluate(self, x):
         a = -20 * np.exp(
-            -0.2 * np.sqrt(0.5 *
-                           (np.power(x[:, 0], 2) + np.power(x[:, 1], 2))))
+            -0.2 * np.sqrt(0.5 * (np.power(x[:, 0], 2) + np.power(x[:, 1], 2)))
+        )
         f = np.cos(2 * np.pi * x[:, 0])
         g = np.cos(2 * np.pi * x[:, 1])
         b = -np.exp(0.5 * (f + g))
@@ -1171,15 +1356,21 @@ class Easom(TestFunction):
             range [-1 * absolute_range, absolute_range]. Is set to 100 by
             default, as is customary for this function.
     """
+
     def __init__(self, absolute_range=100, **kwargs):
-        self.ranges = [[-absolute_range, absolute_range],
-                       [-absolute_range, absolute_range]]
+        self.ranges = [
+            [-absolute_range, absolute_range],
+            [-absolute_range, absolute_range],
+        ]
         super(Easom, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = (-1 * np.cos(x[:, 0]) * np.cos(x[:, 1]) * np.exp(
-            -1 *
-            (np.power(x[:, 0] - np.pi, 2) + np.power(x[:, 1] - np.pi, 2))))
+        y = (
+            -1
+            * np.cos(x[:, 0])
+            * np.cos(x[:, 1])
+            * np.exp(-1 * (np.power(x[:, 0] - np.pi, 2) + np.power(x[:, 1] - np.pi, 2)))
+        )
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1194,6 +1385,7 @@ class Cosine(TestFunction):
 
     The ranges have been set to [-4*pi, 4*pi].
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[-4 * np.pi, 4 * np.pi]]
         super(Cosine, self).__init__(**kwargs)
@@ -1228,12 +1420,10 @@ class Block(TestFunction):
             spanned by block_size. Default: 0.
 
     """
-    def __init__(self,
-                 dimensionality=3,
-                 block_size=1,
-                 block_value=1,
-                 global_value=0,
-                 **kwargs):
+
+    def __init__(
+        self, dimensionality=3, block_size=1, block_value=1, global_value=0, **kwargs
+    ):
         self.dimensionality = dimensionality
         self.block_size = block_size
         self.block_value = block_value
@@ -1275,6 +1465,7 @@ class Bessel(TestFunction):
         fast: Boolean indicating which set of Bessel function implementations
             to use. See above for more information.
     """
+
     def __init__(self, fast=False, **kwargs):
         self.ranges = [[-100, 100]]
         self.fast = bool(fast)
@@ -1312,6 +1503,7 @@ class ModifiedBessel(TestFunction):
         fast: Boolean indicating which set of Bessel function implementations
             to use. See above for more information.
     """
+
     def __init__(self, fast=False, **kwargs):
         self.ranges = [[0, 10]]
         self.fast = bool(fast)
@@ -1338,13 +1530,13 @@ class Eggbox(TestFunction):
     This is a 2-dimensional function bounded 0 and 10*pi in each dimension. No
     derivative is defined.
     """
+
     def __init__(self, **kwargs):
         self.ranges = [[0, 10 * np.pi], [0, 10 * np.pi]]
         super(Eggbox, self).__init__(**kwargs)
 
     def _evaluate(self, x):
-        y = np.exp(
-            np.power(2 + np.cos(x[:, 0] / 2.0) * np.cos(x[:, 1] / 2.0), 5))
+        y = np.exp(np.power(2 + np.cos(x[:, 0] / 2.0) * np.cos(x[:, 1] / 2.0), 5))
         return y.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1364,6 +1556,7 @@ class MultivariateNormal(TestFunction):
             matrix to use. By default is is set to the 2-dimensional unit
             matrix, making the function 2-dimensional.
     """
+
     def __init__(self, covariance=None, **kwargs):
         if covariance is None:
             covariance = np.identity(2)
@@ -1408,14 +1601,10 @@ class GaussianShells(TestFunction):
         w_2: Standard deviation of the second gaussian shell. By default this
             value is 0.1.
     """
-    def __init__(self,
-                 c_1=[2.5, 0],
-                 r_1=2.0,
-                 w_1=0.1,
-                 c_2=[-2.5, 0],
-                 r_2=2.0,
-                 w_2=0.1,
-                 **kwargs):
+
+    def __init__(
+        self, c_1=[2.5, 0], r_1=2.0, w_1=0.1, c_2=[-2.5, 0], r_2=2.0, w_2=0.1, **kwargs
+    ):
         self.c_1 = np.array(c_1)
         self.r_1 = r_1
         self.w_1 = w_1
@@ -1426,8 +1615,9 @@ class GaussianShells(TestFunction):
         super(GaussianShells, self).__init__(**kwargs)
 
     def _shell(self, x, c, r, w):
-        return (np.exp(-1 * np.power(np.linalg.norm(x - c, axis=1) - r, 2) /
-                       (2 * w * w)) / np.sqrt(2 * np.pi * w * w))
+        return np.exp(
+            -1 * np.power(np.linalg.norm(x - c, axis=1) - r, 2) / (2 * w * w)
+        ) / np.sqrt(2 * np.pi * w * w)
 
     def _evaluate(self, x):
         shell_1 = self._shell(x, self.c_1, self.r_1, self.w_1)
@@ -1451,6 +1641,7 @@ class Linear(TestFunction):
         dimensionality: Number of dimensions for input of the function. By
             default this argument is set to 2.
     """
+
     def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -10, 10)
         super(Linear, self).__init__(**kwargs)
@@ -1475,6 +1666,7 @@ class Reciprocal(TestFunction):
         dimensionality: Number of dimensions for input of the function. By
             default this argument is set to 2.
     """
+
     def __init__(self, dimensionality=2, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, 0.001, 1)
         super(Reciprocal, self).__init__(**kwargs)
@@ -1507,6 +1699,7 @@ class BreitWigner(TestFunction):
             it corresponds to the decay width of the particle of the resonance.
             Set to 15 by default.
     """
+
     def __init__(self, m=50, width=15, **kwargs):
         self.m = m
         self.width = width
@@ -1514,20 +1707,35 @@ class BreitWigner(TestFunction):
         super(BreitWigner, self).__init__(**kwargs)
 
     def _k(self):
-        return (2 * np.sqrt(2) * self.m * self.width * self._gamma() /
-                (np.pi * np.sqrt(self.m**2 + self._gamma())))
+        return (
+            2
+            * np.sqrt(2)
+            * self.m
+            * self.width
+            * self._gamma()
+            / (np.pi * np.sqrt(self.m ** 2 + self._gamma()))
+        )
 
     def _gamma(self):
-        return np.sqrt(self.m**2 * (self.m**2 + self.width**2))
+        return np.sqrt(self.m ** 2 * (self.m ** 2 + self.width ** 2))
 
     def _evaluate(self, x):
-        return self._k() / (np.power(np.power(x, 2) - self.m**2, 2) +
-                            self.m**2 * self.width**2)
+        return self._k() / (
+            np.power(np.power(x, 2) - self.m ** 2, 2) + self.m ** 2 * self.width ** 2
+        )
 
     def _derivative(self, x):
-        return (-4 * self._k() * x * (np.power(x, 2) - self.m**2) / np.power(
-            self.width**2 * self.m**2 +
-            np.power(np.power(x, 2) - self.m**2, 2), 2))
+        return (
+            -4
+            * self._k()
+            * x
+            * (np.power(x, 2) - self.m ** 2)
+            / np.power(
+                self.width ** 2 * self.m ** 2
+                + np.power(np.power(x, 2) - self.m ** 2, 2),
+                2,
+            )
+        )
 
 
 class GoldsteinPrice(TestFunction):
@@ -1538,17 +1746,35 @@ class GoldsteinPrice(TestFunction):
     The application range of this function is -2 to 2 for both of the two input
     dimensions.
     """
+
     def __init__(self):
         self.ranges = [[-2, 2], [-2, 2]]
         super(GoldsteinPrice, self).__init__()
 
     def _evaluate(self, x):
-        z = (1 + np.power(x[:, 0] + x[:, 1] + 1, 2) *
-             (19 - 14 * x[:, 0] + 3 * x[:, 0] * x[:, 0] - 14 * x[:, 1] +
-              6 * x[:, 0] * x[:, 1] + 3 * x[:, 1] * x[:, 1])) * (
-                  30 + np.power(2 * x[:, 0] - 3 * x[:, 1], 2) *
-                  (18 - 32 * x[:, 0] + 12 * x[:, 0] * x[:, 0] + 48 * x[:, 1] -
-                   36 * x[:, 0] * x[:, 1] + 27 * x[:, 1] * x[:, 1]))
+        z = (
+            1
+            + np.power(x[:, 0] + x[:, 1] + 1, 2)
+            * (
+                19
+                - 14 * x[:, 0]
+                + 3 * x[:, 0] * x[:, 0]
+                - 14 * x[:, 1]
+                + 6 * x[:, 0] * x[:, 1]
+                + 3 * x[:, 1] * x[:, 1]
+            )
+        ) * (
+            30
+            + np.power(2 * x[:, 0] - 3 * x[:, 1], 2)
+            * (
+                18
+                - 32 * x[:, 0]
+                + 12 * x[:, 0] * x[:, 0]
+                + 48 * x[:, 1]
+                - 36 * x[:, 0] * x[:, 1]
+                + 27 * x[:, 1] * x[:, 1]
+            )
+        )
         return z.reshape(-1, 1)
 
     def _derivative(self, x):
@@ -1567,6 +1793,7 @@ class Schwefel(TestFunction):
         dimensionality: Number of dimensions for input of the function. By
             default this argument is set to 5.
     """
+
     def __init__(self, dimensionality=5):
         self.ranges = self.construct_ranges(dimensionality, -500, 500)
         super(Schwefel, self).__init__()
@@ -1590,10 +1817,11 @@ class HiddenFunction1(HiddenFunction):
         dimensionality: Number of dimensions for the input of the function. By
             default is this argument set to 2.
     """
+
     def __init__(self, dimensionality=2, *args, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -30.0, 30.0)
         super(HiddenFunction1, self).__init__(*args, **kwargs)
-        self.funcname = 'test_func_1.bin'
+        self.funcname = "test_func_1.bin"
 
 
 class HiddenFunction2(HiddenFunction):
@@ -1606,10 +1834,11 @@ class HiddenFunction2(HiddenFunction):
         dimensionality: Number of dimensions for the input of the function. By
             default is this argument set to 2.
     """
+
     def __init__(self, dimensionality=4, *args, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -7.0, 7.0)
         super(HiddenFunction2, self).__init__(*args, **kwargs)
-        self.funcname = 'test_func_2.bin'
+        self.funcname = "test_func_2.bin"
 
 
 class HiddenFunction3(HiddenFunction):
@@ -1622,10 +1851,11 @@ class HiddenFunction3(HiddenFunction):
         dimensionality: Number of dimensions for the input of the function. By
             default is this argument set to 2.
     """
+
     def __init__(self, dimensionality=6, *args, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, 0.0, 1.0)
         super(HiddenFunction3, self).__init__(*args, **kwargs)
-        self.funcname = 'test_func_3.bin'
+        self.funcname = "test_func_3.bin"
 
 
 class HiddenFunction4(HiddenFunction):
@@ -1638,25 +1868,50 @@ class HiddenFunction4(HiddenFunction):
         dimensionality: Number of dimensions for the input of the function. By
             default is this argument set to 2.
     """
+
     def __init__(self, dimensionality=16, *args, **kwargs):
         self.ranges = self.construct_ranges(dimensionality, -500.0, 500.0)
         super(HiddenFunction4, self).__init__(*args, **kwargs)
-        self.funcname = 'test_func_4.bin'
+        self.funcname = "test_func_4.bin"
 
 
 class MSSM7(MLFunction):
     def __init__(self, *args, **kwargs):
-        self.modelname = 'mssm7'
-        self.x_mean = np.array([
-            -1.65550622e+02, 6.53242357e+07, -6.04267288e+06, 1.15227686e+07,
-            -8.96546390e+02, 1.20880748e+03, 3.65456629e+01, 1.73423279e+02,
-            1.18539912e-01, 4.00306869e-01, 4.31081695e+01, 5.80441328e+01
-        ], np.float64)
-        self.x_stdev = np.array([
-            3.13242671e+03, 2.64037878e+07, 4.32735828e+06, 2.22328069e+07,
-            2.33891832e+03, 6.20060930e+03, 1.40566829e+01, 3.83628710e-01,
-            2.51362291e-04, 4.59609868e-02, 3.09244370e+00, 3.24780776e+00
-        ], np.float64)
+        self.modelname = "mssm7"
+        self.x_mean = np.array(
+            [
+                -1.65550622e02,
+                6.53242357e07,
+                -6.04267288e06,
+                1.15227686e07,
+                -8.96546390e02,
+                1.20880748e03,
+                3.65456629e01,
+                1.73423279e02,
+                1.18539912e-01,
+                4.00306869e-01,
+                4.31081695e01,
+                5.80441328e01,
+            ],
+            np.float64,
+        )
+        self.x_stdev = np.array(
+            [
+                3.13242671e03,
+                2.64037878e07,
+                4.32735828e06,
+                2.22328069e07,
+                2.33891832e03,
+                6.20060930e03,
+                1.40566829e01,
+                3.83628710e-01,
+                2.51362291e-04,
+                4.59609868e-02,
+                3.09244370e00,
+                3.24780776e00,
+            ],
+            np.float64,
+        )
         self.y_mean = -262.5887645450105
         self.y_stdev = 7.461633956842537
 
@@ -1665,14 +1920,32 @@ class MSSM7(MLFunction):
         ranges = []
 
         x_min = [
-            -7.16775760e+03, 4.27547804e+05, -9.98192815e+07, -6.81824964e+07,
-            -9.99995488e+03, -9.99999903e+03, 3.00597043e+00, 1.71060011e+02,
-            1.16700013e-01, 2.00000156e-01, 1.90001455e+01, 3.10001673e+01
+            -7.16775760e03,
+            4.27547804e05,
+            -9.98192815e07,
+            -6.81824964e07,
+            -9.99995488e03,
+            -9.99999903e03,
+            3.00597043e00,
+            1.71060011e02,
+            1.16700013e-01,
+            2.00000156e-01,
+            1.90001455e01,
+            3.10001673e01,
         ]
         x_max = [
-            7.18253463e+03, 9.99999857e+07, 4.56142832e+05, 9.99999734e+07,
-            9.99987623e+03, 9.99999881e+03, 6.99999394e+01, 1.75619963e+02,
-            1.20299997e-01, 7.99999435e-01, 6.69997800e+01, 8.49983345e+01
+            7.18253463e03,
+            9.99999857e07,
+            4.56142832e05,
+            9.99999734e07,
+            9.99987623e03,
+            9.99999881e03,
+            6.99999394e01,
+            1.75619963e02,
+            1.20299997e-01,
+            7.99999435e-01,
+            6.69997800e01,
+            8.49983345e01,
         ]
 
         for i in range(len(x_min)):
