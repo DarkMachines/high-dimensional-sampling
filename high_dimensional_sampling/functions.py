@@ -635,16 +635,14 @@ class MLFunction(TestFunction, ABC):
             self.x_mean, self.x_stdev = None, None
             raise Exception(
                 "MLFunctions should either define x_mean and x_stdev or "
-                "x_min and x_max."
-            )
+                "x_min and x_max.")
 
         is_standardised = hasattr(self, 'y_mean') and hasattr(self, 'y_stdev')
         if not is_standardised:
             self.y_mean, self.y_stdev = None, None
             raise Exception(
                 "MLFunctions should either define y_mean and y_stdev or "
-                "y_min and y_max."
-            )
+                "y_min and y_max.")
 
         super(MLFunction, self).__init__(*args, **kwargs)
 
@@ -926,6 +924,7 @@ class Rastrigin(TestFunction):
     def _derivative(self, x):
         return 2 * x + 2 * np.pi * self.a * np.sin(2 * np.pi * x)
 
+
 class CMB_Likelihood(TestFunction):
     """
     Testfunction based on a Cosmic Microwave Background (CMB) power spectrum likelihood.
@@ -934,7 +933,6 @@ class CMB_Likelihood(TestFunction):
 
     Note that this likelihood depends on the external code CLASS. There is no derivative defined.
     """
-
     def __init__(self, **kwargs):
         # import external code CLASS
         self.CLASS = import_module("classy")
@@ -944,12 +942,14 @@ class CMB_Likelihood(TestFunction):
         self.ell = np.array([l for l in range(2, self.lmax + 1)])
         self.ells = self.ell * (self.ell + 1) / (2 * np.pi)
         here = os.path.abspath(os.path.dirname(__file__))
-        self.fpr2 = np.loadtxt(here + "/data/noise_fake_planck_realistic_two.dat")
+        self.fpr2 = np.loadtxt(here +
+                               "/data/noise_fake_planck_realistic_two.dat")
         self.Nltt = self.fpr2[self.ell - 2, 1]
         self.Nlee = self.fpr2[self.ell - 2, 2]
         self.pl = [0.0224, 0.12, 1.0411, 3.0753, 0.965, 0.054]
         self.sigs = [0.00015, 0.0014, 0.00033, 0.0086, 0.0039, 0.0042]
-        self.ranges = [[p - 5 * s, p + 5 * s] for s, p in zip(self.sigs, self.pl)]
+        self.ranges = [[p - 5 * s, p + 5 * s]
+                       for s, p in zip(self.sigs, self.pl)]
 
         # set fiducial spectrum
         self.fid = self._compute_spectrum(self.pl)
@@ -977,24 +977,19 @@ class CMB_Likelihood(TestFunction):
         T = self.cosmo.T_cmb()
         self.cosmo.struct_cleanup()
         return dict(
-            TT=out["tt"][self.ell] * (T * 1.0e6) ** 2 + self.Nltt,
-            TE=out["te"][self.ell] * (T * 1.0e6) ** 2,
-            EE=out["ee"][self.ell] * (T * 1.0e6) ** 2 + self.Nlee,
+            TT=out["tt"][self.ell] * (T * 1.0e6)**2 + self.Nltt,
+            TE=out["te"][self.ell] * (T * 1.0e6)**2,
+            EE=out["ee"][self.ell] * (T * 1.0e6)**2 + self.Nlee,
         )
 
     def _lnL_from_spectra(self, spectra):
-        detTestL = spectra["TT"] * spectra["EE"] - spectra["TE"] ** 2
-        detFidL = self.fid["TT"] * self.fid["EE"] - self.fid["TE"] ** 2
-        mix = (
-            self.fid["TT"] * spectra["EE"]
-            + spectra["TT"] * self.fid["EE"]
-            - 2 * self.fid["TE"] * spectra["TE"]
-        )
-        res = np.sum(
-            self.fsky
-            * (2 * self.ell + 1)
-            * (mix / detTestL + np.log(detTestL / detFidL) - 2)
-        )
+        detTestL = spectra["TT"] * spectra["EE"] - spectra["TE"]**2
+        detFidL = self.fid["TT"] * self.fid["EE"] - self.fid["TE"]**2
+        mix = (self.fid["TT"] * spectra["EE"] +
+               spectra["TT"] * self.fid["EE"] -
+               2 * self.fid["TE"] * spectra["TE"])
+        res = np.sum(self.fsky * (2 * self.ell + 1) *
+                     (mix / detTestL + np.log(detTestL / detFidL) - 2))
         return -0.5 * res
 
     def _evaluate(self, x):
