@@ -7,6 +7,9 @@ import pandas as pd
 from scipy import special, stats
 from .utils import get_time
 
+# for clean import of cosmology code
+from importlib import import_module
+
 # To run GPU trained model with CPU device
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -632,16 +635,14 @@ class MLFunction(TestFunction, ABC):
             self.x_mean, self.x_stdev = None, None
             raise Exception(
                 "MLFunctions should either define x_mean and x_stdev or "
-                "x_min and x_max."
-            )
+                "x_min and x_max.")
 
         is_standardised = hasattr(self, 'y_mean') and hasattr(self, 'y_stdev')
         if not is_standardised:
             self.y_mean, self.y_stdev = None, None
             raise Exception(
                 "MLFunctions should either define y_mean and y_stdev or "
-                "y_min and y_max."
-            )
+                "y_min and y_max.")
 
         super(MLFunction, self).__init__(*args, **kwargs)
 
@@ -922,6 +923,84 @@ class Rastrigin(TestFunction):
 
     def _derivative(self, x):
         return 2 * x + 2 * np.pi * self.a * np.sin(2 * np.pi * x)
+
+
+class CMB_Likelihood(TestFunction):
+    """
+    Testfunction based on a Cosmic Microwave Background (CMB) power spectrum likelihood.
+    See https://github.com/a-e-cole/swyft-CMB/blob/main/notebooks/demo-TTTEEE.ipynb
+    or https://arxiv.org/abs/2111.08030 for more details.
+
+    Note that this likelihood depends on the external code CLASS. There is no derivative defined.
+    """
+    def __init__(self, **kwargs):
+        # import external code CLASS
+        self.CLASS = import_module("classy")
+        self.cosmo = self.CLASS.Class()
+        self.lmax = 2500
+        self.fsky = 0.6
+        self.ell = np.array([l for l in range(2, self.lmax + 1)])
+        self.ells = self.ell * (self.ell + 1) / (2 * np.pi)
+        here = os.path.abspath(os.path.dirname(__file__))
+        self.fpr2 = np.loadtxt(here +
+                               "/data/noise_fake_planck_realistic_two.dat")
+        self.Nltt = self.fpr2[self.ell - 2, 1]
+        self.Nlee = self.fpr2[self.ell - 2, 2]
+        self.pl = [0.0224, 0.12, 1.0411, 3.0753, 0.965, 0.054]
+        self.sigs = [0.00015, 0.0014, 0.00033, 0.0086, 0.0039, 0.0042]
+        self.ranges = [[p - 5 * s, p + 5 * s]
+                       for s, p in zip(self.sigs, self.pl)]
+
+        # set fiducial spectrum
+        self.fid = self._compute_spectrum(self.pl)
+
+        super(CMB_Likelihood, self).__init__(**kwargs)
+
+    def _compute_spectrum(self, params):
+        omega_b, omega_cdm, theta, lnAs, n_s, tau_reio = tuple(params)
+        A_s = np.exp(lnAs) / 1.0e10
+        params = {
+            "output": "tCl pCl lCl",
+            "l_max_scalars": self.lmax,
+            "lensing": "yes",
+            "omega_b": omega_b,
+            "omega_cdm": omega_cdm,
+            "100*theta_s": theta,
+            "A_s": A_s,
+            "n_s": n_s,
+            "tau_reio": tau_reio,
+        }
+        self.cosmo.set(params)
+        self.cosmo.compute(["lensing"])
+        # Extract observables.
+        out = self.cosmo.lensed_cl(self.lmax)
+        T = self.cosmo.T_cmb()
+        self.cosmo.struct_cleanup()
+        return dict(
+            TT=out["tt"][self.ell] * (T * 1.0e6)**2 + self.Nltt,
+            TE=out["te"][self.ell] * (T * 1.0e6)**2,
+            EE=out["ee"][self.ell] * (T * 1.0e6)**2 + self.Nlee,
+        )
+
+    def _lnL_from_spectra(self, spectra):
+        detTestL = spectra["TT"] * spectra["EE"] - spectra["TE"]**2
+        detFidL = self.fid["TT"] * self.fid["EE"] - self.fid["TE"]**2
+        mix = (self.fid["TT"] * spectra["EE"] +
+               spectra["TT"] * self.fid["EE"] -
+               2 * self.fid["TE"] * spectra["TE"])
+        res = np.sum(self.fsky * (2 * self.ell + 1) *
+                     (mix / detTestL + np.log(detTestL / detFidL) - 2))
+        return -0.5 * res
+
+    def _evaluate(self, x):
+        spectra = []
+        for i in range(len(x)):
+            spectra.append(self._compute_spectrum(x[i]))
+        lnLs = np.array([self._lnL_from_spectra(s) for s in spectra])
+        return np.exp(lnLs)
+
+    def _derivative(self, x):
+        return NoDerivativeError()
 
 
 class Rosenbrock(TestFunction):

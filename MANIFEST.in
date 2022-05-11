@@ -2,3 +2,4 @@ include LICENSE
 include README.rst
 include high_dimensional_sampling/hidden_functions/*/*.bin
 include high_dimensional_sampling/ml_functions/*/model.hdf5
+include high_dimensional_sampling/data/*
