@@ -944,7 +944,7 @@ class CMB_Likelihood(TestFunction):
         self.ell = np.array([l for l in range(2, self.lmax + 1)])
         self.ells = self.ell * (self.ell + 1) / (2 * np.pi)
         here = os.path.abspath(os.path.dirname(__file__))
-        self.fpr2 = np.loadtxt(here + "/noise_fake_planck_realistic_two.dat")
+        self.fpr2 = np.loadtxt(here + "/data/noise_fake_planck_realistic_two.dat")
         self.Nltt = self.fpr2[self.ell - 2, 1]
         self.Nlee = self.fpr2[self.ell - 2, 2]
         self.pl = [0.0224, 0.12, 1.0411, 3.0753, 0.965, 0.054]
