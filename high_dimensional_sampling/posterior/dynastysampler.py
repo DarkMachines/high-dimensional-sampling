@@ -6,6 +6,7 @@ Created on Thu May 12 15:40:38 2022
 @author: dm
 """
 
+import high_dimensional_sampling as hds
 
 # basic numeric setup
 import numpy as np
@@ -31,11 +32,6 @@ Dynesty usage:
     
 
 """
-
-
-import high_dimensional_sampling as hds
-import numpy as np
-
 
 class DynestySampler(hds.Procedure):
     def __init__(self, n_initial=10, n_sample=10,converge:bool=False,**kwargs):
