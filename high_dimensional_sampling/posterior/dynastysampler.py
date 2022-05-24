@@ -13,8 +13,6 @@ import numpy as np
 from numpy import linalg
 from importlib import import_module
 
-# seed the random number generator
-rstate = np.random.default_rng(5647)
 
 """
 Example of an optimisation experiment. Implemented procedure is explained at
