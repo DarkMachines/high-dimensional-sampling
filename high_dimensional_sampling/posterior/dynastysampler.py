@@ -37,7 +37,7 @@ import high_dimensional_sampling as hds
 import numpy as np
 
 
-class Dynesty(hds.Procedure):
+class DynestySampler(hds.Procedure):
     def __init__(self, n_initial=10, n_sample=10,converge:bool=False,**kwargs):
         self.store_parameters = ['n_initial', 'n_sample']
         self.n_initial = n_initial
