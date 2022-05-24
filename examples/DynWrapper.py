@@ -10,10 +10,10 @@ Created on Thu May 12 15:40:38 2022
 # basic numeric setup
 import numpy as np
 from numpy import linalg
+from importlib import import_module
 
 # seed the random number generator
 rstate = np.random.default_rng(5647)
-import dynesty
 
 """
 Example of an optimisation experiment. Implemented procedure is explained at
@@ -42,7 +42,8 @@ class Dynesty(hds.Procedure):
         self.store_parameters = ['n_initial', 'n_sample']
         self.n_initial = n_initial
         self.n_sample = n_sample
-        self.sampler = dynesty.NestedSampler(loglikelihood=self.__DefaultLogLike__,prior_transform=self.__Default_prior_transform,ndim=3)  #TBD
+        self.dynasty = import_module("dynasty")
+        self.sampler = self.dynesty.NestedSampler(loglikelihood=self.__DefaultLogLike__,prior_transform=self.__Default_prior_transform,ndim=3)  #TBD
         self.reset()
         self._rstate = np.random.default_rng(5647)
         self._res=None
@@ -93,7 +94,7 @@ class Dynesty(hds.Procedure):
         minmax=np.array(function.get_ranges(0.01))
         self.ranges=minmax[:,1]-minmax[:,0]
         self.mins=minmax[:,0]
-        command="""self.sampler = dynesty.NestedSampler(loglikelihood=function,prior_transform=self.prior_transform,ndim=function.get_dimensionality(),nlive=self.n_sample"""
+        command="""self.sampler = self.dynesty.NestedSampler(loglikelihood=function,prior_transform=self.prior_transform,ndim=function.get_dimensionality(),nlive=self.n_sample"""
         command+=self._comstring+')'
         print(command)
         exec(command)
@@ -142,7 +143,7 @@ class Dynesty(hds.Procedure):
 
     def is_finished(self):
         
-        return(self._converge and dynesty.dynamicsampler.stopping_function(self.sampler.results))
+        return(self._converge and self.dynesty.dynamicsampler.stopping_function(self.sampler.results))
         #return False
 
     def check_testfunction(self, function):
