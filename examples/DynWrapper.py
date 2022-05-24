@@ -6,18 +6,10 @@ Created on Thu May 12 15:40:38 2022
 @author: dm
 """
 
-import time, sys, os
 
 # basic numeric setup
 import numpy as np
 from numpy import linalg
-
-# inline plotting
-
-# plotting
-import matplotlib
-from matplotlib import pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 # seed the random number generator
 rstate = np.random.default_rng(5647)
