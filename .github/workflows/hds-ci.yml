@@ -50,6 +50,9 @@ jobs:
         run: |
           pip install flake8 coveralls
           pip install pyyaml matplotlib
+          pip install gpyopt
+          pip install git+https://github.com/uber-research/TuRBO.git
+          pip install git+https://github.com/bstienen/particlefilter.git
           python setup.py install
       - name: Run test scripts
         run: python setup.py test
