@@ -207,7 +207,7 @@ def test_experiment_logyaml():
     experiment.run(function)
     log = {}
     with open(path + "/gaussianshells/experiment.yaml", 'r') as stream:
-        log = yaml.load(stream)
+        log = yaml.safe_load(stream)
     assert 'experiment' in log
     assert 'type' in log['experiment']
     assert 'function' in log
@@ -329,7 +329,7 @@ def test_logger_benchmarks():
     # Read benchmarks and validate they are > 0
     benchmarks = {}
     with open(basepath + "/benchmarks.yaml", 'r') as stream:
-        benchmarks = yaml.load(stream)
+        benchmarks = yaml.safe_load(stream)
     assert 'benchmarks' in benchmarks
     assert 'matrix_inversion' in benchmarks['benchmarks']
     assert 'sha_hashing' in benchmarks['benchmarks']

@@ -23,9 +23,7 @@ OPENOPT_LOCAL_SOLVERS = [
 
 class Ampgo(hds.Procedure):
     def __init__(self, n_initial=10, n_sample=10):
-        try:
-            NLP
-        except NameError:
+        if 'NLP' not in locals():
             raise ImportError(
                 "The `openopt` package is not installed. See the wiki on our "
                 "GitHub project for installation instructions.")
