@@ -54,6 +54,7 @@ jobs:
         run: |
           pip install pyyaml matplotlib
           pip install gpyopt
+          pip install openopt
           pip install git+https://github.com/uber-research/TuRBO.git
           pip install git+https://github.com/bstienen/particlefilter.git
           python setup.py install
