@@ -46,6 +46,10 @@ jobs:
       - name: Install pip
         run: |
           python -m pip install --upgrade pip
+      - name: Get pip and python version
+        run: |
+          pip -V
+          python3 --version
       - name: Install dependencies with pip
         run: |
           pip install pyyaml matplotlib
